@@ -1,0 +1,13 @@
+[workspace]
+members = ["crates/*"]
+
+[package]
+name = "browser-sdk-generator"
+version = "0.1.0"
+edition = "2021"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+
+[dependencies]
+serde = { workspace = true }
