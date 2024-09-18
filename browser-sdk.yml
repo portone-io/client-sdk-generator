@@ -1021,14 +1021,14 @@ resources:
         예) 삼성카드에 대해 2, 3개월 무이자 할부 적용, 신한카드에 대해 2, 3, 4, 5, 6개월 무이자 할부 적용
         ```typescript
         freeInstallmentPlans: [
-        {
-          cardCompany: 'CARD_COMPANY_SAMSUNG',
-          months: [2, 3]
-        },
-        {
-          cardCompany: 'CARD_COMPANY_SHINHAN',
-          months: [2, 3, 4, 5, 6]
-        }
+         {
+           cardCompany: 'CARD_COMPANY_SAMSUNG',
+           months: [2, 3]
+         },
+         {
+           cardCompany: 'CARD_COMPANY_SHINHAN',
+           months: [2, 3, 4, 5, 6]
+         }
         ]
         ```
     Gender:
