@@ -7,7 +7,21 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace.dependencies]
+biome_diagnostics = "0.5.7"
+biome_formatter = "0.5.7"
+biome_js_factory = "0.5.7"
+biome_js_formatter = "0.5.7"
+biome_js_parser = "0.5.7"
+biome_js_syntax = "0.5.7"
+biome_rowan = "0.5.7"
+convert_case = "0.6.0"
+indoc = "2"
+pretty_assertions = "1.4.0"
+indexmap = { version = "2", features = ["serde"] }
+schemars = { version = "0.8.21", features = ["preserve_order", "indexmap2"] }
 serde = { version = "1", features = ["derive"] }
-
-[dependencies]
-serde = { workspace = true }
+serde_json = "1"
+serde_yaml = { version = "0.9" }
+browser_sdk_schema = { path = "./crates/browser_sdk_schema" }
+browser_sdk_ts_codegen = { path = "./crates/browser_sdk_ts_codegen" }
+browser_sdk_ts_codegen_macros = { path = "./crates/browser_sdk_ts_codegen_macros" }

@@ -1,0 +1,4 @@
+* text=auto eol=lf
+
+tests/__fixtures__/**/* linguist-vendored
+crates/browser_sdk_ts_codegen/templates/**/* linguist-vendored

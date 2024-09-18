@@ -1,0 +1,86 @@
+# Reference: https://github.com/biomejs/biome/blob/99ddb2d0fb7558879355d510f96b7243c769da82/.github/workflows/main.yml
+name: CI on main
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/README.md'
+
+env:
+  RUST_LOG: info
+  RUST_BACKTRACE: 1
+
+jobs:
+  format:
+    name: Format Rust Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Support longpaths
+        run: git config core.longpaths true
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: moonrepo/setup-rust@v1
+        with:
+          components: rustfmt
+          bins: taplo-cli
+      - name: Run rustfmt
+        run: |
+          cargo fmt --all --verbose -- --check
+          taplo format --check
+
+  lint:
+    name: Lint Rust Files
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Install toolchain
+      uses: moonrepo/setup-rust@v1
+      with:
+        components: clippy
+    - name: Run cargo check
+      run: cargo check --workspace --all-targets --release
+    - name: Run clippy
+      run: cargo lint
+
+  check-dependencies:
+      name: Check Dependencies
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: moonrepo/setup-rust@v1
+        with:
+          channel: nightly
+      - name: Install udeps
+        run: cargo install cargo-udeps --locked
+      - name: Run udeps
+        run: cargo +nightly udeps --all-targets
+
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - os: windows-latest
+        - os: ubuntu-latest
+        - os: macos-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Install toolchain
+      uses: moonrepo/setup-rust@v1
+      with:
+        bins: cargo-nextest
+    - name: Run tests on ${{ matrix.os }}
+      run: cargo nextest run --workspace --verbose
+    - name: Clean cache
+      run: cargo cache --autoclean

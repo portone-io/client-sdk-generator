@@ -1,0 +1,8 @@
+[alias]
+generator-cli = "run -p generator_cli --release --"
+generator-cli-dev = "run -p generator_cli --"
+format = "fmt --all --verbose"
+lint = "clippy --workspace --all-targets -- --deny warnings"
+
+[profile.release]
+lto = true
