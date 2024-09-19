@@ -1609,6 +1609,15 @@ resources:
       type: error
       transactionType: ISSUE_BILLING_KEY_AND_PAY
       properties:
+        txId:
+          type: string
+          optional: true
+        paymentId:
+          type: string
+          optional: true
+        billingKey:
+          type: string
+          optional: true
         code:
           name: IssueBillingKeyAndPayErrorCode
           type: union
@@ -1627,15 +1636,6 @@ resources:
           type: string
           optional: true
         pgMessage:
-          type: string
-          optional: true
-        txId:
-          type: string
-          optional: true
-        paymentId:
-          type: string
-          optional: true
-        billingKey:
           type: string
           optional: true
     IssueBillingKeyError:
