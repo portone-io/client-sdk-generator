@@ -1414,13 +1414,21 @@ resources:
         type: object
         properties:
           paypal_v2:
-            type: unknown
+            type: object
+            properties:
+              style:
+                type: unknown
+                optional: true
             optional: true
       LoadPaymentUIBypass:
         type: object
         properties:
           paypal_v2:
-            type: unknown
+            type: object
+            properties:
+              style:
+                type: unknown
+                optional: true
             optional: true
       PaymentBypass:
         type: object
