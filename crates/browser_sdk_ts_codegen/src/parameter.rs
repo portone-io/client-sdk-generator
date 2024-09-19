@@ -335,10 +335,7 @@ fn generate_parameter_type_properties(
             decls,
             imports,
             parameter,
-            &format!(
-                "{parent_name}{property_name}",
-                property_name = property_name.to_case(convert_case::Case::Pascal)
-            ),
+            &format!("{parent_name}{property_name}"),
             current_module_path,
             resource_base_path,
         );
@@ -357,11 +354,7 @@ fn generate_parameter_type_property(
     current_module_path: &PathBuf,
     resource_base_path: &PathBuf,
 ) -> String {
-    let parent_name = format!(
-        "{}{}",
-        parent_name,
-        property_name.to_case(convert_case::Case::Pascal)
-    );
+    let parent_name = format!("{parent_name}{property_name}");
     let member_type = generate_parameter(
         parameter,
         decls,
