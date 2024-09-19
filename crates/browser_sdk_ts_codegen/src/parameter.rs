@@ -170,7 +170,7 @@ fn generate_parameter_type(
                     current_module_path,
                     resource_base_path,
                 );
-                type_names.push(type_name);
+                type_names.push(format!("({type_name})"));
             }
             type_names.join(" | ")
         }
@@ -186,7 +186,7 @@ fn generate_parameter_type(
                     current_module_path,
                     resource_base_path,
                 );
-                type_names.push(type_name);
+                type_names.push(format!("({type_name})"));
             }
             type_names.join(" & ")
         }
@@ -209,7 +209,7 @@ fn generate_parameter_type(
                     resource_base_path,
                 );
                 let discriminated_type = format!(
-                    "{{ {discriminator}: '{variant_name}' }} & {{ {variant_name_camel}: {variant_type} }}",
+                    "({{ {discriminator}: '{variant_name}' }} & {{ {variant_name_camel}: {variant_type} }})",
                     variant_name_camel = variant_name.to_case(convert_case::Case::Camel),
                 );
                 variant_types.push(discriminated_type);
