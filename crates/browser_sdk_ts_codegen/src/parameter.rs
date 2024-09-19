@@ -56,7 +56,7 @@ pub(crate) fn generate_named_parameter(
         current_module_path,
         resource_base_path,
     );
-    let description = parameter.description().to_jsdoc();
+    let description = parameter.description().to_jsdoc(parameter.deprecated());
 
     match parameter.r#type() {
         schema::ParameterType::Error { .. } => (),
@@ -363,7 +363,7 @@ fn generate_parameter_type_property(
         current_module_path,
         resource_base_path,
     );
-    let description = parameter.description().to_jsdoc();
+    let description = parameter.description().to_jsdoc(parameter.deprecated());
     let optional_marker = if parameter.optional() { "?" } else { "" };
     format!("{description}{property_name}{optional_marker}: {member_type}")
 }
@@ -382,7 +382,7 @@ fn generate_const_enum_declaration(
             variants
                 .iter()
                 .fold(String::new(), |mut output, (variant_name, variant)| {
-                    let description = variant.description.to_jsdoc();
+                    let description = variant.description.to_jsdoc(false);
                     let value_prefix = value_prefix
                         .as_ref()
                         .map_or_else(String::new, |p| format!("{}_", p));
@@ -393,7 +393,7 @@ fn generate_const_enum_declaration(
                     .unwrap();
                     output
                 });
-        let description = description.to_jsdoc();
+        let description = description.to_jsdoc(false);
         Some(ts_parse!(
             "{description}const {name} = {{{variants}}} as const" as JsVariableDeclaration
         ))
@@ -424,6 +424,7 @@ mod tests {
                 schema::ParameterType::Integer,
                 false,
                 None,
+                false,
             ),
         );
 
@@ -464,6 +465,7 @@ mod tests {
             schema::ParameterType::String,
             true,
             None,
+            false,
         );
 
         let type_def = generate_unnamed_parameter(
@@ -487,6 +489,7 @@ mod tests {
                 schema::ParameterType::Integer,
                 false,
                 None,
+                false,
             ))),
         };
 
@@ -515,6 +518,7 @@ mod tests {
                     schema::ParameterType::Integer,
                     false,
                     None,
+                    false,
                 ),
             )),
         );
@@ -527,6 +531,7 @@ mod tests {
                     schema::ParameterType::String,
                     false,
                     None,
+                    false,
                 ),
             )),
         );
@@ -623,7 +628,13 @@ mod tests {
         let type_def = generate_parameter(
             &schema::Parameter::Named(NamedParameter::new(
                 "UserRole".to_string(),
-                UnnamedParameter::new(Some("User role".to_string()), enum_param, false, None),
+                UnnamedParameter::new(
+                    Some("User role".to_string()),
+                    enum_param,
+                    false,
+                    None,
+                    false,
+                ),
             )),
             &mut decls,
             &mut IndexSet::new(),
@@ -693,6 +704,7 @@ mod tests {
                 },
                 false,
                 None,
+                false,
             )),
         );
 
@@ -705,6 +717,7 @@ mod tests {
                 },
                 false,
                 None,
+                false,
             )),
         );
 
@@ -749,6 +762,7 @@ mod tests {
                     },
                     false,
                     None,
+                    false,
                 )),
                 schema::Parameter::Unnamed(schema::UnnamedParameter::new(
                     Some("Type B".to_string()),
@@ -757,6 +771,7 @@ mod tests {
                     },
                     false,
                     None,
+                    false,
                 )),
             ],
         };
@@ -792,6 +807,7 @@ mod tests {
                                 schema::ParameterType::Integer,
                                 false,
                                 None,
+                                false,
                             )),
                         );
                         props
@@ -799,6 +815,7 @@ mod tests {
                 },
                 false,
                 None,
+                false,
             )),
         );
 
@@ -816,6 +833,7 @@ mod tests {
                                 schema::ParameterType::Integer,
                                 false,
                                 None,
+                                false,
                             )),
                         );
                         props.insert(
@@ -825,6 +843,7 @@ mod tests {
                                 schema::ParameterType::Integer,
                                 false,
                                 None,
+                                false,
                             )),
                         );
                         props
@@ -832,6 +851,7 @@ mod tests {
                 },
                 false,
                 None,
+                false,
             )),
         );
 

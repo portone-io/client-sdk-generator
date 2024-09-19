@@ -33,6 +33,7 @@ pub trait ParameterExt {
     fn r#type(&self) -> &ParameterType;
     fn optional(&self) -> bool;
     fn pg_specific(&self) -> Option<&IndexMap<String, ParameterType>>;
+    fn deprecated(&self) -> bool;
 }
 
 impl ParameterExt for Parameter {
@@ -70,6 +71,13 @@ impl ParameterExt for Parameter {
             Parameter::Unnamed(parameter) => parameter.pg_specific.as_ref(),
         }
     }
+
+    fn deprecated(&self) -> bool {
+        match self {
+            Parameter::Named(named) => named.parameter.deprecated,
+            Parameter::Unnamed(parameter) => parameter.deprecated,
+        }
+    }
 }
 
 impl ParameterExt for NamedParameter {
@@ -92,6 +100,10 @@ impl ParameterExt for NamedParameter {
     fn pg_specific(&self) -> Option<&IndexMap<String, ParameterType>> {
         self.parameter.pg_specific.as_ref()
     }
+
+    fn deprecated(&self) -> bool {
+        self.parameter.deprecated
+    }
 }
 
 impl ParameterExt for UnnamedParameter {
@@ -113,6 +125,10 @@ impl ParameterExt for UnnamedParameter {
 
     fn pg_specific(&self) -> Option<&IndexMap<String, ParameterType>> {
         self.pg_specific.as_ref()
+    }
+
+    fn deprecated(&self) -> bool {
+        self.deprecated
     }
 }
 
@@ -151,6 +167,9 @@ pub struct UnnamedParameter {
     optional: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pg_specific: Option<IndexMap<String, ParameterType>>,
+    /// Deprecated 여부
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    deprecated: bool,
 }
 
 impl UnnamedParameter {
@@ -159,12 +178,14 @@ impl UnnamedParameter {
         r#type: ParameterType,
         optional: bool,
         pg_specific: Option<IndexMap<String, ParameterType>>,
+        deprecated: bool,
     ) -> Self {
         Self {
             description,
             r#type,
             optional,
             pg_specific,
+            deprecated,
         }
     }
 }
@@ -345,6 +366,7 @@ mod tests {
                                 r#type: ParameterType::String,
                                 optional: false,
                                 pg_specific: None,
+                                deprecated: false,
                             }),
                         );
                         properties.insert(
@@ -354,6 +376,7 @@ mod tests {
                                 r#type: ParameterType::Integer,
                                 optional: true,
                                 pg_specific: None,
+                                deprecated: false,
                             }),
                         );
                         properties
@@ -361,6 +384,7 @@ mod tests {
                 },
                 optional: false,
                 pg_specific: None,
+                deprecated: false,
             }),
         );
         parameters.insert(
@@ -394,6 +418,7 @@ mod tests {
                 },
                 optional: false,
                 pg_specific: None,
+                deprecated: false,
             }),
         );
         parameters.insert(
@@ -408,6 +433,7 @@ mod tests {
                 },
                 optional: false,
                 pg_specific: None,
+                deprecated: false,
             }),
         );
         parameters.insert(
@@ -417,6 +443,7 @@ mod tests {
                 r#type: ParameterType::Boolean,
                 optional: false,
                 pg_specific: None,
+                deprecated: false,
             }),
         );
         parameters.insert(
@@ -428,6 +455,7 @@ mod tests {
                 }),
                 optional: false,
                 pg_specific: None,
+                deprecated: false,
             }),
         );
 

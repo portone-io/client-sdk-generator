@@ -1203,6 +1203,7 @@ resources:
         결제 수단
     PgProvider:
       type: enum
+      deprecated: true
       value_prefix: PG_PROVIDER
       variants:
         HTML5_INICIS: {}
@@ -1250,6 +1251,11 @@ resources:
         HYPHEN: {}
       description: |
         PG사
+    isTestChannel:
+      type: boolean
+      deprecated: true
+      description: |
+        테스트 채널 여부
     Product:
       type: object
       properties:
@@ -1768,9 +1774,8 @@ resources:
             PG사 식별자
         isTestChannel:
           optional: true
-          type: boolean
-          description: |
-            채널 테스트 모드 여부
+          type: resourceRef
+          $ref: "#/resources/entity/isTestChannel"
         billingKeyMethod:
           type: resourceRef
           $ref: "#/resources/entity/BillingKeyMethod"
@@ -1859,9 +1864,8 @@ resources:
           $ref: "#/resources/entity/PgProvider"
         isTestChannel:
           optional: true
-          type: boolean
-          description: |
-            테스트 채널 여부
+          type: resourceRef
+          $ref: "#/resources/entity/isTestChannel"
         taxFreeAmount:
           optional: true
           type: integer
@@ -1974,9 +1978,8 @@ resources:
           $ref: "#/resources/entity/PgProvider"
         isTestChannel:
           optional: true
-          type: boolean
-          description: |
-            테스트 채널 여부
+          type: resourceRef
+          $ref: "#/resources/entity/isTestChannel"
         customer:
           optional: true
           type: resourceRef
@@ -2024,9 +2027,8 @@ resources:
               $ref: "#/resources/entity/PgProvider"
             isTestChannel:
               optional: true
-              type: boolean
-              description: |
-                채널 테스트 모드 여부
+              type: resourceRef
+              $ref: "#/resources/entity/isTestChannel"
             billingKeyMethod:
               type: resourceRef
               $ref: "#/resources/entity/BillingKeyMethod"
@@ -2153,9 +2155,8 @@ resources:
               $ref: "#/resources/entity/PgProvider"
             isTestChannel:
               optional: true
-              type: boolean
-              description: |
-                테스트 채널 여부
+              type: resourceRef
+              $ref: "#/resources/entity/isTestChannel"
             taxFreeAmount:
               optional: true
               type: integer
@@ -2276,9 +2277,8 @@ resources:
               $ref: "#/resources/entity/PgProvider"
             isTestChannel:
               optional: true
-              type: boolean
-              description: |
-                테스트 채널 여부
+              type: resourceRef
+              $ref: "#/resources/entity/isTestChannel"
             channelGroupId:
               optional: true
               type: string

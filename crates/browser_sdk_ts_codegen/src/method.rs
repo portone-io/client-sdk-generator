@@ -66,7 +66,7 @@ pub fn generate_method_module(
         None => "void".to_string(),
     };
 
-    let description = method.description.to_jsdoc();
+    let description = method.description.to_jsdoc(false);
     let func = match callbacks {
         Some(callbacks) => ts_parse!(
             r#"
@@ -128,7 +128,7 @@ pub(crate) fn generate_callbacks(
                 callbacks
                     .iter()
                     .fold(String::new(), |mut output, (callback_name, callback)| {
-                        let description = callback.description.to_jsdoc();
+                        let description = callback.description.to_jsdoc(false);
                         let callback = callback.input.iter().fold(
                             String::new(),
                             |mut acc, (parameter_name, parameter)| {

@@ -415,6 +415,10 @@
           "additionalProperties": {
             "$ref": "#/definitions/ParameterType"
           }
+        },
+        "deprecated": {
+          "description": "Deprecated 여부",
+          "type": "boolean"
         }
       }
     },
@@ -1092,6 +1096,10 @@
           "additionalProperties": {
             "$ref": "#/definitions/ParameterType"
           }
+        },
+        "deprecated": {
+          "description": "Deprecated 여부",
+          "type": "boolean"
         }
       }
     },
