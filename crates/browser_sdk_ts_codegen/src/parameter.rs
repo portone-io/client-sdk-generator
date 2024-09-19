@@ -769,7 +769,7 @@ mod tests {
             &PathBuf::new(),
             &PathBuf::new(),
         );
-        assert_eq!(type_def, "'A' | 'B'");
+        assert_eq!(type_def, "('A') | ('B')");
     }
 
     #[test]
@@ -853,12 +853,12 @@ mod tests {
         assert_eq!(
             type_def,
             indoc! {r#"
-                { type: 'Circle' } & { circle: {
+                ({ type: 'Circle' } & { circle: {
                 /**
                 * Radius of the circle
                 */
                 radius: number
-                } } | { type: 'Rectangle' } & { rectangle: {
+                } }) | ({ type: 'Rectangle' } & { rectangle: {
                 /**
                 * Width of the rectangle
                 */
@@ -868,7 +868,7 @@ mod tests {
                 * Height of the rectangle
                 */
                 height: number
-                } }"#
+                } })"#
             }
         );
     }
