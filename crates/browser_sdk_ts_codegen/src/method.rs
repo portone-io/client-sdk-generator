@@ -93,11 +93,6 @@ pub fn generate_method_module(
         ),
     };
 
-    let re_exports = imports[1..]
-        .iter()
-        .map(|entry| ts_parse!("export type {{ {} }}" as JsExport, entry.type_name,))
-        .collect::<Vec<_>>();
-
     let imports = generate_import_statements(&imports, &current_module_path)
         .into_iter()
         .map(AnyJsModuleItem::from)
@@ -111,7 +106,6 @@ pub fn generate_method_module(
                 .map(AnyJsModuleItem::from),
         )
         .chain(std::iter::once(AnyJsModuleItem::from(js_export!(func))))
-        .chain(re_exports.into_iter().map(AnyJsModuleItem::from))
         .collect::<Vec<_>>();
 
     let module_items = make::js_module_item_list(module_items);

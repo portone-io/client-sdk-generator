@@ -47,32 +47,30 @@ pub fn generate_resource_module(
             }
 
             // Generate index.ts for the current directory
-            if !resource_name.is_empty() {
-                let mut index_ts_content = generate_index_ts(&submodule_names, &subdirectories);
-                if resource_name == "exception" {
-                    index_ts_content = print::print_node(
-                        &ts_parse!(
-                            r#"
-                            export interface PortOneError extends Error {{
-                                __portOneErrorType: string
-                            }}
-    
-                            export function isPortOneError(error: unknown): error is PortOneError {{
-                                return (
-                                    error != null &&
-                                    typeof error === 'object' &&
-                                    '__portOneErrorType' in error &&
-                                    typeof error.__portOneErrorType === 'string'
-                                )
-                            }}
-                            
-                            {index_ts_content}"# as JsModule
-                        )
-                        .into(),
-                    );
-                }
-                fs::write(current_path.join("index.ts"), index_ts_content).unwrap();
+            let mut index_ts_content = generate_index_ts(&submodule_names, &subdirectories);
+            if resource_name == "exception" {
+                index_ts_content = print::print_node(
+                    &ts_parse!(
+                        r#"
+                        export interface PortOneError extends Error {{
+                            __portOneErrorType: string
+                        }}
+
+                        export function isPortOneError(error: unknown): error is PortOneError {{
+                            return (
+                                error != null &&
+                                typeof error === 'object' &&
+                                '__portOneErrorType' in error &&
+                                typeof error.__portOneErrorType === 'string'
+                            )
+                        }}
+                        
+                        {index_ts_content}"# as JsModule
+                    )
+                    .into(),
+                );
             }
+            fs::write(current_path.join("index.ts"), index_ts_content).unwrap();
         }
         schema::Resource::Parameter(parameter) => {
             let current_module_path = path.join(format!("{}.ts", resource_name));
@@ -122,20 +120,17 @@ pub fn generate_resource_module(
     };
 }
 
-fn generate_index_ts(submodule_names: &[String], subdirectories: &[String]) -> String {
+pub(crate) fn generate_index_ts(submodule_names: &[String], subdirectories: &[String]) -> String {
     let mut exports = Vec::new();
 
     // Export modules (e.g., export * from './foo';)
     for module_name in submodule_names {
-        exports.push(format!("export * from './{}.js';", module_name));
+        exports.push(format!("export * from './{module_name}.js';"));
     }
 
     // Export subdirectories as namespaces (e.g., export * as b from './b';)
     for dir_name in subdirectories {
-        exports.push(format!(
-            "export * as {} from './{}/index.js';",
-            dir_name, dir_name
-        ));
+        exports.push(format!("export * from './{dir_name}/index.js';"));
     }
 
     exports.join("\n")

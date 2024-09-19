@@ -243,7 +243,7 @@ fn generate_parameter_type(
             imports.insert(ImportEntry {
                 type_name: "PortOneError".to_string(),
                 path: type_path.clone(),
-                is_type_only: true,
+                is_type_only: false,
                 alias: None,
             });
             imports.insert(ImportEntry {

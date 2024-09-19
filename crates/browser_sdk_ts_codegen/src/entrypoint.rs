@@ -31,11 +31,11 @@ pub fn generate_entrypoint_module(path: &PathBuf, methods: &IndexMap<String, sch
     )
     .to_string();
 
-    let exports = methods.keys().fold(String::new(), |mut acc, method_name| {
+    let method_exports = methods.keys().fold(String::new(), |mut acc, method_name| {
         acc.push_str(&ts_parse!("export * from './{method_name}.js';" as JsExport).to_string());
         acc
     });
-
+    let index_ts = fs::read_to_string(&current_module_path).unwrap();
     let module = ts_parse!(
         r#"
         {imports}
@@ -44,11 +44,12 @@ pub fn generate_entrypoint_module(path: &PathBuf, methods: &IndexMap<String, sch
         
         export {{ setPortOneJsSdkUrl as __INTERNAL__setPortOneSdkUrl }} from './loader.js'
 
-        {exports}
+        {method_exports}
+
+        {index_ts}
 
         export * as Entity from './entity/index.js';
         export * as errors from './exception/index.js';
-        export * from './exception/index.js';
 
         export default PortOne;
         "# as JsModule,
