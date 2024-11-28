@@ -1958,6 +1958,11 @@ resources:
             배송지 주소
           type: resourceRef
           $ref: "#/resources/entity/Address"
+        promotionGroupId:
+          optional: true
+          type: string
+          description: |
+            프로모션 그룹 ID
     IdentityVerificationRequest:
       type: object
       properties:
@@ -2562,17 +2567,27 @@ resources:
         billingKey:
           type: string
           description: |
-            포트가 채번하는 고유 빌링키
+            빌링 결제를 일으킬 때 사용하는 포트원 빌링키
         code:
           type: string
           description: |
-            프로세스가 실패한 경우 실패 코드
+            실패한 경우 오류 코드
           optional: true
         message:
           type: string
           description: |
-            프로세스가 실패한 경우 실패 메시지
+            실패한 경우 오류 메시지
           optional: true
+        pgCode:
+          type: string
+          optional: true
+          description: |
+            PG사에서 오류 코드를 내려 주는 경우 그 오류 코드
+        pgMessage:
+          type: string
+          optional: true
+          description: |
+            PG사에서 오류 메시지를 내려 주는 경우 그 오류 메시지
     PaymentResponse:
       type: object
       description: |
@@ -2588,22 +2603,31 @@ resources:
         txId:
           type: string
           description: |
-            포트가 채번하는 트랜잭션 고유 ID
+            포트원이 채번하는 결재 시도 고유 번호
         paymentId:
           type: string
-          optional: true
           description: |
-            가맹점이 채번하는 주문 고유 ID
+            결제 요청에 전달된 결제 ID
         code:
           type: string
           description: |
-            프로세스가 실패한 경우 실패 코드
+            실패한 경우 오류 코드
           optional: true
         message:
           type: string
           description: |
-            프로세스가 실패한 경우 실패 메시지
+            실패한 경우 오류 메시지
           optional: true
+        pgCode:
+          type: string
+          optional: true
+          description: |
+            PG사에서 오류 코드를 내려 주는 경우 그 오류 코드
+        pgMessage:
+          type: string
+          optional: true
+          description: |
+            PG사에서 오류 메시지를 내려 주는 경우 그 오류 메시지
     IssueBillingKeyAndPayResponse:
       type: object
       properties:
@@ -2616,20 +2640,32 @@ resources:
           type: string
         paymentId:
           type: string
+          description: |
+            결제 요청에 전달된 결제 ID
         billingKey:
           type: string
           description: |
-            포트가 채번하는 고유 빌링키
+            빌링 결제를 일으킬 때 사용하는 포트원 빌링키
         code:
           type: string
           optional: true
           description: |
-            프로세스가 실패한 경우 실패 코드
+            실패한 경우 오류 코드
         message:
           type: string
           optional: true
           description: |
-            프로세스가 실패한 경우 실패 메시지
+            실패한 경우 오류 메시지
+        pgCode:
+          type: string
+          optional: true
+          description: |
+            PG사에서 오류 코드를 내려 주는 경우 그 오류 코드
+        pgMessage:
+          type: string
+          optional: true
+          description: |
+            PG사에서 오류 메시지를 내려 주는 경우 그 오류 메시지
       description: |
         iframe/popup 방식으로 PG사 창이 렌더링 된 경우
 
@@ -2644,23 +2680,32 @@ resources:
             `IDENTITY_VERIFICATION`
         identityVerificationId:
           type: string
-          optional: true
           description: |
-            가맹점이 채번하는 본인인증 건에 대한 고유 ID
+            본인인증 요청에 전달된 본인인증 ID
         identityVerificationTxId:
           type: string
           description: |
-            포트가 채번하는 트랜잭션 고유 ID
+            포트원이 채번하는 본인인증 시도 고유 번호
         code:
           type: string
           optional: true
           description: |
-            프로세스가 실패한 경우 실패 코드
+            실패한 경우 오류 코드
         message:
           type: string
           optional: true
           description: |
-            프로세스가 실패한 경우 실패 메시지
+            실패한 경우 오류 메시지
+        pgCode:
+          type: string
+          optional: true
+          description: |
+            PG사에서 오류 코드를 내려 주는 경우 그 오류 코드
+        pgMessage:
+          type: string
+          optional: true
+          description: |
+            PG사에서 오류 메시지를 내려 주는 경우 그 오류 메시지
       description: |
         iframe/popup 방식으로 PG사 창이 렌더링 된 경우
 
