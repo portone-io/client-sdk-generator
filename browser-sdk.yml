@@ -32,55 +32,105 @@ resources:
             **주, 도, 시**
     Bank:
       type: enum
+      description: |
+        계좌이체, 가상계좌 발급시 사용되는 은행 코드
       variants:
-        BANK_OF_KOREA: {}
-        KOREA_DEVELOPMENT_BANK: {}
-        INDUSTRIAL_BANK_OF_KOREA: {}
-        KOOKMIN_BANK: {}
-        SUHYUP_BANK: {}
-        EXPORT_IMPORT_BANK_OF_KOREA: {}
-        NH_NONGHYUP_BANK: {}
-        LOCAL_NONGHYUP: {}
-        WOORI_BANK: {}
-        SC_BANK_KOREA: {}
-        CITI_BANK_KOREA: {}
-        DAEGU_BANK: {}
-        BUSAN_BANK: {}
-        GWANGJU_BANK: {}
-        JEJU_BANK: {}
-        JEONBUK_BANK: {}
-        KYONGNAM_BANK: {}
-        KFCC: {}
-        SHINHYUP: {}
-        SAVINGS_BANK_KOREA: {}
-        MORGAN_STANLEY_BANK: {}
-        HSBC_BANK: {}
-        DEUTSCHE_BANK: {}
-        JP_MORGAN_CHASE_BANK: {}
-        MIZUHO_BANK: {}
-        MUFG_BANK: {}
-        BANK_OF_AMERICA_BANK: {}
-        BNP_PARIBAS_BANK: {}
-        ICBC: {}
-        BANK_OF_CHINA: {}
-        NATIONAL_FORESTRY_COOPERATIVE_FEDERATION: {}
-        UNITED_OVERSEAS_BANK: {}
-        BANK_OF_COMMUNICATIONS: {}
-        CHINA_CONSTRUCTION_BANK: {}
-        EPOST: {}
-        KODIT: {}
-        KIBO: {}
-        HANA_BANK: {}
-        SHINHAN_BANK: {}
-        K_BANK: {}
-        KAKAO_BANK: {}
-        TOSS_BANK: {}
-        KCIS: {}
-        DAISHIN_SAVINGS_BANK: {}
-        SBI_SAVINGS_BANK: {}
-        HK_SAVINGS_BANK: {}
-        WELCOME_SAVINGS_BANK: {}
-        SHINHAN_SAVINGS_BANK: {}
+        BANK_OF_KOREA:
+          description: 한국은행
+        KOREA_DEVELOPMENT_BANK:
+          description: 산업은행
+        INDUSTRIAL_BANK_OF_KOREA:
+          description: 기업은행
+        KOOKMIN_BANK:
+          description: 국민은행
+        SUHYUP_BANK:
+          description: 수협은행
+        EXPORT_IMPORT_BANK_OF_KOREA:
+          description: 수출입은행
+        NH_NONGHYUP_BANK:
+          description: NH농협은행
+        LOCAL_NONGHYUP:
+          description: 지역농․축협
+        WOORI_BANK:
+          description: 우리은행
+        SC_BANK_KOREA:
+          description: SC제일은행
+        CITI_BANK_KOREA:
+          description: 한국씨티은행
+        DAEGU_BANK:
+          description: 대구은행
+        BUSAN_BANK:
+          description: 부산은행
+        GWANGJU_BANK:
+          description: 광주은행
+        JEJU_BANK:
+          description: 제주은행
+        JEONBUK_BANK:
+          description: 전북은행
+        KYONGNAM_BANK:
+          description: 경남은행
+        KFCC:
+          description: 새마을금고
+        SHINHYUP:
+          description: 신협
+        SAVINGS_BANK_KOREA:
+          description: 저축은행
+        MORGAN_STANLEY_BANK:
+          description: 모건스탠리은행
+        HSBC_BANK:
+          description: HSBC은행
+        DEUTSCHE_BANK:
+          description: 도이치은행
+        JP_MORGAN_CHASE_BANK:
+          description: 제이피모간체이스은행
+        MIZUHO_BANK:
+          description: 미즈호은행
+        MUFG_BANK:
+          description: 엠유에프지은행
+        BANK_OF_AMERICA_BANK:
+          description: BOA은행
+        BNP_PARIBAS_BANK:
+          description: 비엔피파리바은행
+        ICBC:
+          description: 중국공상은행
+        BANK_OF_CHINA:
+          description: 중국은행
+        NATIONAL_FORESTRY_COOPERATIVE_FEDERATION:
+          description: 산림조합중앙회
+        UNITED_OVERSEAS_BANK:
+          description: 대화은행
+        BANK_OF_COMMUNICATIONS:
+          description: 교통은행
+        CHINA_CONSTRUCTION_BANK:
+          description: 중국건설은행
+        EPOST:
+          description: 우체국
+        KODIT:
+          description: 신용보증기금
+        KIBO:
+          description: 기술보증기금
+        HANA_BANK:
+          description: 하나은행
+        SHINHAN_BANK:
+          description: 신한은행
+        K_BANK:
+          description: 케이뱅크
+        KAKAO_BANK:
+          description: 카카오뱅크
+        TOSS_BANK:
+          description: 토스뱅크
+        KCIS:
+          description: 한국신용정보원
+        DAISHIN_SAVINGS_BANK:
+          description: 대신저축은행
+        SBI_SAVINGS_BANK:
+          description: 에스비아이저축은행
+        HK_SAVINGS_BANK:
+          description: 에이치케이저축은행
+        WELCOME_SAVINGS_BANK:
+          description: 웰컴저축은행
+        SHINHAN_SAVINGS_BANK:
+          description: 신한저축은행
         KYOBO_SECURITIES:
           description: 교보증권
         DAISHIN_SECURITIES:
@@ -135,8 +185,6 @@ resources:
           description: 이베스트증권
         CAPE_INVESTMENT_CERTIFICATE:
           description: 케이프투자증권
-      description: |
-        계좌이체, 가상계좌 발급시 사용되는 은행 코드
       value_prefix: BANK
     BillingKeyAndPayMethod:
       type: enum
@@ -160,6 +208,8 @@ resources:
         빌링키 발급 수단
     CardCompany:
       type: enum
+      description: |
+        카드 결제시 사용되는 카드사 코드
       variants:
         KOREA_DEVELOPMENT_BANK: {}
         KFCC: {}
@@ -184,11 +234,11 @@ resources:
         K_BANK: {}
         TOSS_BANK: {}
         MIRAE_ASSET_SECURITIES: {}
-      description: |
-        카드 결제시 사용되는 카드사 코드
       value_prefix: CARD_COMPANY
     Carrier:
       type: enum
+      description: |
+        통신사 코드
       variants:
         SKT:
           description: SK 텔레콤
@@ -203,17 +253,18 @@ resources:
         SK7:
           description: SK 세븐 모바일
       value_prefix: CARRIER
-      description: |
-        통신사 코드
     CashReceiptType:
       type: enum
-      variants:
-        PERSONAL: {}
-        CORPORATE: {}
-        ANONYMOUS: {}
-      value_prefix: CASH_RECEIPT_TYPE
       description: |
-        **결제 > 현금성 결제시 사용되는 현금영수증 발행 용도**
+        **결제창에서 발급 가능한 현금영수증 발급 유형(소득공제용, 지출증빙용, 미발행)**
+      variants:
+        PERSONAL:
+          description: 개인소득공제용
+        CORPORATE:
+          description: 사업자지출증빙용
+        ANONYMOUS:
+          description: 미발행(국세청번호 자동발급)
+      value_prefix: CASH_RECEIPT_TYPE
     Country:
       type: enum
       description: |
@@ -1007,6 +1058,8 @@ resources:
         간편결제 결제수단
     EasyPayProvider:
       type: enum
+      description: |
+        간편 결제 수단
       variants:
         PAYCO: {}
         SAMSUNGPAY: {}
@@ -1023,25 +1076,14 @@ resources:
         SKPAY: {}
         TOSS_BRANDPAY: {}
         HYPHEN: {}
-      description: |
-        간편 결제 유형
       value_prefix: EASY_PAY_PROVIDER
     FreeInstallmentPlan:
       type: object
-      properties:
-        cardCompany:
-          type: resourceRef
-          $ref: "#/resources/entity/CardCompany"
-          description: |
-            카드사 코드
-        months:
-          type: array
-          items:
-            type: integer
-          description: |
-            무이자 할부 개월수 리스트
       description: |
-        **상점 부담 무이자 할부 옵션**
+        **무이자 할부 설정**
+
+        고객사가 부담하는 무이자 할부 설정입니다.
+
         예) 삼성카드에 대해 2, 3개월 무이자 할부 적용, 신한카드에 대해 2, 3, 4, 5, 6개월 무이자 할부 적용
         ```typescript
         freeInstallmentPlans: [
@@ -1055,6 +1097,18 @@ resources:
          }
         ]
         ```
+      properties:
+        cardCompany:
+          type: resourceRef
+          $ref: "#/resources/entity/CardCompany"
+          description: |
+            **무이자 할부를 제공하는 카드사 식별 값**
+        months:
+          type: array
+          items:
+            type: integer
+          description: |
+            **무이자 할부를 제공하는 개월 수**
     Gender:
       type: enum
       variants:
@@ -1066,17 +1120,22 @@ resources:
       value_prefix: GENDER
     GiftCertificateType:
       type: enum
-      variants:
-        BOOKNLIFE: {}
-        SMART_MUNSANG: {}
-        CULTURELAND: {}
-        HAPPYMONEY: {}
-        CULTURE_GIFT: {}
       description: |
-        상품권 유형
+        **상품권 결제시, 상품권을 특정할 수 있는 값**
+      variants:
+        BOOKNLIFE:
+          description: 도서문화상품권
+        SMART_MUNSANG:
+          description: 스마트문상, (구)게임문화상품권
+        CULTURELAND:
+          description: 컬쳐랜드 문화상품권
+        CULTURE_GIFT:
+          description: 문화상품권
       value_prefix: GIFT_CERTIFICATE_TYPE
     Installment:
       type: object
+      description: |
+        **할부 설정**
       properties:
         freeInstallmentPlans:
           type: array
@@ -1084,37 +1143,49 @@ resources:
           items:
             type: resourceRef
             $ref: "#/resources/entity/FreeInstallmentPlan"
-          description: 상점 부담 무이자 할부
         monthOption:
           type: oneOf
-          optional: true
-          properties:
-            fixedMonth:
-              type: integer
-              optional: true
-            availableMonthList:
-              type: array
-              optional: true
-              items:
-                type: integer
           description: |
-            **할부 개월수 옵션**
-            - fixedMonth: 고정 할부 개월수
-            - availableMonthList: 렌더링을 허용 할 할부 개월수 리스트
+            **할부 개월 수 설정**
 
-            예1) 3개월 고정 할부 개월수
+            할부 결제 시 할부 개월 수를 설정할 수 있습니다.
+
+            `fixedMonth`와 `availableMonthList` 중 하나만 제공해주세요.
+
+            - fixedMonth: 고정 할부 개월 수
+            - availableMonthList: 렌더링을 허용 할 할부 개월 수 리스트
+
+            예1) 3개월 고정 할부 개월 수
             ```js
             monthOption: {
              fixedMonth: 3
             }
             ```
 
-            예2) 2, 3, 4, 5, 6개월 리스트 할부 개월수
+            예2) 2, 3, 4, 5, 6개월 리스트 할부 개월 수
             ```js
             monthOption: {
              availableMonthList: [2, 3, 4, 5, 6]
             }
             ```
+          optional: true
+          properties:
+            fixedMonth:
+              type: integer
+              description: |
+                **구매자가 선택할 수 없도록 고정된 할부 개월수**
+
+                구매자가 할부 개월 수를 선택할 수 있도록 하려면 `availableMonthList`를 사용해주세요.
+              optional: true
+            availableMonthList:
+              type: array
+              description: |
+                **구매자가 선택할 수 있는 할부 개월수 리스트**
+
+                구매자가 할부 개월 수를 선택할 수 없도록 하려면 `fixedMonth`를 사용해주세요.
+              optional: true
+              items:
+                type: integer
     IssueBillingKeyUIType:
       type: enum
       variants:
@@ -1153,25 +1224,19 @@ resources:
                   type: string
                   description: |
                     **시작 시점**
-
-                    ISO8601 형식으로 입력해주세요.
             - type: object
               properties:
                 to:
                   type: string
                   description: |
                     **종료 지점**
-
-                    ISO8601 형식으로 입력해주세요.
         interval:
           type: string
           optional: true
           description: |
             **제공 주기**
 
-            `${number}${unit}` 형태로 입력할 수 있습니다.
-            - number: 숫자
-            - unit: `d`, `m`, `y`
+            제공 주기 (`${number}d | ${number}m | ${number}y` 형태로 입력할 수 있습니다.)
       description: |
         **서비스 제공 기간**
 
@@ -1362,9 +1427,9 @@ resources:
           description: 디지털
       value_prefix: PRODUCT_TYPE
       description: |
-        **상품 유형. 대개 휴대폰 소액결제시 필수 입력으로 사용 됨**
-        - REAL: 실물
-        - DIGITAL: 컨텐츠
+        **상품 유형**
+
+        `"PRODUCT_TYPE_REAL"`, `"PRODUCT_TYPE_DIGITAL"` 중 하나의 값을 입력해주세요.
     StoreDetails:
       type: object
       properties:
@@ -3730,6 +3795,10 @@ resources:
               optional: true
               type: resourceRef
               $ref: "#/resources/entity/bypass/PaymentBypass"
+            country:
+              optional: true
+              type: resourceRef
+              $ref: "#/resources/entity/Country"
             productType:
               optional: true
               type: resourceRef
@@ -3742,10 +3811,6 @@ resources:
               optional: true
               type: resourceRef
               $ref: "#/resources/entity/StoreDetails"
-            country:
-              optional: true
-              type: resourceRef
-              $ref: "#/resources/entity/Country"
             shippingAddress:
               optional: true
               description: |
@@ -3762,29 +3827,45 @@ resources:
           types:
             CARD:
               type: object
+              description: |
+                **카드 정보**
+
+                카드 결제 시, 카드 결제에 대한 세부 정보
               properties:
                 cardCompany:
                   type: resourceRef
                   optional: true
+                  description: |
+                    **카드사 다이렉트 호출 시 필요한 카드사 식별 값**
                   $ref: "#/resources/entity/CardCompany"
-                installment:
-                  optional: true
-                  type: resourceRef
-                  $ref: "#/resources/entity/Installment"
-                useCardPoint:
-                  optional: true
-                  type: boolean
-                useAppCardOnly:
-                  optional: true
-                  type: boolean
                 availableCards:
                   optional: true
+                  description: |
+                    **일부 카드사만 노출 설정**
+
+                    일부 카드사만을 선택 가능하게 하고 싶은 경우 사용하는 옵션입니다.
                   type: array
                   items:
                     type: resourceRef
                     $ref: "#/resources/entity/CardCompany"
                 useFreeInterestFromMall:
                   optional: true
+                  description: |
+                    **상점분담 무이자 활성화 여부**
+                  type: boolean
+                installment:
+                  optional: true
+                  type: resourceRef
+                  $ref: "#/resources/entity/Installment"
+                useCardPoint:
+                  optional: true
+                  description: |
+                    **카드사 포인트 사용 여부**
+                  type: boolean
+                useAppCardOnly:
+                  optional: true
+                  description: |
+                    **앱 카드만 허용할지 여부**
                   type: boolean
                 useInstallment:
                   optional: true
@@ -3793,6 +3874,10 @@ resources:
                     할부 사용 가능 여부
             VIRTUAL_ACCOUNT:
               type: object
+              description: |
+                **가상계좌 정보**
+
+                가상계좌 발급시 가상계좌 상세 옵션
               properties:
                 cashReceiptType:
                   optional: true
@@ -3802,37 +3887,62 @@ resources:
                   optional: true
                   type: string
                   description: |
-                    현금영수증 발행 대상 식별 정보
-                accountExpiry:
-                  optional: true
-                  type: oneOf
-                  properties:
-                    validHours:
-                      type: integer
-                    dueDate:
-                      type: string
-                bankCode:
-                  optional: true
-                  type: resourceRef
-                  $ref: "#/resources/entity/Bank"
-                availableBanks:
-                  optional: true
-                  type: array
-                  items:
-                    type: resourceRef
-                    $ref: "#/resources/entity/Bank"
+                    **현금영수증 발행 대상 식별 정보**
                 fixedOption:
-                  optional: true
                   type: oneOf
+                  description: |
+                    **고정식 가상계좌 설정**
+                  optional: true
                   properties:
                     pgAccountId:
                       type: string
+                      description: |
+                        PG사로부터 사전에 가상계좌에 대한 ID를 발급받아 사용하는 경우의 가상계좌 ID
                     accountNumber:
                       type: string
+                      description: |
+                        고정식으로 사용할 가상계좌 번호
+                bankCode:
+                  type: resourceRef
+                  optional: true
+                  $ref: "#/resources/entity/Bank"
+                accountExpiry:
+                  type: oneOf
                   description: |
-                    가상계좌 타입 - 값을 비울 경우 회전식, 채울 경우 고정식 (account id 매핑 타입 / 계좌번호 선발급 타입)
+                    **가상계좌 입금 만료기한**
+
+                    `validHours`와 `dueDate` 중 하나만 입력해주세요.
+                  optional: true
+                  properties:
+                    validHours:
+                      type: integer
+                      description: |
+                        **가상계좌 입금 유효 시간**
+
+                        예) 3을 전달하면 지금으로부터 3시간 후가 만료 기한으로 지정 됨
+                    dueDate:
+                      type: string
+                      description: |
+                        **가상계좌 입금 유효 시각**
+
+                        - YYYYMMDD
+                        - YYYYMMDDHHmmss
+                        - YYYY-MM-DD
+                        - YYYY-MM-DD HH:mm:ss
+                availableBanks:
+                  type: array
+                  description: |
+                    **(KCP V2 전용) 가상계좌 은행 선택 가능 목록**
+                  optional: true
+                  items:
+                    type: resourceRef
+                    $ref: "#/resources/entity/Bank"
             TRANSFER:
               type: object
+              description: |
+                **계좌이체 정보**
+
+                계좌이체 결제시 계좌이체 상세 옵션
               properties:
                 cashReceiptType:
                   optional: true
@@ -3842,26 +3952,40 @@ resources:
                   optional: true
                   type: string
                   description: |
-                    현금영수증 발행 대상 식별 정보
+                    **현금영수증 발행 대상 식별 정보**
                 bankCode:
                   optional: true
                   type: resourceRef
                   $ref: "#/resources/entity/Bank"
             MOBILE:
               type: object
+              description: |
+                **휴대폰 소액결제 정보**
+
+                휴대폰 소액결제시 휴대폰 소액결제 상세 옵션
               properties:
                 carrier:
                   type: resourceRef
+                  description: |
+                    **휴대폰 소액결제 통신사 바로 호출을 위한 통신사 구분 값**
                   optional: true
                   $ref: "#/resources/entity/Carrier"
                 avaliableCarriers:
                   type: array
+                  description: |
+                    **일부 통신사만 노출 설정**
+
+                    일부 통신사만을 선택 가능하게 하고 싶은 경우 사용하는 옵션입니다.
                   optional: true
                   items:
                     type: resourceRef
                     $ref: "#/resources/entity/Carrier"
             GIFT_CERTIFICATE:
               type: object
+              description: |
+                **상품권 정보**
+
+                상품권 결제시 상품권 결제 상세 옵션
               properties:
                 giftCertificateType:
                   type: resourceRef
@@ -3874,19 +3998,25 @@ resources:
                   optional: true
                   type: resourceRef
                   $ref: "#/resources/entity/EasyPayProvider"
-                installment:
+                useFreeInterestFromMall:
                   optional: true
-                  type: resourceRef
-                  $ref: "#/resources/entity/Installment"
+                  description: |
+                    **상점분담 무이자 활성화 여부**
+                  type: boolean
                 availableCards:
                   optional: true
+                  description: |
+                    **일부 카드사만 노출 설정**
+
+                    일부 카드사만을 선택 가능하게 하고 싶은 경우 사용하는 옵션입니다.
                   type: array
                   items:
                     type: resourceRef
                     $ref: "#/resources/entity/CardCompany"
-                useFreeInterestFromMall:
+                installment:
                   optional: true
-                  type: boolean
+                  type: resourceRef
+                  $ref: "#/resources/entity/Installment"
                 cashReceiptType:
                   optional: true
                   type: resourceRef
