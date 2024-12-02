@@ -88,6 +88,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "better_scoped_tls"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50fd297a11c709be8348aec039c8b91de16075d2b2bdaee1bd562c0875993664"
+dependencies = [
+ "scoped-tls",
+]
+
+[[package]]
 name = "biome_console"
 version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -403,6 +412,7 @@ version = "0.1.0"
 name = "browser_sdk_schema"
 version = "0.1.0"
 dependencies = [
+ "better_scoped_tls",
  "indexmap 2.4.0",
  "pretty_assertions",
  "schemars",
@@ -581,6 +591,7 @@ checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 name = "generator_cli"
 version = "0.1.0"
 dependencies = [
+ "better_scoped_tls",
  "browser_sdk_schema",
  "browser_sdk_ts_codegen",
  "clap",
@@ -876,6 +887,12 @@ dependencies = [
  "serde_derive_internals",
  "syn 2.0.75",
 ]
+
+[[package]]
+name = "scoped-tls"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1cf6437eb19a8f4a6cc0f7dca544973b0b78843adbfeb3683d1a94a0024a294"
 
 [[package]]
 name = "scopeguard"

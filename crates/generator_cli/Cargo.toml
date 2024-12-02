@@ -8,6 +8,7 @@ name = "generator-cli"
 path = "src/main.rs"
 
 [dependencies]
+better_scoped_tls = { workspace = true }
 browser_sdk_schema = { workspace = true }
 browser_sdk_ts_codegen = { workspace = true }
 clap = { version = "4.5.16", features = ["derive"] }

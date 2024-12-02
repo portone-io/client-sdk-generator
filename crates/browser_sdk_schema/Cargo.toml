@@ -8,6 +8,7 @@ name = "generate_schema"
 path = "bin/generate_schema.rs"
 
 [dependencies]
+better_scoped_tls = { workspace = true }
 indexmap = { workspace = true }
 pretty_assertions = { workspace = true }
 schemars = { workspace = true }

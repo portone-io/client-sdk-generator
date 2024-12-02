@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use browser_sdk_schema::Schema;
+use browser_sdk_schema::{Schema, RESOURCE_INDEX};
 use browser_sdk_ts_codegen::{
     entrypoint::generate_entrypoint_module, generate_resource_module, loader::generate_loader,
     method::generate_method_modules,
@@ -48,10 +48,13 @@ fn main() {
                 Generator::TypeScript => {
                     println!("Generating TypeScript code");
                     let schema: Schema = load_schema(&args.schema);
-                    generate_resource_module(&out_dir, "", &schema.resources, &out_dir);
-                    generate_method_modules(&out_dir, &schema.methods);
-                    generate_loader(&out_dir, &schema.methods);
-                    generate_entrypoint_module(&out_dir, &schema.methods);
+                    let resource_index = schema.build_resource_index();
+                    RESOURCE_INDEX.set(&resource_index, || {
+                        generate_resource_module(&out_dir, "", &schema.resources, &out_dir);
+                        generate_method_modules(&out_dir, &schema.methods);
+                        generate_loader(&out_dir, &schema.methods);
+                        generate_entrypoint_module(&out_dir, &schema.methods);
+                    });
                 }
             }
         }

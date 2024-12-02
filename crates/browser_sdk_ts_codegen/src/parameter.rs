@@ -2,7 +2,7 @@ use std::fmt::Write;
 use std::path::PathBuf;
 
 use biome_js_syntax::{AnyJsDeclaration, JsVariableDeclaration};
-use browser_sdk_schema::{self as schema, ParameterExt};
+use browser_sdk_schema::{self as schema, ParameterExt, RESOURCE_INDEX};
 use browser_sdk_ts_codegen_macros::ts_parse;
 use convert_case::Casing;
 use indexmap::{IndexMap, IndexSet};
@@ -47,7 +47,7 @@ pub(crate) fn generate_named_parameter(
     current_module_path: &PathBuf,
     resource_base_path: &PathBuf,
 ) -> String {
-    let type_name = parameter.name();
+    let type_name = parameter.name().unwrap_or_default();
     let type_def = generate_unnamed_parameter(
         &parameter.parameter,
         decls,
@@ -219,7 +219,12 @@ fn generate_parameter_type(
         schema::ParameterType::ResourceRef(resource) => {
             // 참조된 리소스의 타입 이름과 경로를 추출
             let resource_ref = resource.resource_ref();
-            let type_name = resource_ref.split('/').last().unwrap().to_string();
+            let type_name = RESOURCE_INDEX.with(|resource_index| {
+                match resource_index.get(resource_ref).map(|r| r.name()) {
+                    Some(Some(name)) => return name.to_string(),
+                    _ => resource_ref.split('/').last().unwrap().to_string(),
+                }
+            });
 
             // 참조된 타입의 파일 경로 계산
             let type_path = resource_ref_to_path(resource_ref, resource_base_path);

@@ -2,6 +2,8 @@ use indexmap::IndexMap;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+better_scoped_tls::scoped_tls!(pub static RESOURCE_INDEX: IndexMap<String, Parameter>);
+
 #[derive(Serialize, Deserialize, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Schema {
@@ -11,6 +13,37 @@ pub struct Schema {
     pub resources: Resource,
     /// 메소드 목록
     pub methods: IndexMap<String, Method>,
+}
+
+impl Schema {
+    pub fn build_resource_index(&self) -> IndexMap<String, Parameter> {
+        let mut index = IndexMap::new();
+        self.collect_resources("", &self.resources, &mut index);
+        index
+    }
+
+    fn collect_resources(
+        &self,
+        path: &str,
+        resource: &Resource,
+        index: &mut IndexMap<String, Parameter>,
+    ) {
+        match resource {
+            Resource::SubResources(sub_resources) => {
+                for (name, sub_resource) in sub_resources {
+                    let new_path = if path.is_empty() {
+                        name.clone()
+                    } else {
+                        format!("{}/{}", path, name)
+                    };
+                    self.collect_resources(&new_path, sub_resource, index);
+                }
+            }
+            Resource::Parameter(parameter) => {
+                index.insert(path.to_string(), parameter.clone());
+            }
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
@@ -28,7 +61,7 @@ pub struct PgProvider {
 }
 
 pub trait ParameterExt {
-    fn name(&self) -> &str;
+    fn name(&self) -> Option<&str>;
     fn description(&self) -> Option<&str>;
     fn r#type(&self) -> &ParameterType;
     fn optional(&self) -> bool;
@@ -37,10 +70,10 @@ pub trait ParameterExt {
 }
 
 impl ParameterExt for Parameter {
-    fn name(&self) -> &str {
+    fn name(&self) -> Option<&str> {
         match self {
-            Parameter::Named(named) => &named.name,
-            Parameter::Unnamed(_) => "",
+            Parameter::Named(named) => Some(&named.name),
+            Parameter::Unnamed(_) => None,
         }
     }
 
@@ -81,8 +114,8 @@ impl ParameterExt for Parameter {
 }
 
 impl ParameterExt for NamedParameter {
-    fn name(&self) -> &str {
-        &self.name
+    fn name(&self) -> Option<&str> {
+        Some(&self.name)
     }
 
     fn description(&self) -> Option<&str> {
@@ -107,8 +140,8 @@ impl ParameterExt for NamedParameter {
 }
 
 impl ParameterExt for UnnamedParameter {
-    fn name(&self) -> &str {
-        ""
+    fn name(&self) -> Option<&str> {
+        None
     }
 
     fn description(&self) -> Option<&str> {
