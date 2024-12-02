@@ -211,8 +211,9 @@ fn generate_parameter_type(
                     resource_base_path,
                 );
                 let discriminated_type = format!(
-                    "({{ {discriminator}: '{variant_name}' }} & {{ {variant_name_camel}: {variant_type} }})",
+                    "({{ {discriminator}: '{variant_name}' }} & {{ {variant_description}{variant_name_camel}: {variant_type} }})",
                     variant_name_camel = variant_name.to_case(convert_case::Case::Camel),
+                    variant_description = variant_param.description().to_jsdoc(false),
                 );
                 variant_types.push(discriminated_type);
             }
