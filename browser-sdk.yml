@@ -1377,12 +1377,82 @@ resources:
         - `pgProvider` 파라미터가 없는 경우에 필수로 존재해야 합니다. 두 파라미터가 모두 존재하는 경우 `channelKey`를 적용하니 둘 중 하나만 제공해주세요.
       type: string
     bypass:
+      identityVerification:
+        Danal:
+          type: object
+          name: DanalIdentityVerificationBypass
+          properties:
+            CPTITLE:
+              type: string
+              optional: true
+              description: |
+                가맹점 서비스 URL 혹은 본인확인 기능 사용 경로
+                본인확인 기능을 앱에서만 사용하는 경우 서비스 홈 URL 입력. Ex) www.MarketA.co.kr
+                본인확인 기능을 사용하는 웹 페이지가 존재할 경우 해당 URL 입력. Ex) m.login.MarketC.co.kr
+                웹 서비스 URL 자체가 존재하지 않는 경우 서비스 이름 (app 이름) 입력. Ex) 마켓A
+
+                해당 값을 넘기지 않을 경우 '포트원'으로 default 값 채움
+            AGELIMIT:
+              type: integer
+              optional: true
+              description: |
+                본인인증을 진행할 수 있는 최소나이
+            IsCarrier:
+              type: string
+              optional: true
+              description: |
+                통신사 정보. 인증 화면에서 해당 통신사만 활성화시킴
+                가능한 값: 'SKT', 'KTF', 'LGT', 'MVNO'
+                여러 개의 통신사를 활성화시키려면 위 값들을 semicolon(;) 으로 이어야 함.
+                ex) 'SKT;KTF'
+        InicisUnified:
+          type: object
+          name: InicisUnifiedIdentityVerificationBypass
+          properties:
+            flgFixedUser:
+              type: string
+              description: |
+                인증 대상 정보를 미리 지정할지 여부
+                - `Y`: 미리 지정
+                - `N`: 미리 지정하지 않음
+            DI_CODE:
+              type: string
+              optional: true
+              description: |
+                DI를 생성할 때 사용할 salt
+            logoUrl:
+              type: string
+              optional: true
+              description: |
+                인증 화면 좌측 상단에, PG사 로고 대신 표시할 로고의 URL
+            directAgency:
+              type: enum
+              name: InicisUnifiedIdentityVerificationDirectAgency
+              optional: true
+              description: |
+                인증 업체를 미리 선택할 경우, 인증 업체 코드
+              variants:
+                PAYCO: {}
+                PASS: {}
+                TOSS: {}
+                KFTC: {}
+                KAKAO: {}
+                NAVER: {}
+                SAMSUNG: {}
+                SHINHAN: {}
+                KB: {}
+                HANA: {}
+                WOORI: {}
+                NH: {}
+                KAKAOBANK: {}
+                SMS: {}
       IdentityVerificationBypass:
         type: object
         properties:
           danel:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/identityVerification/Danal"
           inicisUnified:
             type: unknown
             optional: true
