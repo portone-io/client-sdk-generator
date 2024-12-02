@@ -1520,6 +1520,18 @@ resources:
 
         콘솔에서 채널 연동 시 생성된 채널 키입니다.
       type: string
+    PgCode:
+      type: string
+      description: |
+        **PG 오류 코드**
+
+        - PG에서 오류 코드를 내려 주는 경우 이 오류 코드를 그대로 반환합니다.
+    PgMessage:
+      type: string
+      description: |
+        **PG 오류 메시지**
+
+        - PG에서 오류 메시지를 내려 주는 경우 이 오류 메시지를 그대로 반환합니다.
     bypass:
       identityVerification:
         Danal:
@@ -2978,6 +2990,10 @@ resources:
         code:
           name: IdentityVerificationErrorCode
           type: union
+          description: |
+            **오류 코드**
+
+            - 실패한 경우 오류 코드입니다.
           types:
             - type: resourceRef
               $ref: "#/resources/exception/CheckoutServiceErrorCode"
@@ -2987,6 +3003,10 @@ resources:
               $ref: "#/resources/exception/TxServiceIdentityVerificationErrorCode"
         message:
           type: string
+          description: |
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
         identityVerificationId:
           type: string
           optional: true
@@ -2994,11 +3014,13 @@ resources:
           type: string
           optional: true
         pgCode:
-          type: string
+          type: resourceRef
           optional: true
+          $ref: "#/resources/entity/PgCode"
         pgMessage:
-          type: string
+          type: resourceRef
           optional: true
+          $ref: "#/resources/entity/PgMessage"
     IssueBillingKeyAndPayError:
       type: error
       transactionType: ISSUE_BILLING_KEY_AND_PAY
@@ -3015,6 +3037,10 @@ resources:
         code:
           name: IssueBillingKeyAndPayErrorCode
           type: union
+          description: |
+            **오류 코드**
+
+            - 실패한 경우 오류 코드입니다.
           types:
             - type: resourceRef
               $ref: "#/resources/exception/CheckoutServiceErrorCode"
@@ -3026,12 +3052,18 @@ resources:
               $ref: "#/resources/exception/TxServicePayErrorCode"
         message:
           type: string
+          description: |
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
         pgCode:
-          type: string
+          type: resourceRef
           optional: true
+          $ref: "#/resources/entity/PgCode"
         pgMessage:
-          type: string
+          type: resourceRef
           optional: true
+          $ref: "#/resources/entity/PgMessage"
     IssueBillingKeyError:
       type: error
       transactionType: ISSUE_BILLING_KEY
@@ -3039,6 +3071,10 @@ resources:
         code:
           name: IssueBillingKeyErrorCode
           type: union
+          description: |
+            **오류 코드**
+
+            - 실패한 경우 오류 코드입니다.
           types:
             - type: resourceRef
               $ref: "#/resources/exception/CheckoutServiceErrorCode"
@@ -3048,21 +3084,29 @@ resources:
               $ref: "#/resources/exception/TxServiceIssueErrorCode"
         message:
           type: string
+          description: |
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
         billingKey:
           type: string
           optional: true
         pgCode:
-          type: string
+          type: resourceRef
           optional: true
+          $ref: "#/resources/entity/PgCode"
         pgMessage:
-          type: string
+          type: resourceRef
           optional: true
+          $ref: "#/resources/entity/PgMessage"
     ModuleError:
       type: error
       properties:
         code:
           name: ModuleErrorCode
           type: union
+          description: |
+            **오류 코드**
           types:
             - type: resourceRef
               $ref: "#/resources/exception/CheckoutServiceErrorCode"
@@ -3070,6 +3114,10 @@ resources:
               $ref: "#/resources/exception/GrpcErrorCode"
         message:
           type: string
+          description: |
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
     PaymentError:
       type: error
       transactionType: PAYMENT
@@ -3077,6 +3125,10 @@ resources:
         code:
           name: PaymentErrorCode
           type: union
+          description: |
+            **오류 코드**
+
+            - 실패한 경우 오류 코드입니다.
           types:
             - type: resourceRef
               $ref: "#/resources/exception/CheckoutServiceErrorCode"
@@ -3086,6 +3138,10 @@ resources:
               $ref: "#/resources/exception/TxServicePayErrorCode"
         message:
           type: string
+          description: |
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
         txId:
           type: string
           optional: true
@@ -3093,11 +3149,13 @@ resources:
           type: string
           optional: true
         pgCode:
-          type: string
+          type: resourceRef
           optional: true
+          $ref: "#/resources/entity/PgCode"
         pgMessage:
-          type: string
+          type: resourceRef
           optional: true
+          $ref: "#/resources/entity/PgMessage"
     LoadIssueBillingKeyUIError:
       type: error
       transactionType: ISSUE_BILLING_KEY
@@ -3105,6 +3163,10 @@ resources:
         code:
           name: LoadIssueBillingKeyUIErrorCode
           type: union
+          description: |
+            **오류 코드**
+
+            - 실패한 경우 오류 코드입니다.
           types:
             - type: resourceRef
               $ref: "#/resources/exception/CheckoutServiceErrorCode"
@@ -3114,6 +3176,10 @@ resources:
               $ref: "#/resources/exception/TxServiceIssueErrorCode"
         message:
           type: string
+          description: |
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
     LoadPaymentUIError:
       type: error
       transactionType: PAYMENT
@@ -3121,6 +3187,10 @@ resources:
         code:
           name: LoadPaymentUIErrorCode
           type: union
+          description: |
+            **오류 코드**
+
+            - 실패한 경우 오류 코드입니다.
           types:
             - type: resourceRef
               $ref: "#/resources/exception/CheckoutServiceErrorCode"
@@ -3130,6 +3200,10 @@ resources:
               $ref: "#/resources/exception/TxServicePayErrorCode"
         message:
           type: string
+          description: |
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
   request:
     LoadIssueBillingKeyUIRequest:
       type: object
@@ -4068,23 +4142,25 @@ resources:
         code:
           type: string
           description: |
-            실패한 경우 오류 코드
+            **오류 코드**
+
+            - 실패한 경우 오류 코드입니다.
           optional: true
         message:
           type: string
           description: |
-            실패한 경우 오류 메시지
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
           optional: true
         pgCode:
-          type: string
+          type: resourceRef
           optional: true
-          description: |
-            PG사에서 오류 코드를 내려 주는 경우 그 오류 코드
+          $ref: "#/resources/entity/PgCode"
         pgMessage:
-          type: string
+          type: resourceRef
           optional: true
-          description: |
-            PG사에서 오류 메시지를 내려 주는 경우 그 오류 메시지
+          $ref: "#/resources/entity/PgMessage"
     PaymentResponse:
       type: object
       description: |
@@ -4096,35 +4172,43 @@ resources:
           type: resourceRef
           $ref: "#/resources/entity/TransactionType"
           description: |
-            `PAYMENT`
+            **트랜잭션 유형**
+
+            - 일반결제의 경우 무조건 `PAYMENT`로 전달됩니다.
         txId:
           type: string
           description: |
-            포트원이 채번하는 결재 시도 고유 번호
+            **결제 시도 고유 번호**
+
+            - 포트원에서 채번하는 결제 시도 고유 번호입니다.
         paymentId:
           type: string
           description: |
-            결제 요청에 전달된 결제 ID
+            **결제 ID**
+
+            - 결제 요청에 전달된 결제 ID입니다.
         code:
           type: string
           description: |
-            실패한 경우 오류 코드
+            **오류 코드**
+
+            - 실패한 경우 오류 코드입니다.
           optional: true
         message:
           type: string
           description: |
-            실패한 경우 오류 메시지
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
           optional: true
         pgCode:
-          type: string
+          type: resourceRef
           optional: true
-          description: |
-            PG사에서 오류 코드를 내려 주는 경우 그 오류 코드
+          $ref: "#/resources/entity/PgCode"
         pgMessage:
-          type: string
+          type: resourceRef
           optional: true
-          description: |
-            PG사에서 오류 메시지를 내려 주는 경우 그 오류 메시지
+          $ref: "#/resources/entity/PgMessage"
     IssueBillingKeyAndPayResponse:
       type: object
       properties:
@@ -4147,22 +4231,24 @@ resources:
           type: string
           optional: true
           description: |
-            실패한 경우 오류 코드
+            **오류 코드**
+
+            - 실패한 경우 오류 코드입니다.
         message:
           type: string
           optional: true
           description: |
-            실패한 경우 오류 메시지
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
         pgCode:
-          type: string
+          type: resourceRef
           optional: true
-          description: |
-            PG사에서 오류 코드를 내려 주는 경우 그 오류 코드
+          $ref: "#/resources/entity/PgCode"
         pgMessage:
-          type: string
+          type: resourceRef
           optional: true
-          description: |
-            PG사에서 오류 메시지를 내려 주는 경우 그 오류 메시지
+          $ref: "#/resources/entity/PgMessage"
       description: |
         iframe/popup 방식으로 PG사 창이 렌더링 된 경우
 
@@ -4187,22 +4273,24 @@ resources:
           type: string
           optional: true
           description: |
-            실패한 경우 오류 코드
+            **오류 코드**
+
+            - 실패한 경우 오류 코드입니다.
         message:
           type: string
           optional: true
           description: |
-            실패한 경우 오류 메시지
+            **오류 메시지**
+
+            - 실패한 경우 오류 메시지입니다.
         pgCode:
-          type: string
+          type: resourceRef
           optional: true
-          description: |
-            PG사에서 오류 코드를 내려 주는 경우 그 오류 코드
+          $ref: "#/resources/entity/PgCode"
         pgMessage:
-          type: string
+          type: resourceRef
           optional: true
-          description: |
-            PG사에서 오류 메시지를 내려 주는 경우 그 오류 메시지
+          $ref: "#/resources/entity/PgMessage"
       description: |
         iframe/popup 방식으로 PG사 창이 렌더링 된 경우
 
@@ -4219,6 +4307,7 @@ methods:
   requestIdentityVerification:
     description: |
       **본인인증 요청**
+
       - 가맹점으로부터 본인인증 창 호출 시도시, 전달 받은 본인인증 정보에 알맞은 본인인증 창을 렌더링 시킨다
     input:
       type: resourceRef
