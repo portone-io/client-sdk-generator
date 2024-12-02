@@ -671,17 +671,17 @@ mod tests {
                     /**
                     * Administrator
                     */
-                    Admin: 'Admin',
+                    'Admin': 'Admin',
 
                     /**
                     * Regular user
                     */
-                    User: 'User',
+                    'User': 'User',
 
                     /**
                     * Guest user
                     */
-                    Guest: 'Guest',
+                    'Guest': 'Guest',
                     } as const"#
                 }
             );
@@ -695,7 +695,7 @@ mod tests {
                     /**
                     * User role
                     */
-                    type UserRole = typeof UserRole[keyof typeof UserRole];"#
+                    type UserRole = (typeof UserRole[keyof typeof UserRole] | string & {});"#
                 }
             );
         } else {
