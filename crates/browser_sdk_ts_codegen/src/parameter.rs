@@ -79,9 +79,11 @@ pub(crate) fn generate_unnamed_parameter(
     current_module_path: &PathBuf,
     resource_base_path: &PathBuf,
 ) -> String {
-    if let Some(const_decl) =
-        generate_const_enum_declaration(parent_name, parameter.description(), parameter.r#type())
-    {
+    if let Some(const_decl) = generate_const_enum_declaration(
+        parent_name,
+        parameter.description().as_deref(),
+        parameter.r#type(),
+    ) {
         decls.push(const_decl.into());
     }
     let mut type_def = generate_parameter_type(

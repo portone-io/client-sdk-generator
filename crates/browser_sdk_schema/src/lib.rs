@@ -62,7 +62,7 @@ pub struct PgProvider {
 
 pub trait ParameterExt {
     fn name(&self) -> Option<&str>;
-    fn description(&self) -> Option<&str>;
+    fn description(&self) -> Option<String>;
     fn r#type(&self) -> &ParameterType;
     fn optional(&self) -> bool;
     fn pg_specific(&self) -> Option<&IndexMap<String, ParameterType>>;
@@ -77,10 +77,10 @@ impl ParameterExt for Parameter {
         }
     }
 
-    fn description(&self) -> Option<&str> {
+    fn description(&self) -> Option<String> {
         match self {
-            Parameter::Named(named) => named.parameter.description.as_deref(),
-            Parameter::Unnamed(parameter) => parameter.description.as_deref(),
+            Parameter::Named(named) => named.parameter.description(),
+            Parameter::Unnamed(parameter) => parameter.description(),
         }
     }
 
@@ -118,8 +118,18 @@ impl ParameterExt for NamedParameter {
         Some(&self.name)
     }
 
-    fn description(&self) -> Option<&str> {
-        self.parameter.description.as_deref()
+    fn description(&self) -> Option<String> {
+        match (
+            self.parameter.description.as_deref(),
+            &self.parameter.r#type,
+        ) {
+            (None, ParameterType::ResourceRef(resource_ref)) => RESOURCE_INDEX.with(|index| {
+                index
+                    .get(resource_ref.resource_ref())
+                    .and_then(|parameter| parameter.description().map(|s| s.to_string()))
+            }),
+            (description, _) => description.map(|s| s.to_string()),
+        }
     }
 
     fn r#type(&self) -> &ParameterType {
@@ -144,8 +154,15 @@ impl ParameterExt for UnnamedParameter {
         None
     }
 
-    fn description(&self) -> Option<&str> {
-        self.description.as_deref()
+    fn description(&self) -> Option<String> {
+        match (self.description.as_deref(), &self.r#type) {
+            (None, ParameterType::ResourceRef(resource_ref)) => RESOURCE_INDEX.with(|index| {
+                index
+                    .get(resource_ref.resource_ref())
+                    .and_then(|parameter| parameter.description().map(|s| s.to_string()))
+            }),
+            (description, _) => description.map(|s| s.to_string()),
+        }
     }
 
     fn r#type(&self) -> &ParameterType {
