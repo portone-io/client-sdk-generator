@@ -1410,11 +1410,12 @@ resources:
           name: InicisUnifiedIdentityVerificationBypass
           properties:
             flgFixedUser:
-              type: string
+              type: enum
               description: |
                 인증 대상 정보를 미리 지정할지 여부
-                - `Y`: 미리 지정
-                - `N`: 미리 지정하지 않음
+              variants:
+                Y: {}
+                N: {}
             DI_CODE:
               type: string
               optional: true
@@ -1427,7 +1428,6 @@ resources:
                 인증 화면 좌측 상단에, PG사 로고 대신 표시할 로고의 URL
             directAgency:
               type: enum
-              name: InicisUnifiedIdentityVerificationDirectAgency
               optional: true
               description: |
                 인증 업체를 미리 선택할 경우, 인증 업체 코드
@@ -1454,100 +1454,1184 @@ resources:
             optional: true
             $ref: "#/resources/entity/bypass/identityVerification/Danal"
           inicisUnified:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/identityVerification/InicisUnified"
+      issueBillingKey:
+        SmartroV2:
+          type: object
+          name: SmartroV2IssueBillingKeyBypass
+          properties:
+            SkinColor:
+              type: enum
+              variants:
+                RED: {}
+                GREEN: {}
+                BLUE: {}
+                PURPLE: {}
+              description: |
+                UI 스타일(기본: RED)
+              optional: true
+            IsPwdPass:
+              type: enum
+              variants:
+                Y:
+                  description: |
+                    비밀번호 설정 미사용
+                N:
+                  description: |
+                    비밀번호 설정 사용
+              description: |
+                결제 비밀번호 등록 Skip 여부
+              optional: true
+        InicisV2:
+          type: object
+          name: InicisV2IssueBillingKeyBypass
+          properties:
+            carduse:
+              type: enum
+              variants:
+                percard:
+                  description: |
+                    개인카드만 선택 가능
+                cocard:
+                  description: |
+                    법인 카드만 선택 가능
+              description: |
+                개인/법인카드 선택 옵션
+              optional: true
+        KcpV2:
+          type: object
+          name: KcpV2IssueBillingKeyBypass
+          properties:
+            batch_soc_choice:
+              type: enum
+              variants:
+                S:
+                  description: |
+                    주민번호만 표시
+                C:
+                  description: |
+                    사업자번호만 표시
+              description: |
+                결제창에서 주민번호/사업자 번호 고정여부 설정
+              optional: true
+        Naverpay:
+          type: object
+          name: NaverpayIssueBillingKeyBypass
+          properties:
+            subMerchantName:
+              type: string
+              description: |
+                하부 가맹점 명
+              optional: true
+            subMerchantId:
+              type: string
+              description: |
+                하부 가맹점 ID
+              optional: true
+        TosspayV2:
+          type: object
+          name: TosspayV2IssueBillingKeyBypass
+          properties:
+            encryptedUserCi:
+              type: string
+              description: |
+                암호화된 사용자 CI
+              optional: true
+        Welcome:
+          type: object
+          name: WelcomeIssueBillingKeyBypass
+          properties:
+            logo_url:
+              type: string
+              description: |
+                메인 로고 URL (크기: 89x19)
+              optional: true
+            logo_2nd:
+              type: string
+              description: |
+                서브 로고 URL (크기: 64x13)
+              optional: true
       IssueBillingKeyBypass:
         type: object
         properties:
           kakaopay:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/Kakaopay"
           smartro_v2:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/issueBillingKey/SmartroV2"
           naverpay:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/issueBillingKey/Naverpay"
           welcome:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/issueBillingKey/Welcome"
           tosspay_v2:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/issueBillingKey/TosspayV2"
           inicis_v2:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/issueBillingKey/InicisV2"
           kcp_v2:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/issueBillingKey/KcpV2"
+      issueBillingKeyAndPay:
+        Welcome:
+          type: object
+          name: WelcomeIssueBillingKeyAndPayBypass
+          properties:
+            acceptmethod:
+              type: array
+              items:
+                type: string
+              description: |
+                `acceptmethod` 파라미터는 휴대폰 소액결제 시 기본 선택할 통신사를 설정하며, 추가로 `buyer_tel` 값의 수정 가능 여부를 지정할 수 있습니다.
+
+                **통신사 기본 선택 설정:**
+                - 특정 통신사를 기본 선택하려면 `hppdefaultcorp(통신사코드)` 형식으로 전달합니다.
+                - 예시: KT를 기본 선택 → `hppdefaultcorp(KTF)`
+
+                **가능한 통신사 코드:**
+                - `SKT`: SK 텔레콤
+                - `KTF`: KT
+                - `LGT`: LG 유플러스
+                - `MVNO`: 알뜰폰 전체
+                - `CJH`: 알뜰폰 CJ 헬로 모바일
+                - `KCT`: 알뜰폰 티플러스
+                - `SKL`: 알뜰폰 SK 세븐 모바일
+
+                **휴대폰 소액결제창에 자동 입력되는 `buyer_tel` 수정 가능 여부 설정:**
+                - 수정 불가능으로 설정하려면 `hppnofix(Y)`를 전달합니다.
+                - 수정 가능으로 설정하려면 `hppnofix(N)`를 전달합니다. (기본값)
+              optional: true
+            P_RESERVED:
+              type: array
+              items:
+                type: string
+              description: |
+                `P_RESERVED` 파라미터는 휴대폰 소액결제 시 기본 선택할 통신사를 설정하며, 추가로 `buyer_tel` 값의 수정 가능 여부를 지정할 수 있습니다.
+
+                **통신사 기본 선택 설정:**
+                - 특정 통신사를 기본 선택하려면 `hpp_default_corp=통신사코드` 형식으로 전달합니다.
+                - 예시: KT를 기본 선택 → `hpp_default_corp=KTF`
+
+                **가능한 통신사 코드:**
+                - `SKT`: SK 텔레콤
+                - `KTF`: KT
+                - `LGT`: LG 유플러스
+                - `MVNO`: 알뜰폰 전체
+                - `CJH`: 알뜰폰 CJ 헬로 모바일
+                - `KCT`: 알뜰폰 티플러스
+                - `SKL`: 알뜰폰 SK 세븐 모바일
+
+                **휴대폰 소액결제창에 자동 입력되는 `buyer_tel` 수정 가능 여부 설정:**
+                - 수정 불가능으로 설정하려면 `hpp_nofix=Y`를 전달합니다.
+                - 수정 가능으로 설정하려면 `hpp_nofix=N`를 전달합니다. (기본값)
+              optional: true
       IssueBillingKeyAndPayBypass:
         type: object
         properties:
           welcome:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/issueBillingKeyAndPay/Welcome"
+      loadIssueBillingKeyUI:
+        PaypalV2:
+          type: object
+          name: PaypalV2LoadIssueBillingKeyUIBypass
+          properties:
+            style:
+              type: object
+              description: |
+                Paypal 빌링키 발급 UI 호출 시 필요한 파라미터
+              properties:
+                color:
+                  type: enum
+                  variants:
+                    gold: {}
+                    blue: {}
+                    silver: {}
+                    white: {}
+                    black: {}
+                  description: |
+                    버튼 색상
+                  optional: true
+                height:
+                  type: integer
+                  description: |
+                    버튼 높이
+                  optional: true
+                label:
+                  type: enum
+                  variants:
+                    paypal: {}
+                    checkout: {}
+                    buynow: {}
+                    pay: {}
+                    installment: {}
+                    subscribe: {}
+                    donate: {}
+                  description: |
+                    버튼 라벨
+                  optional: true
+                layout:
+                  type: enum
+                  variants:
+                    vertical: {}
+                    horizontal: {}
+                  description: |
+                    버튼 렌더링 방향
+                  optional: true
+                shape:
+                  type: enum
+                  variants:
+                    rect: {}
+                    pill: {}
+                  description: |
+                    버튼 모양
+                  optional: true
+                tagline:
+                  type: boolean
+                  description: |
+                    버튼 하위에 문구 노출 여부
+                  optional: true
+              optional: true
+            shipping_address:
+              type: object
+              properties:
+                recipient_name:
+                  type: string
+                  description: |
+                    수령인 이름
+                  optional: true
+                line1:
+                  type: string
+                  description: |
+                    도로명 주소
+                line2:
+                  type: string
+                  description: |
+                    아파트 동 호수
+                  optional: true
+                city:
+                  type: string
+                  description: |
+                    도시 이름
+                state:
+                  type: string
+                  description: |
+                    주 이름 (아르헨티나, 브라질, 캐나다, 중국, 인도, 이탈리아, 일본, 멕시코, 태국 또는 미국의 경우 필수)
+                  optional: true
+                postal_code:
+                  type: string
+                  description: |
+                    우편번호
+                  optional: true
+                country_code:
+                  type: resourceRef
+                  description: |
+                    국가 코드
+                  $ref: "#/resources/entity/Country"
+              optional: true
+            additional_data:
+              type: array
+              items:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  value:
+                    type: string
+              description: |
+                STC 파라미터
+              optional: true
       LoadIssueBillingKeyUIBypass:
         type: object
         properties:
           paypal_v2:
-            type: object
-            properties:
-              style:
-                type: unknown
-                optional: true
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/loadIssueBillingKeyUI/PaypalV2"
+      loadPaymentUI:
+        PaypalV2:
+          type: object
+          name: PaypalV2LoadPaymentUIBypass
+          properties:
+            style:
+              type: object
+              optional: true
+              description: |
+                SPB 버튼 렌더링에 필요한 파라미터
+              properties:
+                color:
+                  type: enum
+                  variants:
+                    gold: {}
+                    blue: {}
+                    silver: {}
+                    white: {}
+                    black: {}
+                  description: |
+                    버튼 색상
+                  optional: true
+                height:
+                  type: integer
+                  description: |
+                    버튼 높이
+                  optional: true
+                label:
+                  type: enum
+                  variants:
+                    paypal: {}
+                    checkout: {}
+                    buynow: {}
+                    pay: {}
+                    installment: {}
+                    subscribe: {}
+                    donate: {}
+                  description: |
+                    버튼 라벨
+                  optional: true
+                layout:
+                  type: enum
+                  variants:
+                    vertical: {}
+                    horizontal: {}
+                  description: |
+                    버튼 렌더링 방향
+                  optional: true
+                shape:
+                  type: enum
+                  variants:
+                    rect: {}
+                    pill: {}
+                  description: |
+                    버튼 모양
+                  optional: true
+                period:
+                  type: string
+                  description: |
+                    label이 installment일 때 할부 결제 되는 월
+                  optional: true
+                tagline:
+                  type: boolean
+                  description: |
+                    버튼 하위에 문구 노출 여부
+                  optional: true
+            enable-funding:
+              type: string
+              description: |
+                허용할 결제 수단 (예: "card, credit, bancontact")
+              optional: true
+            disable-funding:
+              type: string
+              description: |
+                차단할 결제 수단 (예: "venmo, mercadopago")
+              optional: true
+            purchase_units:
+              type: array
+              description: |
+                create order API 호출에 필요한 파라미터
+              optional: true
+              items:
+                type: object
+                properties:
+                  shipping:
+                    type: object
+                    optional: true
+                    description: |
+                      구매 상품 정보
+                    properties:
+                      address:
+                        type: object
+                        optional: true
+                        description: |
+                          수령지 정보
+                        properties:
+                          address_line_1:
+                            type: string
+                            description: |
+                              수령지 주소. 미 입력 시 입력된 주소로 override되지 않음
+                          address_line_2:
+                            type: string
+                            optional: true
+                          admin_area_1:
+                            type: string
+                            optional: true
+                          admin_area_2:
+                            type: string
+                            description: |
+                              필수 입력. 미 입력 시 create order 실패
+                          postal_code:
+                            type: string
+                            optional: true
+                          country_code:
+                            type: resourceRef
+                            description: |
+                              국가 코드
+                            $ref: "#/resources/entity/Country"
+            payer:
+              type: object
+              optional: true
+              properties:
+                tax_info:
+                  type: object
+                  optional: true
+                  description: |
+                    구매자 정보
+                  properties:
+                    tax_id:
+                      type: string
+                      description: |
+                        구매자 세금 정보 (브라질 구매자의 경우 필수 입력)
+                    tax_id_type:
+                      type: string
+                address:
+                  type: object
+                  optional: true
+                  properties:
+                    address_line_1:
+                      type: string
+                      description: |
+                        구매자 주소지 정보
+                      optional: true
+                    address_line_2:
+                      type: string
+                      optional: true
+                    admin_area_1:
+                      type: string
+                      optional: true
+                    admin_area_2:
+                      type: string
+                      optional: true
+                    postal_code:
+                      type: string
+                      description: |
+                        우편번호
+                      optional: true
+                    country_code:
+                      type: resourceRef
+                      description: |
+                        국가 코드
+                      $ref: "#/resources/entity/Country"
+            additional_data:
+              type: array
+              items:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  value:
+                    type: string
+              description: |
+                STC 파라미터
+              optional: true
       LoadPaymentUIBypass:
         type: object
         properties:
           paypal_v2:
-            type: object
-            properties:
-              style:
-                type: unknown
-                optional: true
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/loadPaymentUI/PaypalV2"
+      payment:
+        Tosspayments:
+          type: object
+          name: TosspaymentsPaymentBypass
+          properties:
+            discountCode:
+              type: string
+              description: |
+                카드사 할인코드
+              optional: true
+            useInternationalCardOnly:
+              type: boolean
+              description: |
+                해외 카드만 허용할지 여부
+              optional: true
+        Ksnet:
+          type: object
+          name: KsnetPaymentBypass
+          properties:
+            sndQpayType:
+              type: enum
+              variants:
+                "1":
+                  description: |
+                    간편 결제 표시
+                "0":
+                  description: |
+                    간편 결제 미표시
+              description: |
+                간편 결제 표시 구분
+              optional: true
+        Kakaopay:
+          type: object
+          name: KakaopayPaymentBypass
+          properties:
+            custom_message:
+              type: string
+              description: |
+                결제창에 추가로 띄워줄 사용자 정의 문구.
+
+                해당 파라미터를 지정해서 보내면 가격 아래 부분에 문구가 띄워짐
+              optional: true
+        SmartroV2:
+          type: object
+          name: SmartroV2PaymentBypass
+          properties:
+            GoodsCnt:
+              type: integer
+              description: |
+                결제 상품 품목 개수
+              optional: true
+            SkinColor:
+              type: enum
+              variants:
+                RED: {}
+                GREEN: {}
+                BLUE: {}
+                PURPLE: {}
+              description: |
+                UI 스타일 (기본값: RED)
+              optional: true
+            OpenType:
+              type: enum
+              variants:
+                KR: {}
+                EN: {}
+              description: |
+                해외 카드만 결제를 허용할지 여부 (기본값: KR)
+              optional: true
+        Naverpay:
+          type: object
+          name: NaverpayPaymentBypass
+          properties:
+            useCfmYmdt:
+              type: string
+              description: |
+                이용 완료일(YYYYMMDD)
+              optional: true
+            productItems:
+              type: array
+              items:
+                type: object
+                properties:
+                  categoryType:
+                    type: string
+                    description: |
+                      결제 상품 유형
+                  categoryId:
+                    type: string
+                    description: |
+                      결제 상품 분류
+                  uid:
+                    type: string
+                    description: |
+                      결제 상품 식별값
+                  name:
+                    type: string
+                    description: |
+                      상품명
+                  payReferrer:
+                    type: enum
+                    variants:
+                      NAVER_BOOK: {}
+                      NAVER_MUSIC: {}
+                      NAVER_SHOPPING: {}
+                      NAVER_MAP: {}
+                      NAVER_PLACE: {}
+                      SEARCH_AD: {}
+                      NAVER_SEARCH: {}
+                      BRAND_SEARCH: {}
+                      PARTNER_DIRECT: {}
+                      ETC: {}
+                    description: |
+                      결제 상품 유입경로
+                    optional: true
+                  startDate:
+                    type: string
+                    description: |
+                      시작일(YYYYMMDD)
+                    optional: true
+                  endDate:
+                    type: string
+                    description: |
+                      종료일(YYYYMMDD)
+                    optional: true
+                  sellerId:
+                    type: string
+                    description: |
+                      하위 판매자 식별키
+                    optional: true
+                  count:
+                    type: integer
+                    description: |
+                      결제 상품 개수
+            subMerchantInfo:
+              type: object
+              properties:
+                subMerchantName:
+                  type: string
+                  description: |
+                    하부 가맹점 명
+                subMerchantId:
+                  type: string
+                  description: |
+                    하부 가맹점 ID
+                subMerchantBusinessNo:
+                  type: string
+                  description: |
+                    하부 가맹점 사업자 번호(숫자 10자리)
+                subMerchantPayId:
+                  type: string
+                  description: |
+                    하부 가맹점 결제 키
+                subMerchantTelephoneNo:
+                  type: string
+                  description: |
+                    하부 가맹점 대표 전화번호
+                subMerchantCustomerServiceUrl:
+                  type: string
+                  description: |
+                    하부 가맹점 고객 서비스 URL
+              description: |
+                하부 가맹점 정보. PG 업종 가맹점인 경우에만 필수 값
+              optional: true
+            deliveryFee:
+              type: integer
+              description: |
+                배송비
+              optional: true
+        NiceV2:
+          type: object
+          name: NiceV2PaymentBypass
+          properties:
+            LogoImage:
+              type: string
+              description: |
+                로고 이미지의 full URL
+              optional: true
+            NPDisableScroll:
+              type: enum
+              variants:
+                Y: {}
+                N: {}
+              description: |
+                결제 창 스크롤 미사용 여부 (PC Only, Y: 미사용 / N(default): 사용)
+              optional: true
+            SkinType:
+              type: enum
+              variants:
+                red: {}
+                green: {}
+                purple: {}
+                gray: {}
+                dark: {}
+              description: |
+                결제 창 스킨 설정
+              optional: true
+            UserCI:
+              type: string
+              description: |
+                문화 상품권 결제시 결제 고객 사용자 인증 CI 정보. 아이디/비밀번호 외 추가로 CI 인증이 필요한 경우 사용. 사용 전 영업 담당자와 사전 협의 필수
+              optional: true
+            MallUserID:
+              type: string
+              description: |
+                상점 사용자 아이디. 문화 상품권 결제시 경우 필수 입력
+              optional: true
+            DirectCouponYN:
+              type: enum
+              variants:
+                Y: {}
+                N: {}
+              description: |
+                신용카드 쿠폰 자동 적용 여부(Y: 사전 등록된 선 할인 쿠폰을 자동 적용 / N: 쿠폰 미적용(기본값))
+                할부 거래 요청 시 할인 적용 후 승인 금액이 할부 가능 금액 (50,000) 미만인 경우 인증 실패 처리
+              optional: true
+            DirectShowOpt:
+              type: enum
+              variants:
+                BANK: {}
+                CELLPHONE: {}
+              description: |
+                다이렉트 호출 결제 수단(BANK: 계좌이체/CELLPHONE: 휴대폰 소액결제)
+                간편결제와 카드사 다이렉트 호출의 경우 CheckoutService가 다이렉트 여부를 판단 후 올바른 값을 직접 넣어 줌
+                단, 계좌이체와 휴대폰 소액결제는 각각 은행 코드와 통신사 코드를 전달하는 방식이 아니기 때문에
+                정확한 다이렉트 호출이 아니므로 다이렉트 호출/비 다이렉트 호출을 구분하기 위해 DirectShowOpt 파라미터를 가맹점으로부터 직접 받음
+              optional: true
+            CardShowOpt:
+              type: string
+              description: |
+                카드사 별 호출 방식
+                형식) 카드코드:노출유형|카드코드:노출유형
+                - 노출 유형: 1(안심클릭), 2(간편결제), 3(앱 카드 직접 호출)
+                - 카드 코드: 02(국민), 04(삼성), 06(신한), 07(현대), 08(롯데), 12(NH), 15(우리)만 가능
+                예시) CardShowOpt=08:3|02:3 → 롯데카드와 국민카드 선택시 앱 카드 직접 호출 방식으로 렌더링
+              optional: true
+            PaycoClientId:
+              type: string
+              description: |
+                페이코 계정 자동 로그인 기능 사용하기 위해 페이코에서 가맹점에 발급한 ClientId
+              optional: true
+            PaycoAccessToken:
+              type: string
+              description: |
+                페이코 계정 자동 로그인 기능 사용을 위한 접속 토큰
+              optional: true
+            SamPayMallType:
+              type: enum
+              variants:
+                "01": {}
+                "99": {}
+              description: |
+                삼성페이 가맹점 유형
+                - 01: 삼성페이 內 쇼핑
+                - 99: 기타(기본값)
+              optional: true
+        TossBrandpay:
+          type: object
+          name: TossBrandpayPaymentBypass
+          properties:
+            brandpayOptions:
+              type: object
+              description: |
+                loadBrandpay 호출시 전달하는 세번째 파라미터
+              optional: true
+              properties:
+                ui:
+                  type: object
+                  optional: true
+                  properties:
+                    highlightColor:
+                      type: string
+                      description: |
+                        UI의 메인 색상. (기본값: #3182f6)
+                      optional: true
+                    buttonStyle:
+                      type: enum
+                      variants:
+                        default: {}
+                        full: {}
+                      description: |
+                        버튼 스타일
+                        - default(기본값): 모서리가 둥글고 주변에 여백을 가진 버튼
+                        - full: 하단 영역이 전부 채워지는 형태의 버튼
+                      optional: true
+                    labels:
+                      type: object
+                      optional: true
+                      properties:
+                        oneTouchPay:
+                          type: string
+                          description: |
+                            UI에 표시되는 원터치 결제를 대신해 사용할 텍스트. (기본값: "원터치 결제")
+                          optional: true
+                    navigationBar:
+                      type: object
+                      optional: true
+                      properties:
+                        visible:
+                          type: boolean
+                          description: |
+                            내비게이션 바 사용 여부. (기본값: true)
+                          optional: true
+                        paddingTop:
+                          type: integer
+                          description: |
+                            내비게이션 바 위쪽에 설정할 여백 값. 값의 단위는 px
+                          optional: true
+            widgetOptions:
+              type: object
+              optional: true
+              description: |
+                브랜드페이 위젯 render() 함수 호출시 전달하는 두번째 파라미터
+              properties:
+                methodType:
+                  type: enum
+                  variants:
+                    카드: {}
+                    계좌: {}
+                  description: |
+                    위젯에 보여줄 결제 수단. 예) 카드 전달시 등록한 결제 수단 중 카드만 노출 됨
+                  optional: true
+                methodId:
+                  type: string
+                  description: |
+                    위젯에서 기본 결제 수단으로 선택할 결제 수단의 ID
+                  optional: true
+                ui:
+                  type: object
+                  optional: true
+                  properties:
+                    promotionSection:
+                      type: object
+                      optional: true
+                      properties:
+                        summary:
+                          type: object
+                          optional: true
+                          properties:
+                            visible:
+                              type: boolean
+                              description: |
+                                혜택 배지 영역을 보여줄지 여부. 혜택 배지 영역에서는 즉시 할인 대상 카드 정보 등을 간략히 보여 줌. 기본값은 true
+                              optional: true
+                        description:
+                          type: object
+                          optional: true
+                          properties:
+                            visible:
+                              type: boolean
+                              description: |
+                                결제 혜택 영역을 보여줄지 여부. 기본값은 true
+                              optional: true
+                            defaultOpen:
+                              type: boolean
+                              description: |
+                                결제 혜택의 상세 설명을 보여줄지 여부. 각 카드사의 결제 혜택을 자세히 설명 함. 기본값은 false
+                              optional: true
+            discountCode:
+              type: string
+              description: |
+                카드사 할인코드
+              optional: true
+            methodId:
+              type: string
+              description: |
+                등록되어 있는 결제수단 중 하나를 지정해서 바로 결제하고 싶을 때 사용
+              optional: true
+        Welcome:
+          type: object
+          name: WelcomePaymentBypass
+          properties:
+            logo_url:
+              type: string
+              description: |
+                메인 로고 URL (크기: 89x19)
+              optional: true
+            logo_2nd:
+              type: string
+              description: |
+                서브 로고 URL (크기: 64x13)
+              optional: true
+            acceptmethod:
+              type: array
+              items:
+                type: string
+              description: |
+                다양한 결제 옵션을 설정하기 위한 파라미터 배열입니다.
+
+                가능한 값들은 다음과 같습니다:
+
+                - **SKIN(#색상코드)**: 결제 창의 배경 색상 설정 (기본값: #c1272c)
+                  - 예시: `SKIN(#fc6b2d)`
+                - **below1000**: 1,000원 미만 결제 허용 여부
+                - **onlyeasypaycode(간편결제코드들)**: 카드 결제창에 렌더링될 간편 결제 리스트 지정
+                  - 예시: `onlyeasypaycode(kakaopay:lpay:payco)`
+                  - 간편결제코드:
+                    - 카카오페이: `kakaopay`
+                    - 엘페이: `lpay`
+                    - 페이코: `payco`
+                    - 토스페이: `tosspay`
+                - **SLIMQUOTA(코드-개월:개월^코드-개월:개월)**: 부분 무이자 할부 옵션
+                  - 형식: `SLIMQUOTA(카드코드-할부개월:부분무이자개월^...)`
+                - **paypopup**: 안심 클릭을 팝업 형태로 렌더링 할지 여부
+                - **hppdefaultcorp(통신사코드)**: 휴대폰 소액결제 시 기본 선택 통신사 지정
+                  - 예시: `hppdefaultcorp(KTF)`
+                  - 통신사코드:
+                    - `SKT`: SK 텔레콤
+                    - `KTF`: KT
+                    - `LGT`: LG 유플러스
+                    - `MVNO`: 알뜰폰 전체
+                    - `CJH`: 알뜰폰 CJ 헬로 모바일
+                    - `KCT`: 알뜰폰 티플러스
+                    - `SKL`: 알뜰폰 SK 세븐 모바일
+                - **hppnofix(Y\|N)**: 휴대폰 소액결제창에 자동 입력되는 `buyer_tel` 값을 수정할 수 있는지 여부
+                  - `Y`: 수정 불가능
+                  - `N`: 수정 가능 (기본값)
+                - **va_ckprice**: 가상계좌 발급 시, 주민번호 채번 할 때 금액 체크 기능
+              optional: true
+            P_CARD_OPTION:
+              type: string
+              description: |
+                1. **신용카드 우선 선택 옵션**
+                  - 예시: `selcode=14`
+                  - 해당 카드 코드에 해당하는 카드가 선택된 채로 표시
+                  - 간편결제는 불가능 (타 카드 선택 가능)
+
+                2. **선택적 표시 옵션**
+                  - 예시 1: `onlycard=visa3d`
+                  - 예시 2: `selcode=14:onlycard=visa3d`
+                  - 선택적 표시 가능 결제 방식:
+                    - 안심결제: `visa3d`
+                    - ISP: `isp`
+                    - 간편결제: `easypay`
+              optional: true
+            P_ONLY_EASYPAYCODE:
+              type: string
+              description: |
+                카드 결제창에 렌더링될 간편 결제 리스트를 지정합니다.
+
+                예시: 카카오페이, 엘페이, 페이코만 렌더링 → `KAKAOPAY:LPAY:PAYCO`
+
+                - 카카오페이: `KAKAOPAY`
+                - 엘페이: `LPAY`
+                - 페이코: `PAYCO`
+                - 토스페이: `TOSSPAY`
+              optional: true
+            P_RESERVED:
+              type: array
+              items:
+                type: string
+              description: |
+                결제창 동작을 제어하기 위한 파라미터들을 설정하는 배열입니다.
+
+                가능한 값들은 다음과 같습니다:
+
+                - **below1000=Y**: 1,000원 미만 결제 허용 여부
+                - **hpp_default_corp=통신사코드**: 휴대폰 소액결제 시 기본 선택 통신사 지정
+                  - 예시: `hpp_default_corp=KTF`
+                  - 통신사코드:
+                    - `SKT`: SK 텔레콤
+                    - `KTF`: KT
+                    - `LGT`: LG 유플러스
+                    - `MVNO`: 알뜰폰 전체
+                    - `CJH`: 알뜰폰 CJ 헬로 모바일
+                    - `KCT`: 알뜰폰 티플러스
+                    - `SKL`: 알뜰폰 SK 세븐 모바일
+                - **hpp_nofix=Y\|N**: 휴대폰 소액결제창에서 자동 입력된 `buyer_tel` 수정 가능 여부
+                  - `Y`: 수정 불가능
+                  - `N`: 수정 가능 (기본값)
+              optional: true
+        TosspayV2:
+          type: object
+          name: TosspayV2PaymentBypass
+          description: |
+            정규화가 어려운 토스페이 bypass 파라미터
+            가맹점으로부터 전달 된 값을 PG사로 그대로 전달
+          properties:
+            expiredTime:
+              type: string
+              description: |
+                결제 만료 기한 (yyyy-MM-dd HH:mm:ss)
+              optional: true
+            cashReceiptTradeOption:
+              type: enum
+              variants:
+                CULTURE: {}
+                GENERAL: {}
+                PUBLIC_TP: {}
+              description: |
+                현금영수증 발급타입
+                - CULTURE: 문화비
+                - GENERAL: 일반 (기본값)
+                - PUBLIC_TP: 교통비
+              optional: true
+        InicisV2:
+          type: object
+          name: InicisV2Bypass
+          properties:
+            logo_url:
+              type: string
+              description: |
+                메인로고 삽입 [size: 89*18]
+              optional: true
+            logo_2nd:
+              type: string
+              description: |
+                서브로고 삽입 [size: 64*13]
+              optional: true
+            parentemail:
+              type: string
+              description: |
+                보호자 이메일주소
+                14세 미만 필수, "@", "." 외 특수문자 입력불가
+              optional: true
+            Ini_SSGPAY_MDN:
+              type: string
+              description: |
+                SSGPAY 결제요청 시 PUSH전송 휴대폰번호
+                숫자만 허용
+              optional: true
+            acceptmethod:
+              type: array
+              items:
+                type: string
+              description: |
+                지불수단별 추가옵션
+                - **SKIN(#색상코드)**: 결제창 배경색상 설정 [기본값: #C1272C]
+                  - 예시: `SKIN(#fc6b2d)`
+                - **below1000**: 신용카드 결제 시 1000원 이하 금액 결제 가능 옵션
+                - **ocb**: 카드 메인화면에 OCB 적립을 위한 카드번호 창 표시 옵션
+                - **paypopup**: 안심클릭계열 신용카드 POPUP 형태 표시 옵션
+                - **hidebar**: 프로그래스바 미노출 옵션
+                - **noeasypay**: 간편결제 미노출 옵션
+                - **slimquota(코드-개월:개월^코드-개월:개월)**: 부분 무이자 설정 (슬림 할부)
+                  - 예시: `slimquota(11-2:3^34-2:3)`
+                - **mallpoint(카드코드:카드코드)**: 카드사 포인트 사용 설정
+                  - 예시: `mallpoint(11:34)`
+              optional: true
+            P_CARD_OPTION:
+              type: string
+              description: |
+                신용카드 우선선택 옵션
+                설정한 카드코드에 해당하는 카드가 선택된 채로 표시됨
+                - 형식: `selcode=카드코드`
+                - 예시: `selcode=14`
+              optional: true
+            P_MNAME:
+              type: string
+              description: |
+                가맹점 이름
+              optional: true
+            P_RESERVED:
+              type: array
+              items:
+                type: string
+              description: |
+                지불수단별 추가옵션
+                - **below1000=Y**: 신용카드 결제 시 1000원 이하 금액 결제 가능 옵션
+                - **noeasypay=Y**: 간편결제 미노출 옵션
+                - **global_visa3d=Y**: 해외카드 노출 옵션
+                - **apprun_check=Y**: 안드로이드 앱 내 웹뷰에서 ISP 결제 진행 시, custom url scheme 대신 intent:// 로 처리할 지 여부
+              optional: true
+        Kpn:
+          type: object
+          name: KpnBypass
+          properties:
+            CardSelect:
+              type: array
+              items:
+                type: enum
+                variants:
+                  GLOBAL: {}
+                  11PAY: {}
+                  LEGACY_AUTH: {}
+                  KEY_IN: {}
+              description: |
+                - GLOBAL('09') : 해외카드 (VISA + MASTER + JCB)
+                - 11PAY('96') : 11Pay (SKPay)
+                - LEGACY_AUTH('98') : 구인증
+                - KEY_IN('99') : 키인
+              optional: true
+        KcpV2:
+          type: object
+          name: KcpV2Bypass
+          properties:
+            skin_indx:
+              type: string
+              optional: true
+            site_logo:
+              type: string
+              optional: true
+            shop_user_id:
+              type: string
+            kcp_pay_title:
+              type: string
+              optional: true
+            complex_pnt_yn:
+              type: enum
+              variants:
+                Y: {}
+                N: {}
+              description: |
+                포인트 결제의 경우 신용카드 + 포인트 결제인데, N으로 설정 시 포인트로만 결제가 이루어짐
+              optional: true
+            pt_memcorp_cd:
+              type: string
+              optional: true
+            disp_tax_yn:
+              type: enum
+              variants:
+                Y: {}
+                N: {}
+                R: {}
+                E: {}
+              description: |
+                가상계좌, 계좌이체 시 현금영수증 노출 여부
+              optional: true
+            site_name:
+              type: string
+              description: |
+                결제창에 노출될 고객사 상호명
+              optional: true
+            deli_term:
+              type: string
+              description: |
+                에스크로 배송 예상 소요일
+              optional: true
+        Hyphen:
+          type: object
+          name: HyphenPaymentBypass
+          properties:
+            designCd:
+              type: string
+              optional: true
       PaymentBypass:
         type: object
         properties:
           tosspayments:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/Tosspayments"
           ksnet:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/Ksnet"
           kakaopay:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/Kakaopay"
           smartro_v2:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/SmartroV2"
           naverpay:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/Naverpay"
           nice_v2:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/NiceV2"
           toss_brandpay:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/TossBrandpay"
           welcome:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/Welcome"
           tosspay_v2:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/TosspayV2"
           inicis_v2:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/InicisV2"
           kpn:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/Kpn"
           kcp_v2:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/KcpV2"
           hyphen:
-            type: unknown
+            type: resourceRef
             optional: true
+            $ref: "#/resources/entity/bypass/payment/Hyphen"
   exception:
     CheckoutServiceErrorCode:
       type: enum
@@ -2781,6 +3865,14 @@ resources:
 
         프로세스 종료 후, 콜백 함수로 전달 될 본인인증 정보 데이터
 methods:
+  requestPayment:
+    input:
+      type: resourceRef
+      $ref: "#/resources/request/PaymentRequest"
+    output:
+      type: resourceRef
+      $ref: "#/resources/response/PaymentResponse"
+      optional: true
   requestIdentityVerification:
     description: |
       ### 본인인증 요청
@@ -2806,14 +3898,6 @@ methods:
     output:
       type: resourceRef
       $ref: "#/resources/response/IssueBillingKeyResponse"
-      optional: true
-  requestPayment:
-    input:
-      type: resourceRef
-      $ref: "#/resources/request/PaymentRequest"
-    output:
-      type: resourceRef
-      $ref: "#/resources/response/PaymentResponse"
       optional: true
   loadPaymentUI:
     input:

@@ -135,7 +135,7 @@ fn generate_parameter_type(
         }
         schema::ParameterType::EmptyObject => String::from("Record<string, never>"),
         schema::ParameterType::Enum { .. } => {
-            format!("typeof {parent_name}[keyof typeof {parent_name}]")
+            format!("(typeof {parent_name}[keyof typeof {parent_name}] | string & {{}})")
         }
         schema::ParameterType::OneOf { properties } => {
             let type_path = resource_ref_to_path("../utils", resource_base_path);
@@ -340,7 +340,7 @@ fn generate_parameter_type_properties(
             decls,
             imports,
             parameter,
-            &format!("{parent_name}{property_name}"),
+            parent_name,
             current_module_path,
             resource_base_path,
         );
@@ -359,7 +359,10 @@ fn generate_parameter_type_property(
     current_module_path: &PathBuf,
     resource_base_path: &PathBuf,
 ) -> String {
-    let parent_name = format!("{parent_name}{property_name}");
+    let parent_name = format!(
+        "{parent_name}{property_name}",
+        property_name = property_name.to_case(convert_case::Case::Pascal)
+    );
     let member_type = generate_parameter(
         parameter,
         decls,
@@ -370,6 +373,11 @@ fn generate_parameter_type_property(
     );
     let description = parameter.description().to_jsdoc(parameter.deprecated());
     let optional_marker = if parameter.optional() { "?" } else { "" };
+    let property_name = if property_name.contains('-') {
+        format!("'{}'", property_name)
+    } else {
+        property_name.to_string()
+    };
     format!("{description}{property_name}{optional_marker}: {member_type}")
 }
 
@@ -393,7 +401,7 @@ fn generate_const_enum_declaration(
                         .map_or_else(String::new, |p| format!("{}_", p));
                     writeln!(
                         output,
-                        "{description}{variant_name}: '{value_prefix}{variant_name}',"
+                        "{description}'{variant_name}': '{value_prefix}{variant_name}',"
                     )
                     .unwrap();
                     output
