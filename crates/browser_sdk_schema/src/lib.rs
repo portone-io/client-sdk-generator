@@ -128,6 +128,7 @@ impl ParameterExt for NamedParameter {
                     .get(resource_ref.resource_ref())
                     .and_then(|parameter| parameter.description().map(|s| s.to_string()))
             }),
+            (None, ParameterType::Array { items }) => items.description(),
             (description, _) => description.map(|s| s.to_string()),
         }
     }
@@ -161,6 +162,7 @@ impl ParameterExt for UnnamedParameter {
                     .get(resource_ref.resource_ref())
                     .and_then(|parameter| parameter.description().map(|s| s.to_string()))
             }),
+            (None, ParameterType::Array { items }) => items.description(),
             (description, _) => description.map(|s| s.to_string()),
         }
     }
