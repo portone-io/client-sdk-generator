@@ -146,7 +146,17 @@ impl ParameterExt for NamedParameter {
     }
 
     fn deprecated(&self) -> bool {
-        self.parameter.deprecated
+        match (self.parameter.deprecated, &self.parameter.r#type) {
+            (true, _) => true,
+            (_, ParameterType::ResourceRef(resource_ref)) => RESOURCE_INDEX.with(|index| {
+                index
+                    .get(resource_ref.resource_ref())
+                    .map(|parameter| parameter.deprecated())
+                    .unwrap_or(false)
+            }),
+            (_, ParameterType::Array { items }) => items.deprecated(),
+            _ => false,
+        }
     }
 }
 
@@ -180,7 +190,17 @@ impl ParameterExt for UnnamedParameter {
     }
 
     fn deprecated(&self) -> bool {
-        self.deprecated
+        match (self.deprecated, &self.r#type) {
+            (true, _) => true,
+            (_, ParameterType::ResourceRef(resource_ref)) => RESOURCE_INDEX.with(|index| {
+                index
+                    .get(resource_ref.resource_ref())
+                    .map(|parameter| parameter.deprecated())
+                    .unwrap_or(false)
+            }),
+            (_, ParameterType::Array { items }) => items.deprecated(),
+            _ => false,
+        }
     }
 }
 
