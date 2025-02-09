@@ -65,7 +65,7 @@ pub trait ParameterExt {
     fn description(&self) -> Option<String>;
     fn r#type(&self) -> &ParameterType;
     fn optional(&self) -> bool;
-    fn pg_specific(&self) -> Option<&IndexMap<String, ParameterType>>;
+    fn pg_specific(&self) -> Option<&IndexMap<String, PgSpecific>>;
     fn deprecated(&self) -> bool;
 }
 
@@ -98,7 +98,7 @@ impl ParameterExt for Parameter {
         }
     }
 
-    fn pg_specific(&self) -> Option<&IndexMap<String, ParameterType>> {
+    fn pg_specific(&self) -> Option<&IndexMap<String, PgSpecific>> {
         match self {
             Parameter::Named(named) => named.parameter.pg_specific.as_ref(),
             Parameter::Unnamed(parameter) => parameter.pg_specific.as_ref(),
@@ -141,7 +141,7 @@ impl ParameterExt for NamedParameter {
         self.parameter.optional
     }
 
-    fn pg_specific(&self) -> Option<&IndexMap<String, ParameterType>> {
+    fn pg_specific(&self) -> Option<&IndexMap<String, PgSpecific>> {
         self.parameter.pg_specific.as_ref()
     }
 
@@ -185,7 +185,7 @@ impl ParameterExt for UnnamedParameter {
         self.optional
     }
 
-    fn pg_specific(&self) -> Option<&IndexMap<String, ParameterType>> {
+    fn pg_specific(&self) -> Option<&IndexMap<String, PgSpecific>> {
         self.pg_specific.as_ref()
     }
 
@@ -238,7 +238,7 @@ pub struct UnnamedParameter {
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     optional: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pg_specific: Option<IndexMap<String, ParameterType>>,
+    pg_specific: Option<IndexMap<String, PgSpecific>>,
     /// Deprecated 여부
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     deprecated: bool,
@@ -249,7 +249,7 @@ impl UnnamedParameter {
         description: Option<String>,
         r#type: ParameterType,
         optional: bool,
-        pg_specific: Option<IndexMap<String, ParameterType>>,
+        pg_specific: Option<IndexMap<String, PgSpecific>>,
         deprecated: bool,
     ) -> Self {
         Self {
@@ -260,6 +260,17 @@ impl UnnamedParameter {
             deprecated,
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct PgSpecific {
+    /// PG사 파라미터 설명
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    /// Optional 여부
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    optional: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, PartialEq, Clone, JsonSchema)]
