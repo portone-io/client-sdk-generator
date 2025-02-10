@@ -1190,7 +1190,6 @@ resources:
       type: enum
       variants:
         PAYPAL_RT: {}
-      description:
     LoadableUIType:
       type: union
       types:
@@ -1279,7 +1278,6 @@ resources:
       type: enum
       variants:
         PAYPAL_SPB: {}
-      description:
     PaymentPayMethod:
       type: enum
       variants:
@@ -1428,8 +1426,6 @@ resources:
       value_prefix: PRODUCT_TYPE
       description: |
         **상품 유형**
-
-        `"PRODUCT_TYPE_REAL"`, `"PRODUCT_TYPE_DIGITAL"` 중 하나의 값을 입력해주세요.
     StoreDetails:
       type: object
       properties:
@@ -1668,7 +1664,7 @@ resources:
               description: |
                 **인증 창에 표시할 로고 URL**
 
-                인증 창 좌측 상단 이니시스 로고 대신 들어갈 로고의 URL입니다.
+                인증 창 좌측 상단 KG이니시스 로고 대신 들어갈 로고의 URL입니다.
                 최적 크기는 가로 164px, 세로 28px입니다.
 
                 HTTP URL인 경우 로고가 표시되지 않을 수 있습니다.
@@ -2184,7 +2180,7 @@ resources:
             discountCode:
               type: string
               description: |
-                토스페이먼츠 <-> 고객사 계약에 따라 프로모션 적용이 가능한 코드
+                토스페이먼츠 \<-> 고객사 계약에 따라 프로모션 적용이 가능한 코드
               optional: true
             useInternationalCardOnly:
               type: boolean
@@ -2684,7 +2680,7 @@ resources:
           description: |
             KG이니시스 bypass 파라미터
 
-            이니시스는 PC 결제 모듈과 모바일 결제 모듈이 분리되어 있기 때문에 bypass 파라미터 또한 PC용과 모바일용이 분리되어 있습니다.
+            KG이니시스는 PC 결제 모듈과 모바일 결제 모듈이 분리되어 있기 때문에 bypass 파라미터 또한 PC용과 모바일용이 분리되어 있습니다.
           name: InicisV2Bypass
           properties:
             logo_url:
@@ -2768,7 +2764,7 @@ resources:
                   부분 무이자 설정 (별도 계약시 이용 가능)
                   
                   `string` 부분에는 `코드-개월:개월^코드-개월:개월` 와 같은 형식으로 입력합니다. (ex. `slimquota(11-2:3^34-2:3)`)
-                  카드사 코드는 [이니시스 통합 코드](https://manual.inicis.com/pay/code.html) 페이지에서
+                  카드사 코드는 [KG이니시스 통합 코드](https://manual.inicis.com/pay/code.html) 페이지에서
                   "결제요청 시 카드코드" 섹션을 참고하시기 바랍니다.
 
                 - **mallpoint(카드코드:카드코드)**
@@ -2776,7 +2772,7 @@ resources:
                   몰포인트 (별도 계약시 이용 가능)
 
                   `string` 부분에는 `카드코드:카드코드` 와 같은 형식으로 입력합니다. (ex. `mallpoint(11:34)`)
-                  카드사 코드는 [이니시스 통합 코드](https://manual.inicis.com/pay/code.html) 페이지에서
+                  카드사 코드는 [KG이니시스 통합 코드](https://manual.inicis.com/pay/code.html) 페이지에서
                   "결제요청 시 카드코드" 섹션을 참고하시기 바랍니다.
               optional: true
             P_CARD_OPTION:
@@ -3305,14 +3301,6 @@ resources:
         channelKey:
           type: resourceRef
           $ref: "#/resources/entity/ChannelKey"
-        pgProvider:
-          optional: true
-          type: resourceRef
-          $ref: "#/resources/entity/PgProvider"
-        isTestChannel:
-          optional: true
-          type: resourceRef
-          $ref: "#/resources/entity/IsTestChannel"
         billingKeyMethod:
           type: resourceRef
           $ref: "#/resources/entity/BillingKeyMethod"
@@ -3396,14 +3384,6 @@ resources:
           type: string
           description: |
             채널 이름
-        pgProvider:
-          optional: true
-          type: resourceRef
-          $ref: "#/resources/entity/PgProvider"
-        isTestChannel:
-          optional: true
-          type: resourceRef
-          $ref: "#/resources/entity/IsTestChannel"
         taxFreeAmount:
           optional: true
           type: resourceRef
@@ -3513,14 +3493,6 @@ resources:
           optional: true
           type: resourceRef
           $ref: "#/resources/entity/ChannelKey"
-        pgProvider:
-          optional: true
-          type: resourceRef
-          $ref: "#/resources/entity/PgProvider"
-        isTestChannel:
-          optional: true
-          type: resourceRef
-          $ref: "#/resources/entity/IsTestChannel"
         customer:
           optional: true
           type: resourceRef
@@ -3565,14 +3537,6 @@ resources:
               type: resourceRef
               $ref: "#/resources/entity/ChannelKey"
               optional: true
-            pgProvider:
-              optional: true
-              type: resourceRef
-              $ref: "#/resources/entity/PgProvider"
-            isTestChannel:
-              optional: true
-              type: resourceRef
-              $ref: "#/resources/entity/IsTestChannel"
             billingKeyMethod:
               type: resourceRef
               $ref: "#/resources/entity/BillingKeyMethod"
@@ -3694,14 +3658,6 @@ resources:
               type: resourceRef
               $ref: "#/resources/entity/ChannelKey"
               optional: true
-            pgProvider:
-              optional: true
-              type: resourceRef
-              $ref: "#/resources/entity/PgProvider"
-            isTestChannel:
-              optional: true
-              type: resourceRef
-              $ref: "#/resources/entity/IsTestChannel"
             billingKeyAndPayMethod:
               type: resourceRef
               $ref: "#/resources/entity/BillingKeyAndPayMethod"
@@ -3824,14 +3780,6 @@ resources:
               optional: true
               type: resourceRef
               $ref: "#/resources/entity/ChannelGroupId"
-            pgProvider:
-              optional: true
-              type: resourceRef
-              $ref: "#/resources/entity/PgProvider"
-            isTestChannel:
-              optional: true
-              type: resourceRef
-              $ref: "#/resources/entity/IsTestChannel"
             taxFreeAmount:
               optional: true
               type: resourceRef
