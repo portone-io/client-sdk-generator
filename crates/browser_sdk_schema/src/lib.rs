@@ -339,9 +339,9 @@ pub enum ParameterType {
         /// Error의 프로퍼티 목록
         properties: IndexMap<String, Parameter>,
     },
-    #[schemars(title = "unknown")]
+    #[schemars(title = "json")]
     #[default]
-    Unknown,
+    Json,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]

@@ -373,7 +373,7 @@
           }
         },
         {
-          "title": "unknown",
+          "title": "json",
           "type": "object",
           "required": [
             "type"
@@ -382,7 +382,7 @@
             "type": {
               "type": "string",
               "enum": [
-                "unknown"
+                "json"
               ]
             }
           }
@@ -756,7 +756,7 @@
           }
         },
         {
-          "title": "unknown",
+          "title": "json",
           "type": "object",
           "required": [
             "type"
@@ -765,7 +765,7 @@
             "type": {
               "type": "string",
               "enum": [
-                "unknown"
+                "json"
               ]
             }
           }

@@ -176,7 +176,7 @@ fn generate_parameter_type(
             }
             type_names.join(" | ")
         }
-        schema::ParameterType::Unknown => String::from("unknown"),
+        schema::ParameterType::Json => String::from("Record<string, any>"),
         schema::ParameterType::Intersection { types } => {
             let mut type_names = Vec::new();
             for (i, param) in types.iter().enumerate() {
