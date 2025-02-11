@@ -3508,6 +3508,13 @@ resources:
           type: string
           description: |
             프로모션 그룹 ID
+        promotionIds:
+          optional: true
+          type: array
+          items:
+            type: string
+          description: |
+            프로모션 ID 목록
     IdentityVerificationRequest:
       type: object
       properties:
