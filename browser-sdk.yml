@@ -1227,7 +1227,17 @@ resources:
         EN_US:
           description: 영어
         ZH_CN:
-          description: 중국어
+          description: 중국어 (중국 본토)
+        ZH_TW:
+          description: 중국어 (대만)
+        JA_JP:
+          description: 일본어
+        RU_RU:
+          description: 러시아어
+        TH_TH:
+          description: 타이어
+        VI_VN:
+          description: 베트남어
       description: |
         **결제창 언어** (지원되지 않은 일부 PG사 존재)
     OfferPeriod:
@@ -1377,6 +1387,7 @@ resources:
         KPN: {}
         KCP_V2: {}
         HYPHEN: {}
+        EXIMBAY_V2: {}
     IsTestChannel:
       type: boolean
       deprecated: true
@@ -1438,6 +1449,10 @@ resources:
           type: string
           optional: true
           description: "**상품 태그**"
+        link:
+          type: string
+          optional: true
+          description: "**상품 판매 URL**"
     ProductType:
       type: enum
       variants:
