@@ -301,6 +301,7 @@ pub enum ParameterType {
     #[schemars(title = "emptyObject")]
     EmptyObject,
     #[schemars(title = "enum")]
+    #[serde(rename_all = "camelCase")]
     Enum {
         /// Enum의 variant 목록
         variants: IndexMap<String, EnumVariant>,
