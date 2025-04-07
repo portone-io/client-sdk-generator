@@ -110,6 +110,9 @@ Dart enum은 다른 class를 extends할 수 없어 일반적인 union의 구현�
 variant에서 toUnionTypeName()을 호출할 수 있도록 합니다.
 
 ```dart
+// Usage
+LoadableUIType unionValue = PaymentUIType.PAYPAL_SPB.toLooadableUIType();
+
 class LoadableUIType {
     final PaymentUIType? paymentUIType;
     final IssueBillingKeyUIType? issueBillingKeyUIType;
@@ -153,6 +156,9 @@ enum IssueBillingKeyUIType {
 variant가 생길 수 있으므로 discriminator을 union에 귀속시킴
 
 ```dart
+// Usage
+PaymentRequestUnion unionValue = PaymentRequestUnionCard().toPaymentRequestUnion();
+
 class PaymentRequestUnion {
     // discriminator
     final String payMethod;
