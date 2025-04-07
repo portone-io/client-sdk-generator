@@ -2,15 +2,16 @@
 
 ## 기본 타입
 
-| In Schema | In Dart     |
-|-----------|-------------|
-| integer   | int         |
-| number    | double      |
-| boolean   | bool        |
-| array     | List<T>     |
-| json      | dynamic     |
+| In Schema | In Dart   |
+| --------- | --------- |
+| integer   | int       |
+| number    | double    |
+| boolean   | bool      |
+| array     | List\<T\> |
+| json      | dynamic   |
 
-각 타입은 Extension Method `(int|double|bool|List<dynamic>) toJson()`을 갖습니다.
+각 타입은 Extension Method `(int|double|bool|List<dynamic>) _toJson()`을
+갖습니다.
 
 ## Object
 
@@ -35,19 +36,28 @@ class Address {
         this.province
     });
 
-    Map<String, dynamic> toJson() => {
-        if (country != null) 'country': country.toJson(),
-        'addressLine1': addressLine1.toJson(),
-        'addressLine2': addressLine2.toJson(),
-        if (city != null) 'city': city.toJson(),
-        if (province != null) 'province': province.toJson(),
+    Map<String, dynamic> _toJson() => {
+        if (country != null) 'country': country._toJson(),
+        'addressLine1': addressLine1._toJson(),
+        'addressLine2': addressLine2._toJson(),
+        if (city != null) 'city': city._toJson(),
+        if (province != null) 'province': province._toJson(),
     };
+}
+```
+
+## Empty Object
+
+```dart
+class IssueBillingKeyRequestUnionPaypal {
+    Map<String, dynamic> _toJson() => {};
 }
 ```
 
 ## Enum
 
-Dart에서는 non-ASCII 문자열을 identifier로 인정하지 않으므로, Enhaned Enum을 사용합니다.
+Dart에서는 non-ASCII 문자열을 identifier로 인정하지 않으므로, Enhaned Enum을
+사용합니다.
 
 ```dart
 /// 계좌이체, 가상계좌 발급시 사용되는 은행 코드
@@ -64,7 +74,7 @@ enum Bank {
 
     const Bank(String value): _value = value;
 
-    String toJson() => this._value;
+    String _toJson() => this._value;
 }
 ```
 
@@ -83,13 +93,13 @@ class MonthOption {
         this.availableMonthList = null,
     });
 
-    MonthOption.fixedMonth(int fixedMonth) = this._internal(fixedMonth = fixedMonth);
+    MonthOption.fixedMonth(int fixedMonth) = this._internal(fixedMonth: fixedMonth);
 
     MonthOption.availableMonthList(List<int> availableMonthList) : this.internal(availableMonthList: availableMonthList);
 
-    Map<String, dynamic> toJson() => {
-        if (fixedMonth != null) "fixedMonth": fixedMonth.toJson(),
-        if (availableMonthList != null) "availableMonthList": availableMonthList.toJson(),
+    Map<String, dynamic> _toJson() => {
+        if (fixedMonth != null) "fixedMonth": fixedMonth._toJson(),
+        if (availableMonthList != null) "availableMonthList": availableMonthList._toJson(),
     };
 }
 ```
@@ -109,7 +119,7 @@ class LoadableUIType {
         this.issueBillingKeyUIType = null,
     });
 
-    dynamic toJson() => paymentUIType?.toJson() ?? issueBillingKeyUIType?.toJson();
+    dynamic _toJson() => paymentUIType?._toJson() ?? issueBillingKeyUIType?._toJson();
 }
 
 enum PaymentUIType {
@@ -119,7 +129,7 @@ enum PaymentUIType {
 
     const PaymentUIType(String value): _value = value;
 
-    String toJson() => this._value;
+    String _toJson() => this._value;
 
     LoadableUIType toLoadableUIType() => LoadableUIType._internal(paymentUIType: this);
 }
@@ -131,7 +141,7 @@ enum IssueBillingKeyUIType {
 
     const IssueBillingKeyUIType(String value): _value = value;
 
-    String toJson() => this._value;
+    String _toJson() => this._value;
 
     LoadableUIType toLoadableUIType() => LoadableUIType._internal(issueBillingKeyUIType: this);
 }
@@ -139,7 +149,8 @@ enum IssueBillingKeyUIType {
 
 ## Discriminated Union
 
-현재는 각 variant가 한 union에서만 쓰이고 있지만, 여러 union에서 공유하는 variant가 생길 수 있으므로 discriminator을 union에 귀속시킴
+현재는 각 variant가 한 union에서만 쓰이고 있지만, 여러 union에서 공유하는
+variant가 생길 수 있으므로 discriminator을 union에 귀속시킴
 
 ```dart
 class PaymentRequestUnion {
@@ -156,9 +167,9 @@ class PaymentRequestUnion {
         }
     );
 
-    Map<String, dynamic> toJson() => {
+    Map<String, dynamic> _toJson() => {
         "payMethod": payMethod,
-        ...?CARD?.toJson(),
+        ...?CARD?._toJson(),
     };    
 }
 
@@ -170,10 +181,18 @@ class PaymentRequestUnionCard {
 }
 ```
 
-## Empty Object
+## Intersection
 
 ```dart
-class IssueBillingKeyRequestUnionPaypal {
-    Map<String, dynamic> toJson() => {};
+class PaymentRequest {
+    final PaymentRequestBase paymentRequestBase;
+    final PaymentRequestUnion paymentRequestUnion;
+
+    PaymentRequest(this.paymentRequestBase, this.paymentRequestUnion);
+
+    Map<String, dynamic> _toJson() => {
+        ...paymentRequestBase,
+        ...paymentRequestUnion,
+    };
 }
 ```
