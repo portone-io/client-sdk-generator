@@ -311,6 +311,10 @@
             "discriminator": {
               "description": "Discriminator 프로퍼티 이름",
               "type": "string"
+            },
+            "optional": {
+              "description": "Discriminator 프로퍼티 Optional 여부",
+              "type": "boolean"
             }
           }
         },

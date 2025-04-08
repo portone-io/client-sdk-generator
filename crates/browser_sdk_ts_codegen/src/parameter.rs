@@ -196,6 +196,7 @@ fn generate_parameter_type(
         schema::ParameterType::DiscriminatedUnion {
             types,
             discriminator,
+            optional,
         } => {
             let mut variant_types = Vec::new();
             for (variant_name, variant_param) in types {
@@ -217,6 +218,9 @@ fn generate_parameter_type(
                     variant_description = variant_param.description().to_jsdoc(false),
                 );
                 variant_types.push(discriminated_type);
+            }
+            if *optional {
+                variant_types.push(format!("({{ {discriminator}?: undefined }})"));
             }
             variant_types.join(" | ")
         }
@@ -879,6 +883,7 @@ mod tests {
         let discriminated_union_param = schema::ParameterType::DiscriminatedUnion {
             types,
             discriminator: "type".to_string(),
+            optional: false,
         };
 
         assert!(decls.is_empty());

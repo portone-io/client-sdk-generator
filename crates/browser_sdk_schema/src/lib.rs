@@ -234,6 +234,9 @@ pub enum ParameterType {
         types: IndexMap<String, Parameter>,
         /// Discriminator 프로퍼티 이름
         discriminator: String,
+        /// Discriminator 프로퍼티 Optional 여부
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        optional: bool,
     },
     #[schemars(title = "resourceRef")]
     ResourceRef(ResourceRef),
