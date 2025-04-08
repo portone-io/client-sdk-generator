@@ -71,98 +71,7 @@ pub trait ParameterExt {
 
 impl ParameterExt for Parameter {
     fn name(&self) -> Option<&str> {
-        match self {
-            Parameter::Named(named) => Some(&named.name),
-            Parameter::Unnamed(_) => None,
-        }
-    }
-
-    fn description(&self) -> Option<String> {
-        match self {
-            Parameter::Named(named) => named.parameter.description(),
-            Parameter::Unnamed(parameter) => parameter.description(),
-        }
-    }
-
-    fn r#type(&self) -> &ParameterType {
-        match self {
-            Parameter::Named(named) => &named.parameter.r#type,
-            Parameter::Unnamed(parameter) => &parameter.r#type,
-        }
-    }
-
-    fn optional(&self) -> bool {
-        match self {
-            Parameter::Named(named) => named.parameter.optional,
-            Parameter::Unnamed(parameter) => parameter.optional,
-        }
-    }
-
-    fn pg_specific(&self) -> Option<&IndexMap<String, PgSpecific>> {
-        match self {
-            Parameter::Named(named) => named.parameter.pg_specific.as_ref(),
-            Parameter::Unnamed(parameter) => parameter.pg_specific.as_ref(),
-        }
-    }
-
-    fn deprecated(&self) -> bool {
-        match self {
-            Parameter::Named(named) => named.parameter.deprecated,
-            Parameter::Unnamed(parameter) => parameter.deprecated,
-        }
-    }
-}
-
-impl ParameterExt for NamedParameter {
-    fn name(&self) -> Option<&str> {
-        Some(&self.name)
-    }
-
-    fn description(&self) -> Option<String> {
-        match (
-            self.parameter.description.as_deref(),
-            &self.parameter.r#type,
-        ) {
-            (None, ParameterType::ResourceRef(resource_ref)) => RESOURCE_INDEX.with(|index| {
-                index
-                    .get(resource_ref.resource_ref())
-                    .and_then(|parameter| parameter.description().map(|s| s.to_string()))
-            }),
-            (None, ParameterType::Array { items }) => items.description(),
-            (description, _) => description.map(|s| s.to_string()),
-        }
-    }
-
-    fn r#type(&self) -> &ParameterType {
-        &self.parameter.r#type
-    }
-
-    fn optional(&self) -> bool {
-        self.parameter.optional
-    }
-
-    fn pg_specific(&self) -> Option<&IndexMap<String, PgSpecific>> {
-        self.parameter.pg_specific.as_ref()
-    }
-
-    fn deprecated(&self) -> bool {
-        match (self.parameter.deprecated, &self.parameter.r#type) {
-            (true, _) => true,
-            (_, ParameterType::ResourceRef(resource_ref)) => RESOURCE_INDEX.with(|index| {
-                index
-                    .get(resource_ref.resource_ref())
-                    .map(|parameter| parameter.deprecated())
-                    .unwrap_or(false)
-            }),
-            (_, ParameterType::Array { items }) => items.deprecated(),
-            _ => false,
-        }
-    }
-}
-
-impl ParameterExt for UnnamedParameter {
-    fn name(&self) -> Option<&str> {
-        None
+        self.name.as_deref()
     }
 
     fn description(&self) -> Option<String> {
@@ -205,47 +114,42 @@ impl ParameterExt for UnnamedParameter {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
-#[serde(rename_all = "camelCase", untagged)]
-pub enum Parameter {
-    Named(NamedParameter),
-    Unnamed(UnnamedParameter),
-}
-
-#[derive(Serialize, Deserialize, Debug, Default, PartialEq, Clone, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct NamedParameter {
+pub struct Parameter {
     /// 파라미터 이름
-    name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// 파라미터 설명
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
     #[serde(flatten)]
-    pub parameter: UnnamedParameter,
+    pub r#type: ParameterType,
+    /// Optional 여부
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub optional: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pg_specific: Option<IndexMap<String, PgSpecific>>,
+    /// Deprecated 여부
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub deprecated: bool,
 }
 
-impl NamedParameter {
-    pub fn new(name: String, parameter: UnnamedParameter) -> Self {
-        Self { name, parameter }
+impl Default for Parameter {
+    fn default() -> Self {
+        Self {
+            name: None,
+            description: None,
+            r#type: ParameterType::default(),
+            optional: false,
+            pg_specific: None,
+            deprecated: false,
+        }
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Default, PartialEq, Clone, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct UnnamedParameter {
-    /// 파라미터 설명
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
-    #[serde(flatten)]
-    r#type: ParameterType,
-    /// Optional 여부
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    optional: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pg_specific: Option<IndexMap<String, PgSpecific>>,
-    /// Deprecated 여부
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    deprecated: bool,
-}
-
-impl UnnamedParameter {
+impl Parameter {
     pub fn new(
+        name: Option<String>,
         description: Option<String>,
         r#type: ParameterType,
         optional: bool,
@@ -253,6 +157,7 @@ impl UnnamedParameter {
         deprecated: bool,
     ) -> Self {
         Self {
+            name,
             description,
             r#type,
             optional,
@@ -438,30 +343,33 @@ mod tests {
         let mut parameters: IndexMap<String, Parameter> = IndexMap::new();
         parameters.insert(
             "Person".to_string(),
-            Parameter::Unnamed(UnnamedParameter {
+            Parameter {
+                name: None,
                 description: Some("A person object".to_string()),
                 r#type: ParameterType::Object {
                     properties: {
                         let mut properties = IndexMap::new();
                         properties.insert(
                             "name".to_string(),
-                            Parameter::Unnamed(UnnamedParameter {
+                            Parameter {
+                                name: None,
                                 description: Some("The person's name".to_string()),
                                 r#type: ParameterType::String,
                                 optional: false,
                                 pg_specific: None,
                                 deprecated: false,
-                            }),
+                            },
                         );
                         properties.insert(
                             "age".to_string(),
-                            Parameter::Unnamed(UnnamedParameter {
+                            Parameter {
+                                name: None,
                                 description: Some("The person's age".to_string()),
                                 r#type: ParameterType::Integer,
                                 optional: true,
                                 pg_specific: None,
                                 deprecated: false,
-                            }),
+                            },
                         );
                         properties
                     },
@@ -469,11 +377,12 @@ mod tests {
                 optional: false,
                 pg_specific: None,
                 deprecated: false,
-            }),
+            },
         );
         parameters.insert(
             "Colors".to_string(),
-            Parameter::Unnamed(UnnamedParameter {
+            Parameter {
+                name: None,
                 description: Some("An enum of colors".to_string()),
                 r#type: ParameterType::Enum {
                     variants: {
@@ -503,36 +412,43 @@ mod tests {
                 optional: false,
                 pg_specific: None,
                 deprecated: false,
-            }),
+            },
         );
         parameters.insert(
             "Numbers".to_string(),
-            Parameter::Unnamed(UnnamedParameter {
+            Parameter {
+                name: None,
                 description: Some("An array of numbers".to_string()),
                 r#type: ParameterType::Array {
-                    items: Box::new(Parameter::Unnamed(UnnamedParameter {
+                    items: Box::new(Parameter {
+                        name: None,
+                        description: None,
                         r#type: ParameterType::Integer,
-                        ..Default::default()
-                    })),
+                        optional: false,
+                        pg_specific: None,
+                        deprecated: false,
+                    }),
                 },
                 optional: false,
                 pg_specific: None,
                 deprecated: false,
-            }),
+            },
         );
         parameters.insert(
             "IsHuman".to_string(),
-            Parameter::Unnamed(UnnamedParameter {
+            Parameter {
+                name: None,
                 description: Some("Boolean to indicate if human".to_string()),
                 r#type: ParameterType::Boolean,
                 optional: false,
                 pg_specific: None,
                 deprecated: false,
-            }),
+            },
         );
         parameters.insert(
             "Reference".to_string(),
-            Parameter::Unnamed(UnnamedParameter {
+            Parameter {
+                name: None,
                 description: Some("Reference to another parameter".to_string()),
                 r#type: ParameterType::ResourceRef(ResourceRef {
                     resource_ref: "#/resources/Person".to_string(),
@@ -540,7 +456,7 @@ mod tests {
                 optional: false,
                 pg_specific: None,
                 deprecated: false,
-            }),
+            },
         );
 
         let schema = Schema {

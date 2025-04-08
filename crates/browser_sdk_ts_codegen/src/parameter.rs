@@ -19,28 +19,29 @@ pub(crate) fn generate_parameter(
     current_module_path: &PathBuf,
     resource_base_path: &PathBuf,
 ) -> String {
-    match parameter {
-        schema::Parameter::Named(parameter) => generate_named_parameter(
+    if parameter.name().is_some() {
+        generate_named_parameter(
             parameter,
             decls,
             imports,
             parent_name,
             current_module_path,
             resource_base_path,
-        ),
-        schema::Parameter::Unnamed(parameter) => generate_unnamed_parameter(
+        )
+    } else {
+        generate_unnamed_parameter(
             parameter,
             decls,
             imports,
             parent_name,
             current_module_path,
             resource_base_path,
-        ),
+        )
     }
 }
 
 pub(crate) fn generate_named_parameter(
-    parameter: &schema::NamedParameter,
+    parameter: &schema::Parameter,
     decls: &mut Vec<AnyJsDeclaration>,
     imports: &mut IndexSet<ImportEntry>,
     _parent_name: &str,
@@ -49,7 +50,7 @@ pub(crate) fn generate_named_parameter(
 ) -> String {
     let type_name = parameter.name().unwrap_or_default();
     let type_def = generate_unnamed_parameter(
-        &parameter.parameter,
+        parameter,
         decls,
         imports,
         type_name,
@@ -72,7 +73,7 @@ pub(crate) fn generate_named_parameter(
 }
 
 pub(crate) fn generate_unnamed_parameter(
-    parameter: &schema::UnnamedParameter,
+    parameter: &schema::Parameter,
     decls: &mut Vec<AnyJsDeclaration>,
     imports: &mut IndexSet<ImportEntry>,
     parent_name: &str,
@@ -425,7 +426,7 @@ mod tests {
     use super::*;
     use biome_js_syntax::AnyJsDeclaration;
     use biome_rowan::AstNode;
-    use browser_sdk_schema::{self as schema, NamedParameter, UnnamedParameter};
+    use browser_sdk_schema::{self as schema};
     use indexmap::IndexMap;
     use indoc::indoc;
     use pretty_assertions::assert_eq;
@@ -433,15 +434,13 @@ mod tests {
     #[test]
     fn test_generate_named_parameter() {
         let mut decls = Vec::new();
-        let named_param = schema::NamedParameter::new(
-            "UserId".to_string(),
-            schema::UnnamedParameter::new(
-                Some("The ID of the user".to_string()),
-                schema::ParameterType::Integer,
-                false,
-                None,
-                false,
-            ),
+        let named_param = schema::Parameter::new(
+            Some("UserId".to_string()),
+            Some("The ID of the user".to_string()),
+            schema::ParameterType::Integer,
+            false,
+            None,
+            false,
         );
 
         let type_name = generate_named_parameter(
@@ -476,7 +475,8 @@ mod tests {
     #[test]
     fn test_generate_unnamed_parameter_optional() {
         let mut decls = Vec::new();
-        let unnamed_param = schema::UnnamedParameter::new(
+        let unnamed_param = schema::Parameter::new(
+            None,
             Some("Optional user name".to_string()),
             schema::ParameterType::String,
             true,
@@ -499,14 +499,16 @@ mod tests {
     #[test]
     fn test_generate_parameter_type_array() {
         let mut decls = Vec::new();
+        let array_item = schema::Parameter::new(
+            None,
+            Some("Array of integers".to_string()),
+            schema::ParameterType::Integer,
+            false,
+            None,
+            false,
+        );
         let array_param = schema::ParameterType::Array {
-            items: Box::new(schema::Parameter::Unnamed(schema::UnnamedParameter::new(
-                Some("Array of integers".to_string()),
-                schema::ParameterType::Integer,
-                false,
-                None,
-                false,
-            ))),
+            items: Box::new(array_item),
         };
 
         let type_def = generate_parameter_type(
@@ -527,29 +529,25 @@ mod tests {
         let mut properties = IndexMap::new();
         properties.insert(
             "id".to_string(),
-            schema::Parameter::Named(schema::NamedParameter::new(
-                "Id".to_string(),
-                schema::UnnamedParameter::new(
-                    Some("User ID".to_string()),
-                    schema::ParameterType::Integer,
-                    false,
-                    None,
-                    false,
-                ),
-            )),
+            schema::Parameter::new(
+                Some("Id".to_string()),
+                Some("User ID".to_string()),
+                schema::ParameterType::Integer,
+                false,
+                None,
+                false,
+            ),
         );
         properties.insert(
             "name".to_string(),
-            schema::Parameter::Named(schema::NamedParameter::new(
-                "Name".to_string(),
-                schema::UnnamedParameter::new(
-                    Some("User name".to_string()),
-                    schema::ParameterType::String,
-                    false,
-                    None,
-                    false,
-                ),
-            )),
+            schema::Parameter::new(
+                Some("Name".to_string()),
+                Some("User name".to_string()),
+                schema::ParameterType::String,
+                false,
+                None,
+                false,
+            ),
         );
 
         let object_param = schema::ParameterType::Object { properties };
@@ -642,16 +640,14 @@ mod tests {
         };
 
         let type_def = generate_parameter(
-            &schema::Parameter::Named(NamedParameter::new(
-                "UserRole".to_string(),
-                UnnamedParameter::new(
-                    Some("User role".to_string()),
-                    enum_param,
-                    false,
-                    None,
-                    false,
-                ),
-            )),
+            &schema::Parameter::new(
+                Some("UserRole".to_string()),
+                Some("User role".to_string()),
+                enum_param,
+                false,
+                None,
+                false,
+            ),
             &mut decls,
             &mut IndexSet::new(),
             "",
@@ -713,7 +709,8 @@ mod tests {
 
         properties.insert(
             "TypeA".to_string(),
-            schema::Parameter::Unnamed(schema::UnnamedParameter::new(
+            schema::Parameter::new(
+                None,
                 Some("Type A".to_string()),
                 schema::ParameterType::StringLiteral {
                     value: "A".to_string(),
@@ -721,12 +718,13 @@ mod tests {
                 false,
                 None,
                 false,
-            )),
+            ),
         );
 
         properties.insert(
             "TypeB".to_string(),
-            schema::Parameter::Unnamed(schema::UnnamedParameter::new(
+            schema::Parameter::new(
+                None,
                 Some("Type B".to_string()),
                 schema::ParameterType::StringLiteral {
                     value: "B".to_string(),
@@ -734,7 +732,7 @@ mod tests {
                 false,
                 None,
                 false,
-            )),
+            ),
         );
 
         let oneof_param = schema::ParameterType::OneOf { properties };
@@ -771,7 +769,8 @@ mod tests {
 
         let union_param = schema::ParameterType::Union {
             types: vec![
-                schema::Parameter::Unnamed(schema::UnnamedParameter::new(
+                schema::Parameter::new(
+                    None,
                     Some("Type A".to_string()),
                     schema::ParameterType::StringLiteral {
                         value: "A".to_string(),
@@ -779,8 +778,9 @@ mod tests {
                     false,
                     None,
                     false,
-                )),
-                schema::Parameter::Unnamed(schema::UnnamedParameter::new(
+                ),
+                schema::Parameter::new(
+                    None,
                     Some("Type B".to_string()),
                     schema::ParameterType::StringLiteral {
                         value: "B".to_string(),
@@ -788,7 +788,7 @@ mod tests {
                     false,
                     None,
                     false,
-                )),
+                ),
             ],
         };
 
@@ -811,20 +811,22 @@ mod tests {
 
         types.insert(
             "Circle".to_string(),
-            schema::Parameter::Unnamed(schema::UnnamedParameter::new(
+            schema::Parameter::new(
+                None,
                 Some("Circle shape".to_string()),
                 schema::ParameterType::Object {
                     properties: {
                         let mut props = IndexMap::new();
                         props.insert(
                             "radius".to_string(),
-                            schema::Parameter::Unnamed(schema::UnnamedParameter::new(
+                            schema::Parameter::new(
+                                None,
                                 Some("Radius of the circle".to_string()),
                                 schema::ParameterType::Integer,
                                 false,
                                 None,
                                 false,
-                            )),
+                            ),
                         );
                         props
                     },
@@ -832,35 +834,38 @@ mod tests {
                 false,
                 None,
                 false,
-            )),
+            ),
         );
 
         types.insert(
             "Rectangle".to_string(),
-            schema::Parameter::Unnamed(schema::UnnamedParameter::new(
+            schema::Parameter::new(
+                None,
                 Some("Rectangle shape".to_string()),
                 schema::ParameterType::Object {
                     properties: {
                         let mut props = IndexMap::new();
                         props.insert(
                             "width".to_string(),
-                            schema::Parameter::Unnamed(schema::UnnamedParameter::new(
+                            schema::Parameter::new(
+                                None,
                                 Some("Width of the rectangle".to_string()),
                                 schema::ParameterType::Integer,
                                 false,
                                 None,
                                 false,
-                            )),
+                            ),
                         );
                         props.insert(
                             "height".to_string(),
-                            schema::Parameter::Unnamed(schema::UnnamedParameter::new(
+                            schema::Parameter::new(
+                                None,
                                 Some("Height of the rectangle".to_string()),
                                 schema::ParameterType::Integer,
                                 false,
                                 None,
                                 false,
-                            )),
+                            ),
                         );
                         props
                     },
@@ -868,7 +873,7 @@ mod tests {
                 false,
                 None,
                 false,
-            )),
+            ),
         );
 
         let discriminated_union_param = schema::ParameterType::DiscriminatedUnion {
@@ -889,12 +894,20 @@ mod tests {
         assert_eq!(
             type_def,
             indoc! {r#"
-                ({ type: 'Circle' } & { circle: {
+                ({ type: 'Circle' } & { 
+                /**
+                * Circle shape
+                */
+                circle: {
                 /**
                 * Radius of the circle
                 */
                 radius: number
-                } }) | ({ type: 'Rectangle' } & { rectangle: {
+                } }) | ({ type: 'Rectangle' } & { 
+                /**
+                * Rectangle shape
+                */
+                rectangle: {
                 /**
                 * Width of the rectangle
                 */

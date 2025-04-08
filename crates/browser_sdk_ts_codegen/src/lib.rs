@@ -76,12 +76,12 @@ pub fn generate_resource_module(
             let current_module_path = path.join(format!("{}.ts", resource_name));
             let mut decls: Vec<AnyJsDeclaration> = Vec::new();
             let mut imports: IndexSet<ImportEntry> = IndexSet::new();
-            let parameter = match parameter {
-                schema::Parameter::Named(named_parameter) => named_parameter,
-                schema::Parameter::Unnamed(unnamed_parameter) => &schema::NamedParameter::new(
-                    resource_name.to_string(),
-                    unnamed_parameter.clone(),
-                ),
+            let parameter = match &parameter.name {
+                Some(_) => parameter,
+                None => &schema::Parameter {
+                    name: Some(resource_name.to_string()),
+                    ..parameter.clone()
+                },
             };
             generate_named_parameter(
                 parameter,
