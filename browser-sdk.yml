@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=./schema.json
+# yaml-language-server: $schema=./browser-sdk.schema.json
 
 pgProviders: {}
 resources:
@@ -1066,14 +1066,14 @@ resources:
           optional: true
           description: |
             **구매자 이름 후리가나**
-            
+
             일본어 읽는 법 표기
         lastNameKana:
           type: string
           optional: true
           description: |
             **구매자 성 후리가나**
-            
+
             일본어 읽는 법 표기
     EasyPayPaymentMethod:
       type: enum
@@ -3223,7 +3223,7 @@ resources:
                   type: string
                   description: |
                     **결제창 색상**
-                    
+
                     가능한 값:
                     - `red1`
                     - `red2`
