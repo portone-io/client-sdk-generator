@@ -161,7 +161,7 @@ PaymentRequestUnion unionValue = PaymentRequestUnionCard().toPaymentRequestUnion
 
 class PaymentRequestUnion {
     // discriminator
-    final String payMethod;
+    final String? payMethod;
     final PaymentRequestUnionCard? card;
     // ...
 
@@ -172,6 +172,8 @@ class PaymentRequestUnion {
             // ...
         }
     );
+
+    PaymentRequestUnion.empty() : this._internal(null);
 
     Map<String, dynamic> _toJson() => {
         'payMethod': payMethod,

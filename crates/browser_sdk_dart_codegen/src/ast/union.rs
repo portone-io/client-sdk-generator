@@ -57,22 +57,38 @@ impl fmt::Display for Union {
             {
                 let indent = Indent(2);
                 for variant in self.variants.iter() {
-                    writeln!(f, "{indent}this.{variant_name} = null,", variant_name = variant.name.as_ref())?;
+                    writeln!(
+                        f,
+                        "{indent}this.{variant_name} = null,",
+                        variant_name = variant.name.as_ref()
+                    )?;
                 }
             }
             writeln!(f, "{indent}}});")?;
             writeln!(f)?;
             let (first, rest) = self.variants.split_first().expect("at least one variant");
             if rest.is_empty() {
-                writeln!(f, "{indent}dynamic _toJson() => {variant_name}?._toJson();", variant_name = first.name.as_ref())?;
+                writeln!(
+                    f,
+                    "{indent}dynamic _toJson() => {variant_name}?._toJson();",
+                    variant_name = first.name.as_ref()
+                )?;
             } else {
-                writeln!(f, "{indent}dynamic _toJson() => {variant_name}?._toJson()", variant_name = first.name.as_ref())?;
+                writeln!(
+                    f,
+                    "{indent}dynamic _toJson() => {variant_name}?._toJson()",
+                    variant_name = first.name.as_ref()
+                )?;
                 {
                     let indent = Indent(2);
                     let len = rest.len();
                     for (i, variant) in rest.iter().enumerate() {
                         let terminator = if i + 1 == len { ";" } else { "" };
-                        writeln!(f, "{indent}?? {variant_name}?._toJson(){terminator}", variant_name = variant.name.as_ref())?;
+                        writeln!(
+                            f,
+                            "{indent}?? {variant_name}?._toJson(){terminator}",
+                            variant_name = variant.name.as_ref()
+                        )?;
                     }
                 }
             }
@@ -87,6 +103,7 @@ pub struct DiscriminatedUnion {
     pub description: Option<Comment>,
     pub discriminator: Identifier,
     pub variants: Vec<DiscriminatedUnionVariant>,
+    pub allow_empty: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -111,11 +128,19 @@ impl fmt::Display for DiscriminatedUnion {
                 .collect::<Vec<_>>();
 
             let indent = Indent(1);
-            writeln!(
-                f,
-                "{indent}final String {discriminator};",
-                discriminator = self.discriminator.as_ref()
-            )?;
+            if self.allow_empty {
+                writeln!(
+                    f,
+                    "{indent}final String? {discriminator};",
+                    discriminator = self.discriminator.as_ref()
+                )?;
+            } else {
+                writeln!(
+                    f,
+                    "{indent}final String {discriminator};",
+                    discriminator = self.discriminator.as_ref()
+                )?;
+            }
             for (variant, variant_name) in self.variants.iter().zip(variant_names.iter()) {
                 for comment in variant.description.iter().flat_map(Comment::lines) {
                     writeln!(f, "{indent}/// {comment}")?;
@@ -145,6 +170,14 @@ impl fmt::Display for DiscriminatedUnion {
                 writeln!(f, "{indent}}}")?;
             }
             writeln!(f, "{indent});")?;
+            if self.allow_empty {
+                writeln!(f)?;
+                writeln!(
+                    f,
+                    "{indent}{name}.empty() : this._internal(null);",
+                    name = self.name.as_ref()
+                )?;
+            }
             writeln!(f)?;
             writeln!(f, "{indent}Map<String, dynamic> _toJson() => {{")?;
             {
@@ -224,11 +257,12 @@ mod tests {
                     description: None,
                 },
             ],
+            allow_empty: true,
         };
         assert_eq!(
             union.to_string(),
             r"class PaymentRequestUnion {
-    final String payMethod;
+    final String? payMethod;
     final PaymentRequestUnionCard? card;
     final PaymentRequestUnionEasyPay? easyPay;
 
@@ -239,6 +273,8 @@ mod tests {
             this.easyPay = null,
         }
     );
+
+    PaymentRequestUnion.empty() : this._internal(null);
 
     Map<String, dynamic> _toJson() => {
         'payMethod': payMethod,
