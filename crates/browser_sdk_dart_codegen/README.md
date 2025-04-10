@@ -162,28 +162,28 @@ PaymentRequestUnion unionValue = PaymentRequestUnionCard().toPaymentRequestUnion
 class PaymentRequestUnion {
     // discriminator
     final String payMethod;
-    final PaymentRequestUnionCard? CARD;
+    final PaymentRequestUnionCard? card;
     // ...
 
     PaymentRequestUnion._internal(
         this.payMethod,
         {
-            this.CARD = null,
+            this.card = null,
             // ...
         }
     );
 
     Map<String, dynamic> _toJson() => {
-        "payMethod": payMethod,
-        ...?CARD?._toJson(),
-    };    
+        'payMethod': payMethod,
+        ...?card?._toJson(),
+    };
 }
 
 /// **카드 정보**
 class PaymentRequestUnionCard {
     // ...
 
-    PaymentRequestUnion toPaymentRequestUnion() => PaymentRequestUnion._internal("CARD", CARD: this);
+    PaymentRequestUnion toPaymentRequestUnion() => PaymentRequestUnion._internal("CARD", card: this);
 }
 ```
 
@@ -197,8 +197,8 @@ class PaymentRequest {
     PaymentRequest(this.paymentRequestBase, this.paymentRequestUnion);
 
     Map<String, dynamic> _toJson() => {
-        ...paymentRequestBase,
-        ...paymentRequestUnion,
+        ...paymentRequestBase._toJson(),
+        ...paymentRequestUnion._toJson(),
     };
 }
 ```
