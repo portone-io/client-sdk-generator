@@ -74,7 +74,10 @@ impl fmt::Display for Object {
                 writeln!(f)?;
                 for parent in self.union_parents.iter() {
                     match parent {
-                        UnionParent::Union { parent_name, variant_name } => {
+                        UnionParent::Union {
+                            parent_name,
+                            variant_name,
+                        } => {
                             writeln!(
                                 f,
                                 "{indent}{parent_name} to{parent_name}() => {parent_name}._internal({variant_name}: this);",
@@ -82,7 +85,11 @@ impl fmt::Display for Object {
                                 variant_name = variant_name.as_ref(),
                             )?;
                         }
-                        UnionParent::DiscriminatedUnion { parent_name, variant_name, discriminator_value } => {
+                        UnionParent::DiscriminatedUnion {
+                            parent_name,
+                            variant_name,
+                            discriminator_value,
+                        } => {
                             writeln!(
                                 f,
                                 "{indent}{parent_name} to{parent_name}() => {parent_name}._internal('{discriminator_value}', {variant_name}: this);",
@@ -134,7 +141,10 @@ mod tests {
             name: Identifier::try_from("Test").unwrap(),
             description: Some(Comment("Test Object".into())),
             fields: vec![],
-            union_parents: vec![UnionParent::Union { parent_name: Identifier::try_from("UnionParent").unwrap(), variant_name: Identifier::try_from("test").unwrap() }],
+            union_parents: vec![UnionParent::Union {
+                parent_name: Identifier::try_from("UnionParent").unwrap(),
+                variant_name: Identifier::try_from("test").unwrap(),
+            }],
         };
         assert_eq!(
             object.to_string(),
