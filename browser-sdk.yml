@@ -3587,6 +3587,28 @@ resources:
               description: |
                 결제 혜택의 상세 설명을 보여줄지 여부. 각 카드사의 결제 혜택을 자세히 설명 함. 기본값은 false
               optional: true
+        PayletterGlobal:
+          type: object
+          description: "페이레터 해외결제 bypass 파라미터"
+          name: PayletterGlobalBypass
+          properties:
+            pginfo:
+              type: string
+              description: |
+                **결제수단 지정용 파라미터**
+
+                - 해외카드 인증 : `PLCreditCard`
+                - 해외카드 비인증(3DS) : `PLCreditCardMpi`
+                - 유니온페이 : `PLUnionPay_HC`
+                - 위챗페이 PC결제: `WeChatPayQRCodePayment`
+                - 위챗페이 모바일결제 : `WeChatPayH5Payment`
+                - 알리페이 : `ICBAlipay`
+              optional: true
+            servicename:
+              type: string
+              description: |
+                고객사 서비스명, WeChatPay, Alipay 이용 시 필수 입력
+              optional: true
       PaymentBypass:
         type: object
         description: |
@@ -3652,6 +3674,10 @@ resources:
             type: resourceRef
             optional: true
             $ref: "#/resources/entity/bypass/payment/InicisJp"
+          payletter_global:
+            type: resourceRef
+            optional: true
+            $ref: "#/resources/entity/bypass/payment/PayletterGlobal"
     OfferPeriodRange:
       type: union
       description: |
@@ -4535,6 +4561,7 @@ resources:
     IssueBillingKeyAndPayRequestUnion:
       type: discriminatedUnion
       discriminator: billingKeyAndPayMethod
+      optional: true
       types:
         MOBILE:
           type: resourceRef
@@ -4692,6 +4719,7 @@ resources:
     PaymentRequestUnion:
       type: discriminatedUnion
       discriminator: payMethod
+      optional: true
       types:
         CARD:
           type: resourceRef
