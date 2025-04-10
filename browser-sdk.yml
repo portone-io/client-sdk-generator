@@ -3069,6 +3069,7 @@ resources:
               type: string
               description: |
                 **가맹점 로고 이미지 URL**
+
                 69 * 20 픽셀 크기의 이미지 URL
               optional: true
         KsnetSndQpayType:
