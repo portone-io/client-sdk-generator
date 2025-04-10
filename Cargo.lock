@@ -413,6 +413,7 @@ name = "browser_sdk_dart_codegen"
 version = "0.1.0"
 dependencies = [
  "browser_sdk_schema",
+ "convert_case",
 ]
 
 [[package]]
