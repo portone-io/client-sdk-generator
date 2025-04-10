@@ -2526,6 +2526,11 @@ resources:
               type: resourceRef
               $ref: '#/resources/entity/bypass/payment/KsnetSndQpayType'
               optional: true
+            easyPayDirect:
+              type: boolean
+              description: |
+                **KSNET 간편결제 다이렉트 여부**
+              optional: true
         Kakaopay:
           type: object
           description: "카카오페이 bypass 파라미터"
@@ -3023,6 +3028,48 @@ resources:
             settings:
               type: resourceRef
               $ref: '#/resources/entity/bypass/payment/EximbayV2Settings'
+              optional: true
+        InicisJp:
+          type: object
+          description: "이니시스 일본 bypass 파라미터"
+          name: InicisJpBypass
+          properties:
+            paymentUI:
+              type: resourceRef
+              $ref: '#/resources/entity/bypass/payment/InicisJpPaymentUI'
+              optional: true
+        InicisJpPaymentUI:
+          type: object
+          description: |
+            결제창 UI 설정
+          properties:
+            colorTheme:
+              type: string
+              description: |
+                **결제창 색상**
+                
+                가능한 값:
+                - `red1`
+                - `red2`
+                - `red3`
+                - `red4`
+                - `orange`
+                - `yellow`
+                - `black`
+                - `purple`
+                - `green`
+                - `blue1`
+                - `blue2`
+                - `blue3`
+                - `blue4`
+                - `blue5`
+                - `blue6`
+              optional: true
+            logoUrl:
+              type: string
+              description: |
+                **가맹점 로고 이미지 URL**
+                69 * 20 픽셀 크기의 이미지 URL
               optional: true
         KsnetSndQpayType:
           type: enum
@@ -3600,6 +3647,10 @@ resources:
             type: resourceRef
             optional: true
             $ref: "#/resources/entity/bypass/payment/EximbayV2"
+          inicis_jp:
+            type: resourceRef
+            optional: true
+            $ref: "#/resources/entity/bypass/payment/InicisJp"
     OfferPeriodRange:
       type: union
       description: |
