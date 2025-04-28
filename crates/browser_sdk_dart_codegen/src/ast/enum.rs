@@ -1,13 +1,13 @@
 use std::fmt;
 
-use super::{Comment, Identifier, Indent};
+use super::{Comment, Identifier, Indent, UnionParent};
 
 #[derive(Debug, Clone)]
 pub struct Enum {
     pub name: Identifier,
     pub description: Option<Comment>,
     pub variants: Vec<EnumVariant>,
-    pub union_parents: Vec<Identifier>,
+    pub union_parents: Vec<UnionParent>,
 }
 
 #[derive(Debug, Clone)]
@@ -40,7 +40,7 @@ impl fmt::Display for Enum {
                 "{indent}const {name}(String value) : _value = value;",
                 name = self.name.as_ref()
             )?;
-            writeln!(f, "{indent}String _toJson() => _value;")?;
+            writeln!(f, "{indent}String toJson() => _value;")?;
         }
         writeln!(f, "}}")
     }
@@ -94,7 +94,7 @@ enum Test1 {
 
     final String _value;
     const Test1(String value) : _value = value;
-    String _toJson() => _value;
+    String toJson() => _value;
 }
 "
         );

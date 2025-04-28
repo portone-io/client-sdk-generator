@@ -10,9 +10,6 @@
 | array     | List\<T\> |
 | json      | dynamic   |
 
-각 타입은 Extension Method `(int|double|bool|List<dynamic>) _toJson()`을
-갖습니다.
-
 ## Object
 
 ```dart
@@ -36,12 +33,12 @@ class Address {
         this.province
     });
 
-    Map<String, dynamic> _toJson() => {
-        if (country != null) 'country': country._toJson(),
-        'addressLine1': addressLine1._toJson(),
-        'addressLine2': addressLine2._toJson(),
-        if (city != null) 'city': city._toJson(),
-        if (province != null) 'province': province._toJson(),
+    Map<String, dynamic> toJson() => {
+        if (country != null) 'country': country.toJson(),
+        'addressLine1': addressLine1,
+        'addressLine2': addressLine2,
+        if (city != null) 'city': city!,
+        if (province != null) 'province': province!,
     };
 }
 ```
@@ -50,7 +47,7 @@ class Address {
 
 ```dart
 class IssueBillingKeyRequestUnionPaypal {
-    Map<String, dynamic> _toJson() => {};
+    Map<String, dynamic> toJson() => {};
 }
 ```
 
@@ -74,7 +71,7 @@ enum Bank {
 
     const Bank(String value): _value = value;
 
-    String _toJson() => this._value;
+    String toJson() => this._value;
 }
 ```
 
@@ -88,18 +85,18 @@ class MonthOption {
     /// **구매자가 선택할 수 있는 할부 개월수 리스트**
     final List<int>? availableMonthList;
 
-    MonthOption._internal({
-        this.fixedMonth = null,
-        this.availableMonthList = null,
+    MonthOption.internal({
+        this.fixedMonth,
+        this.availableMonthList,
     });
 
-    MonthOption.fixedMonth(int fixedMonth) = this._internal(fixedMonth: fixedMonth);
+    MonthOption.fixedMonth(int fixedMonth) = this.internal(fixedMonth: fixedMonth);
 
     MonthOption.availableMonthList(List<int> availableMonthList) : this.internal(availableMonthList: availableMonthList);
 
-    Map<String, dynamic> _toJson() => {
-        if (fixedMonth != null) "fixedMonth": fixedMonth._toJson(),
-        if (availableMonthList != null) "availableMonthList": availableMonthList._toJson(),
+    Map<String, dynamic> toJson() => {
+        if (fixedMonth != null) "fixedMonth": fixedMonth.toJson(),
+        if (availableMonthList != null) "availableMonthList": availableMonthList.toJson(),
     };
 }
 ```
@@ -117,12 +114,12 @@ class LoadableUIType {
     final PaymentUIType? paymentUIType;
     final IssueBillingKeyUIType? issueBillingKeyUIType;
 
-    LoadableUIType._internal({
-        this.paymentUIType = null,
-        this.issueBillingKeyUIType = null,
+    LoadableUIType.internal({
+        this.paymentUIType,
+        this.issueBillingKeyUIType,
     });
 
-    dynamic _toJson() => paymentUIType?._toJson() ?? issueBillingKeyUIType?._toJson();
+    dynamic toJson() => paymentUIType?.toJson() ?? issueBillingKeyUIType?.toJson();
 }
 
 enum PaymentUIType {
@@ -132,9 +129,9 @@ enum PaymentUIType {
 
     const PaymentUIType(String value): _value = value;
 
-    String _toJson() => this._value;
+    String toJson() => this._value;
 
-    LoadableUIType toLoadableUIType() => LoadableUIType._internal(paymentUIType: this);
+    LoadableUIType toLoadableUIType() => LoadableUIType.internal(paymentUIType: this);
 }
 
 enum IssueBillingKeyUIType {
@@ -144,9 +141,9 @@ enum IssueBillingKeyUIType {
 
     const IssueBillingKeyUIType(String value): _value = value;
 
-    String _toJson() => this._value;
+    String toJson() => this._value;
 
-    LoadableUIType toLoadableUIType() => LoadableUIType._internal(issueBillingKeyUIType: this);
+    LoadableUIType toLoadableUIType() => LoadableUIType.internal(issueBillingKeyUIType: this);
 }
 ```
 
@@ -165,19 +162,19 @@ class PaymentRequestUnion {
     final PaymentRequestUnionCard? card;
     // ...
 
-    PaymentRequestUnion._internal(
+    PaymentRequestUnion.internal(
         this.payMethod,
         {
-            this.card = null,
+            this.card,
             // ...
         }
     );
 
-    PaymentRequestUnion.empty() : this._internal(null);
+    PaymentRequestUnion.empty() : this.internal(null);
 
-    Map<String, dynamic> _toJson() => {
+    Map<String, dynamic> toJson() => {
         'payMethod': payMethod,
-        ...?card?._toJson(),
+        ...?card?.toJson(),
     };
 }
 
@@ -185,7 +182,7 @@ class PaymentRequestUnion {
 class PaymentRequestUnionCard {
     // ...
 
-    PaymentRequestUnion toPaymentRequestUnion() => PaymentRequestUnion._internal("CARD", card: this);
+    PaymentRequestUnion toPaymentRequestUnion() => PaymentRequestUnion.internal("CARD", card: this);
 }
 ```
 
@@ -198,9 +195,9 @@ class PaymentRequest {
 
     PaymentRequest(this.paymentRequestBase, this.paymentRequestUnion);
 
-    Map<String, dynamic> _toJson() => {
-        ...paymentRequestBase._toJson(),
-        ...paymentRequestUnion._toJson(),
+    Map<String, dynamic> toJson() => {
+        ...paymentRequestBase.toJson(),
+        ...paymentRequestUnion.toJson(),
     };
 }
 ```

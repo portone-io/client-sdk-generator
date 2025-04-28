@@ -600,6 +600,7 @@ name = "generator_cli"
 version = "0.1.0"
 dependencies = [
  "better_scoped_tls",
+ "browser_sdk_dart_codegen",
  "browser_sdk_schema",
  "browser_sdk_ts_codegen",
  "clap",

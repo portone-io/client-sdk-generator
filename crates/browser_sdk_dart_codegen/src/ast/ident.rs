@@ -11,10 +11,10 @@ impl TryFrom<String> for Identifier {
     type Error = String;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
-        if value.is_ascii() {
+        if value.is_ascii() && !value.contains('-') {
             Ok(Identifier(value))
         } else {
-            Err(format!("non-ascii identifier: {}", value))
+            Err(format!("non-identifier: {}", value))
         }
     }
 }
