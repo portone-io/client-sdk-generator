@@ -66,6 +66,11 @@ impl ResourceProcessor {
                 is_list: false,
                 is_required,
             },
+            ParameterType::Json => CompositeType {
+                scalar: ScalarType::Object,
+                is_list: false,
+                is_required,
+            },
             ParameterType::Array { items } => {
                 let scalar = match &items.r#type {
                     ParameterType::String | ParameterType::StringLiteral { .. } => {
@@ -76,7 +81,7 @@ impl ResourceProcessor {
                     ParameterType::ResourceRef(resource_ref) => ScalarType::TypeReference(
                         Self::resource_ref_to_type_reference(resource_ref),
                     ),
-                    ParameterType::Json => ScalarType::Dynamic,
+                    ParameterType::Json => ScalarType::Object,
                     _ => unreachable!(),
                 };
                 CompositeType {
@@ -86,30 +91,43 @@ impl ResourceProcessor {
                 }
             }
             ParameterType::ResourceRef(resource_ref) => {
-                let inner_definition = RESOURCE_INDEX.with(|index| {
-                    let parameter = index.get(resource_ref.resource_ref()).unwrap();
-                    match parameter.r#type {
-                        ParameterType::Object { .. }
-                        | ParameterType::EmptyObject
-                        | ParameterType::Enum { .. }
-                        | ParameterType::Union { .. }
-                        | ParameterType::OneOf { .. }
-                        | ParameterType::Intersection { .. }
-                        | ParameterType::DiscriminatedUnion { .. }
-                        | ParameterType::ResourceRef(..) => None,
-                        _ => Some(Self::build_field(name, parameter)),
+                return RESOURCE_INDEX.with(|index| {
+                    let mut resource_ref = resource_ref;
+                    loop {
+                        let parameter = index.get(resource_ref.resource_ref()).unwrap();
+                        match &parameter.r#type {
+                            ParameterType::Object { .. }
+                            | ParameterType::EmptyObject
+                            | ParameterType::Enum { .. }
+                            | ParameterType::Union { .. }
+                            | ParameterType::OneOf { .. }
+                            | ParameterType::Intersection { .. }
+                            | ParameterType::DiscriminatedUnion { .. } => {
+                                let value_type = CompositeType {
+                                    scalar: ScalarType::TypeReference(
+                                        Self::resource_ref_to_type_reference(resource_ref),
+                                    ),
+                                    is_list: false,
+                                    is_required,
+                                };
+                                break ObjectField {
+                                    name: field_name,
+                                    serialized_name: name.to_string(),
+                                    value_type,
+                                    description: parameter.description.clone().map(Comment),
+                                };
+                            }
+                            ParameterType::ResourceRef(r) => {
+                                resource_ref = r;
+                            }
+                            _ => {
+                                let mut field = Self::build_field(name, parameter);
+                                field.value_type.is_required = is_required;
+                                break field;
+                            }
+                        }
                     }
                 });
-                match inner_definition {
-                    Some(done) => return done,
-                    None => CompositeType {
-                        scalar: ScalarType::TypeReference(Self::resource_ref_to_type_reference(
-                            resource_ref,
-                        )),
-                        is_list: false,
-                        is_required,
-                    },
-                }
             }
             _ => unreachable!("{:#?}", parameter.r#type),
         };
@@ -441,7 +459,7 @@ impl ResourceProcessor {
     }
 }
 
-pub fn generate_entity_module(
+pub fn generate_resources_module(
     resource: &Resource,
     file_base_path: impl AsRef<Path>,
     import_base_path: impl AsRef<Path>,
@@ -449,7 +467,28 @@ pub fn generate_entity_module(
     let mut processor = ResourceProcessor {
         entities: HashMap::new(),
     };
-    processor.process_resource(resource, &mut vec!["entity".to_string()]);
+    if let Resource::SubResources(subresources) = resource {
+        for (key, value) in subresources.iter() {
+            if matches!(key.as_str(), "entity" | "request") {
+                processor.process_resource(value, &mut vec![key.clone()]);
+            }
+        }
+    }
+    // Mobile-only transformations
+    for (path, entity) in processor.entities.iter_mut() {
+        if path.starts_with("request/") {
+            if let Entity::Object(object) = entity {
+                object
+                    .fields
+                    .retain(|field| field.name.as_ref() != "redirectUrl");
+                for field in object.fields.iter_mut() {
+                    if field.name.as_ref() == "appScheme" {
+                        field.value_type.is_required = true;
+                    }
+                }
+            }
+        }
+    }
     processor.connect_union_parents();
     processor.generate_directory(file_base_path, import_base_path);
 }

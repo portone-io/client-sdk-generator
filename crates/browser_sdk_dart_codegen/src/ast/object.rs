@@ -166,7 +166,7 @@ impl fmt::Display for ToJson<'_> {
             ScalarType::Int
             | ScalarType::Double
             | ScalarType::Bool
-            | ScalarType::Dynamic
+            | ScalarType::Object
             | ScalarType::String => {
                 write!(f, "{name}{non_null}")
             }

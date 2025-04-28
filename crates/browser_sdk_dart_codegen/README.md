@@ -8,7 +8,7 @@
 | number    | double    |
 | boolean   | bool      |
 | array     | List\<T\> |
-| json      | dynamic   |
+| json      | Object    |
 
 ## Object
 
