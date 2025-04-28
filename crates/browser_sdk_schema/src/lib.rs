@@ -278,6 +278,8 @@ pub struct EnumVariant {
     /// Enum variant 설명
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub alias: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
@@ -394,18 +396,21 @@ mod tests {
                             "Red".to_string(),
                             EnumVariant {
                                 description: Some("Red color".to_string()),
+                                alias: None,
                             },
                         );
                         variants.insert(
                             "Green".to_string(),
                             EnumVariant {
                                 description: Some("Green color".to_string()),
+                                alias: None,
                             },
                         );
                         variants.insert(
                             "Blue".to_string(),
                             EnumVariant {
                                 description: Some("Blue color".to_string()),
+                                alias: Some("Aqua".to_string()),
                             },
                         );
                         variants
@@ -511,6 +516,7 @@ resources:
         description: Green color
       Blue:
         description: Blue color
+        alias: Aqua
   Numbers:
     description: An array of numbers
     type: array

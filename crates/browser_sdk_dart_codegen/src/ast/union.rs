@@ -4,16 +4,16 @@ use convert_case::{Case, Casing};
 
 use crate::ast::Indent;
 
-use super::{Comment, Identifier};
+use super::{Comment, Identifier, TypeReference};
 
 #[derive(Debug, Clone)]
 pub enum UnionParent {
     Union {
-        parent_name: Identifier,
+        parent: TypeReference,
         variant_name: Identifier,
     },
     DiscriminatedUnion {
-        parent_name: Identifier,
+        parent: TypeReference,
         variant_name: Identifier,
         discriminator_value: String,
     },
@@ -29,7 +29,7 @@ pub struct Union {
 #[derive(Debug, Clone)]
 pub struct UnionVariant {
     pub name: Identifier,
-    pub type_name: Identifier,
+    pub type_name: TypeReference,
     pub description: Option<Comment>,
 }
 
@@ -48,18 +48,18 @@ impl fmt::Display for Union {
                 writeln!(
                     f,
                     "{indent}final {variant_type}? {variant_name};",
-                    variant_type = variant.type_name.as_ref(),
+                    variant_type = variant.type_name.name.as_ref(),
                     variant_name = variant.name.as_ref(),
                 )?;
             }
             writeln!(f)?;
-            writeln!(f, "{indent}{name}._internal({{", name = self.name.as_ref())?;
+            writeln!(f, "{indent}{name}.internal({{", name = self.name.as_ref())?;
             {
                 let indent = Indent(2);
                 for variant in self.variants.iter() {
                     writeln!(
                         f,
-                        "{indent}this.{variant_name} = null,",
+                        "{indent}this.{variant_name},",
                         variant_name = variant.name.as_ref()
                     )?;
                 }
@@ -70,13 +70,13 @@ impl fmt::Display for Union {
             if rest.is_empty() {
                 writeln!(
                     f,
-                    "{indent}dynamic _toJson() => {variant_name}?._toJson();",
+                    "{indent}dynamic toJson() => {variant_name}?.toJson();",
                     variant_name = first.name.as_ref()
                 )?;
             } else {
                 writeln!(
                     f,
-                    "{indent}dynamic _toJson() => {variant_name}?._toJson()",
+                    "{indent}dynamic toJson() => {variant_name}?.toJson()",
                     variant_name = first.name.as_ref()
                 )?;
                 {
@@ -86,7 +86,7 @@ impl fmt::Display for Union {
                         let terminator = if i + 1 == len { ";" } else { "" };
                         writeln!(
                             f,
-                            "{indent}?? {variant_name}?._toJson(){terminator}",
+                            "{indent}?? {variant_name}?.toJson(){terminator}",
                             variant_name = variant.name.as_ref()
                         )?;
                     }
@@ -110,7 +110,7 @@ pub struct DiscriminatedUnion {
 pub struct DiscriminatedUnionVariant {
     pub discriminator_value: String,
     pub name: Identifier,
-    pub type_name: Identifier,
+    pub type_name: TypeReference,
     pub description: Option<Comment>,
 }
 
@@ -148,11 +148,11 @@ impl fmt::Display for DiscriminatedUnion {
                 writeln!(
                     f,
                     "{indent}final {variant_type}? {variant_name};",
-                    variant_type = variant.type_name.as_ref(),
+                    variant_type = variant.type_name.name.as_ref(),
                 )?;
             }
             writeln!(f)?;
-            writeln!(f, "{indent}{name}._internal(", name = self.name.as_ref())?;
+            writeln!(f, "{indent}{name}.internal(", name = self.name.as_ref())?;
             {
                 let indent = Indent(2);
                 writeln!(
@@ -164,7 +164,7 @@ impl fmt::Display for DiscriminatedUnion {
                 {
                     let indent = Indent(3);
                     for variant_name in variant_names.iter() {
-                        writeln!(f, "{indent}this.{variant_name} = null,",)?;
+                        writeln!(f, "{indent}this.{variant_name},",)?;
                     }
                 }
                 writeln!(f, "{indent}}}")?;
@@ -174,12 +174,12 @@ impl fmt::Display for DiscriminatedUnion {
                 writeln!(f)?;
                 writeln!(
                     f,
-                    "{indent}{name}.empty() : this._internal(null);",
+                    "{indent}{name}.empty() : this.internal(null);",
                     name = self.name.as_ref()
                 )?;
             }
             writeln!(f)?;
-            writeln!(f, "{indent}Map<String, dynamic> _toJson() => {{")?;
+            writeln!(f, "{indent}Map<String, dynamic> toJson() => {{")?;
             {
                 let indent = Indent(2);
                 writeln!(
@@ -188,7 +188,7 @@ impl fmt::Display for DiscriminatedUnion {
                     discriminator = self.discriminator.as_ref()
                 )?;
                 for variant_name in variant_names.iter() {
-                    writeln!(f, "{indent}...?{variant_name}?._toJson(),")?;
+                    writeln!(f, "{indent}...?{variant_name}?.toJson(),")?;
                 }
             }
             writeln!(f, "{indent}}};")?;
@@ -209,12 +209,18 @@ mod tests {
             variants: vec![
                 UnionVariant {
                     name: Identifier::try_from("paymentUiType").unwrap(),
-                    type_name: Identifier::try_from("PaymentUIType").unwrap(),
+                    type_name: TypeReference {
+                        name: Identifier::try_from("PaymentUIType").unwrap(),
+                        path: "".into(),
+                    },
                     description: None,
                 },
                 UnionVariant {
                     name: Identifier::try_from("issueBillingKeyUiType").unwrap(),
-                    type_name: Identifier::try_from("IssueBillingKeyUIType").unwrap(),
+                    type_name: TypeReference {
+                        name: Identifier::try_from("IssueBillingKeyUIType").unwrap(),
+                        path: "".into(),
+                    },
                     description: None,
                 },
             ],
@@ -225,13 +231,13 @@ mod tests {
     final PaymentUIType? paymentUiType;
     final IssueBillingKeyUIType? issueBillingKeyUiType;
 
-    LoadableUIType._internal({
-        this.paymentUiType = null,
-        this.issueBillingKeyUiType = null,
+    LoadableUIType.internal({
+        this.paymentUiType,
+        this.issueBillingKeyUiType,
     });
 
-    dynamic _toJson() => paymentUiType?._toJson()
-        ?? issueBillingKeyUiType?._toJson();
+    dynamic toJson() => paymentUiType?.toJson()
+        ?? issueBillingKeyUiType?.toJson();
 }
 "
         );
@@ -247,13 +253,19 @@ mod tests {
                 DiscriminatedUnionVariant {
                     name: Identifier::try_from("card").unwrap(),
                     discriminator_value: "CARD".into(),
-                    type_name: Identifier::try_from("PaymentRequestUnionCard").unwrap(),
+                    type_name: TypeReference {
+                        name: Identifier::try_from("PaymentRequestUnionCard").unwrap(),
+                        path: "".into(),
+                    },
                     description: None,
                 },
                 DiscriminatedUnionVariant {
                     name: Identifier::try_from("easyPay").unwrap(),
                     discriminator_value: "EASY_PAY".into(),
-                    type_name: Identifier::try_from("PaymentRequestUnionEasyPay").unwrap(),
+                    type_name: TypeReference {
+                        name: Identifier::try_from("PaymentRequestUnionEasyPay").unwrap(),
+                        path: "".into(),
+                    },
                     description: None,
                 },
             ],
@@ -266,20 +278,20 @@ mod tests {
     final PaymentRequestUnionCard? card;
     final PaymentRequestUnionEasyPay? easyPay;
 
-    PaymentRequestUnion._internal(
+    PaymentRequestUnion.internal(
         this.payMethod,
         {
-            this.card = null,
-            this.easyPay = null,
+            this.card,
+            this.easyPay,
         }
     );
 
-    PaymentRequestUnion.empty() : this._internal(null);
+    PaymentRequestUnion.empty() : this.internal(null);
 
-    Map<String, dynamic> _toJson() => {
+    Map<String, dynamic> toJson() => {
         'payMethod': payMethod,
-        ...?card?._toJson(),
-        ...?easyPay?._toJson(),
+        ...?card?.toJson(),
+        ...?easyPay?.toJson(),
     };
 }
 "

@@ -623,18 +623,21 @@ mod tests {
             "Admin".to_string(),
             schema::EnumVariant {
                 description: Some("Administrator".to_string()),
+                alias: None,
             },
         );
         variants.insert(
             "User".to_string(),
             schema::EnumVariant {
                 description: Some("Regular user".to_string()),
+                alias: None,
             },
         );
         variants.insert(
             "Guest".to_string(),
             schema::EnumVariant {
                 description: Some("Guest user".to_string()),
+                alias: None,
             },
         );
 

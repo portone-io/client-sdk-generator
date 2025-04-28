@@ -29,3 +29,39 @@ impl Comment {
         self.0.trim().lines().map(str::trim)
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct TypeReference {
+    pub path: String,
+    pub name: Identifier,
+}
+
+#[derive(Debug, Clone)]
+pub enum ScalarType {
+    Int,
+    Double,
+    Bool,
+    Dynamic,
+    String,
+    TypeReference(TypeReference),
+}
+
+impl ScalarType {
+    pub fn to_identifier(&self) -> &str {
+        match self {
+            ScalarType::Int => "int",
+            ScalarType::Double => "double",
+            ScalarType::Bool => "bool",
+            ScalarType::Dynamic => "dynamic",
+            ScalarType::String => "String",
+            ScalarType::TypeReference(TypeReference { name, .. }) => name.as_ref(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompositeType {
+    pub scalar: ScalarType,
+    pub is_list: bool,
+    pub is_required: bool,
+}

@@ -1,6 +1,6 @@
 use core::fmt;
 
-use super::{Comment, Identifier, Indent, UnionParent};
+use super::{Comment, Identifier, Indent, TypeReference, UnionParent};
 
 pub struct Intersection {
     pub name: Identifier,
@@ -11,7 +11,7 @@ pub struct Intersection {
 
 pub struct IntersectionConstituent {
     pub name: Identifier,
-    pub type_name: Identifier,
+    pub type_name: TypeReference,
 }
 
 impl fmt::Display for Intersection {
@@ -23,7 +23,7 @@ impl fmt::Display for Intersection {
                 writeln!(
                     f,
                     "{indent}final {type_name} {name};",
-                    type_name = constituent.type_name.as_ref(),
+                    type_name = constituent.type_name.name.as_ref(),
                     name = constituent.name.as_ref()
                 )?;
             }
@@ -37,13 +37,13 @@ impl fmt::Display for Intersection {
             }
             writeln!(f, "{indent});")?;
             writeln!(f)?;
-            writeln!(f, "{indent}Map<String, dynamic> _toJson() => {{")?;
+            writeln!(f, "{indent}Map<String, dynamic> toJson() => {{")?;
             {
                 let indent = Indent(2);
                 for constituent in self.constituents.iter() {
                     writeln!(
                         f,
-                        "{indent}...{name}._toJson(),",
+                        "{indent}...{name}.toJson(),",
                         name = constituent.name.as_ref()
                     )?;
                 }
@@ -54,25 +54,25 @@ impl fmt::Display for Intersection {
                 for parent in self.union_parents.iter() {
                     match parent {
                         UnionParent::Union {
-                            parent_name,
+                            parent,
                             variant_name,
                         } => {
                             writeln!(
                                 f,
-                                "{indent}{parent_name} to{parent_name}() => {parent_name}._internal({variant_name}: this);",
-                                parent_name = parent_name.as_ref(),
+                                "{indent}{parent_name} to{parent_name}() => {parent_name}.internal({variant_name}: this);",
+                                parent_name = parent.name.as_ref(),
                                 variant_name = variant_name.as_ref(),
                             )?;
                         }
                         UnionParent::DiscriminatedUnion {
-                            parent_name,
+                            parent,
                             variant_name,
                             discriminator_value,
                         } => {
                             writeln!(
                                 f,
-                                "{indent}{parent_name} to{parent_name}() => {parent_name}._internal('{discriminator_value}', {variant_name}: this);",
-                                parent_name = parent_name.as_ref(),
+                                "{indent}{parent_name} to{parent_name}() => {parent_name}.internal('{discriminator_value}', {variant_name}: this);",
+                                parent_name = parent.name.as_ref(),
                                 variant_name = variant_name.as_ref(),
                                 discriminator_value = discriminator_value,
                             )?;
@@ -97,11 +97,17 @@ mod tests {
             constituents: vec![
                 IntersectionConstituent {
                     name: Identifier::try_from("paymentRequestBase").unwrap(),
-                    type_name: Identifier::try_from("PaymentRequestBase").unwrap(),
+                    type_name: TypeReference {
+                        name: Identifier::try_from("PaymentRequestBase").unwrap(),
+                        path: "".into(),
+                    },
                 },
                 IntersectionConstituent {
                     name: Identifier::try_from("paymentRequestUnion").unwrap(),
-                    type_name: Identifier::try_from("PaymentRequestUnion").unwrap(),
+                    type_name: TypeReference {
+                        name: Identifier::try_from("PaymentRequestUnion").unwrap(),
+                        path: "".into(),
+                    },
                 },
             ],
             union_parents: vec![],
@@ -117,9 +123,9 @@ mod tests {
         this.paymentRequestUnion,
     );
 
-    Map<String, dynamic> _toJson() => {
-        ...paymentRequestBase._toJson(),
-        ...paymentRequestUnion._toJson(),
+    Map<String, dynamic> toJson() => {
+        ...paymentRequestBase.toJson(),
+        ...paymentRequestUnion.toJson(),
     };
 }
 "
