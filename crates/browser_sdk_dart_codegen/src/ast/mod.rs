@@ -41,7 +41,7 @@ pub enum ScalarType {
     Int,
     Double,
     Bool,
-    Dynamic,
+    Object,
     String,
     TypeReference(TypeReference),
 }
@@ -52,7 +52,7 @@ impl ScalarType {
             ScalarType::Int => "int",
             ScalarType::Double => "double",
             ScalarType::Bool => "bool",
-            ScalarType::Dynamic => "dynamic",
+            ScalarType::Object => "Object",
             ScalarType::String => "String",
             ScalarType::TypeReference(TypeReference { name, .. }) => name.as_ref(),
         }

@@ -63,12 +63,8 @@ fn main() {
                     let schema: Schema = load_schema(&args.schema);
                     let resource_index = schema.build_resource_index();
                     RESOURCE_INDEX.set(&resource_index, || {
-                        let browser_sdk_schema::Resource::SubResources(subres) = &schema.resources
-                        else {
-                            panic!("There must be entity subresource");
-                        };
-                        browser_sdk_dart_codegen::generate_entity_module(
-                            &subres["entity"],
+                        browser_sdk_dart_codegen::generate_resources_module(
+                            &schema.resources,
                             &out_dir,
                             "package:portone_flutter_sdk",
                         );
