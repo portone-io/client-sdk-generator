@@ -409,7 +409,8 @@ fn generate_const_enum_declaration(
                         .map_or_else(String::new, |p| format!("{}_", p));
                     writeln!(
                         output,
-                        "{description}'{variant_name}': '{value_prefix}{variant_name}',"
+                        "{description}'{identifier}': '{value_prefix}{variant_name}',",
+                        identifier = variant.alias.as_deref().unwrap_or(variant_name)
                     )
                     .unwrap();
                     output
