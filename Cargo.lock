@@ -409,6 +409,14 @@ name = "browser-sdk-generator"
 version = "0.1.0"
 
 [[package]]
+name = "browser_sdk_dart_codegen"
+version = "0.1.0"
+dependencies = [
+ "browser_sdk_schema",
+ "convert_case",
+]
+
+[[package]]
 name = "browser_sdk_schema"
 version = "0.1.0"
 dependencies = [
@@ -592,6 +600,7 @@ name = "generator_cli"
 version = "0.1.0"
 dependencies = [
  "better_scoped_tls",
+ "browser_sdk_dart_codegen",
  "browser_sdk_schema",
  "browser_sdk_ts_codegen",
  "clap",

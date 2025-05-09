@@ -12,7 +12,7 @@ use clap::{Parser as ClapParser, Subcommand, ValueEnum};
 struct Args {
     #[command(subcommand)]
     command: Commands,
-    #[arg(short, long, global = true, default_value = "browser-sdk.yaml")]
+    #[arg(short, long, global = true, default_value = "browser-sdk.yml")]
     schema: PathBuf,
 }
 
@@ -21,7 +21,7 @@ enum Commands {
     #[clap(name = "generate")]
     Generate {
         out_dir: PathBuf,
-        #[arg(long, value_enum, default_value_t = Generator::TypeScript)]
+        #[arg(long, value_enum)]
         generator: Generator,
     },
 }
@@ -30,6 +30,8 @@ enum Commands {
 enum Generator {
     #[clap(name = "typescript")]
     TypeScript,
+    #[clap(name = "dart")]
+    Dart,
 }
 
 fn load_schema(path: &PathBuf) -> Schema {
@@ -55,6 +57,24 @@ fn main() {
                         generate_loader(&out_dir, &schema.methods);
                         generate_entrypoint_module(&out_dir, &schema.methods);
                     });
+                }
+                Generator::Dart => {
+                    println!("Generating Dart code");
+                    let schema: Schema = load_schema(&args.schema);
+                    let resource_index = schema.build_resource_index();
+                    RESOURCE_INDEX.set(&resource_index, || {
+                        browser_sdk_dart_codegen::generate_resources_module(
+                            &schema.resources,
+                            &out_dir,
+                            "package:portone_flutter_sdk",
+                        );
+                    });
+                    let mut child = std::process::Command::new("dart")
+                        .arg("format")
+                        .arg(&out_dir)
+                        .spawn()
+                        .unwrap();
+                    child.wait().unwrap();
                 }
             }
         }

@@ -1678,18 +1678,9 @@ resources:
           optional: true
           description: 상점명 후리카나 (일본어 읽는법 표기)
         openingHours:
-          type: object
+          type: resourceRef
+          $ref: "#/resources/entity/OpeningHours"
           optional: true
-          description: 상점 영업시간 (HH:mm)
-          properties:
-            open:
-              type: string
-              optional: true
-              description: 영업 시작 시간
-            close:
-              type: string
-              optional: true
-              description: 영업 종료 시간
         contactName:
           type: string
           optional: true
@@ -1703,6 +1694,18 @@ resources:
         - KSNET 카카오페이의 경우 필수 입력
         - (신)나이스페이의 경우 매출 전표에 표기 할 용도로 선택 입력
         - 이니시스 일본결제의 경우 JPPG(gmoPayment) 결제의 상점정보로 사용되거나 편의점 결제 시 영수증 표시 정보로 사용됨.
+    OpeningHours:
+      type: object
+      description: 상점 영업시간 (HH:mm)
+      properties:
+        open:
+          type: string
+          optional: true
+          description: 영업 시작 시간
+        close:
+          type: string
+          optional: true
+          description: 영업 종료 시간
     TransactionType:
       type: enum
       variants:
@@ -3076,9 +3079,11 @@ resources:
           type: enum
           variants:
             "1":
+              alias: SHOW_EASY_PAY
               description: |
                 간편 결제 표시
             "0":
+              alias: HIDE_EASY_PAY
               description: |
                 간편 결제 미표시
           description: |
@@ -3217,8 +3222,10 @@ resources:
           type: enum
           variants:
             "01":
+              alias: SAMSUNG_PAY_SHOP
               description: 삼성페이 內 쇼핑
             "99":
+              alias: OTHER
               description: 기타 (기본값)
           description: |
             삼성페이 고객사 유형 (01: 삼성페이 內 쇼핑 / 99: 기타 (기본값))
@@ -3269,6 +3276,7 @@ resources:
             GLOBAL:
               description: 해외카드
             11PAY:
+              alias: PAY11
               description: 11Pay
             LEGACY_AUTH:
               description: 구인증
@@ -3498,8 +3506,10 @@ resources:
         TossBrandpayWidgetOptionsMethodType:
           type: enum
           variants:
-            카드: {}
-            계좌: {}
+            카드:
+              alias: CARD
+            계좌:
+              alias: ACCOUNT
           description: |
             위젯에 보여줄 결제 수단. 예) 카드 전달시 등록한 결제 수단 중 카드만 노출 됨
         TossBrandpayWidgetOptionsUi:
@@ -3527,8 +3537,10 @@ resources:
           type: enum
           variants:
             default:
+              alias: DEFAULT
               description: 모서리가 둥글고 주변에 여백을 가진 버튼(기본값)
             full:
+              alias: FULL
               description: 하단 영역이 전부 채워지는 형태의 버튼
           description: |
             버튼 스타일
