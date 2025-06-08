@@ -229,8 +229,8 @@ fn generate_parameter_type(
             let resource_ref = resource.resource_ref();
             let type_name = RESOURCE_INDEX.with(|resource_index| {
                 match resource_index.get(resource_ref).map(|r| r.name()) {
-                    Some(Some(name)) => return name.to_string(),
-                    _ => resource_ref.split('/').last().unwrap().to_string(),
+                    Some(Some(name)) => name.to_string(),
+                    _ => resource_ref.split('/').next_back().unwrap().to_string(),
                 }
             });
 

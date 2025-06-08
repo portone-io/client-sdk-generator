@@ -1,6 +1,6 @@
 use biome_formatter::{IndentStyle, IndentWidth, QuoteStyle};
 use biome_js_formatter::{
-    context::{trailing_comma::TrailingComma, JsFormatOptions, Semicolons},
+    context::{trailing_commas::TrailingCommas, JsFormatOptions, Semicolons},
     format_node,
 };
 use biome_js_syntax::{JsFileSource, JsSyntaxNode};
@@ -8,8 +8,8 @@ use biome_js_syntax::{JsFileSource, JsSyntaxNode};
 pub fn print_node(node: &JsSyntaxNode) -> String {
     let options = JsFormatOptions::new(JsFileSource::ts())
         .with_indent_style(IndentStyle::Space)
-        .with_indent_width(IndentWidth::from(2))
-        .with_trailing_comma(TrailingComma::Es5)
+        .with_indent_width(IndentWidth::try_from(2).unwrap())
+        .with_trailing_commas(TrailingCommas::Es5)
         .with_quote_style(QuoteStyle::Single)
         .with_semicolons(Semicolons::AsNeeded);
 

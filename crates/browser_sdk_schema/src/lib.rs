@@ -18,12 +18,11 @@ pub struct Schema {
 impl Schema {
     pub fn build_resource_index(&self) -> IndexMap<String, Parameter> {
         let mut index = IndexMap::new();
-        self.collect_resources("", &self.resources, &mut index);
+        Schema::collect_resources("", &self.resources, &mut index);
         index
     }
 
     fn collect_resources(
-        &self,
         path: &str,
         resource: &Resource,
         index: &mut IndexMap<String, Parameter>,
@@ -36,7 +35,7 @@ impl Schema {
                     } else {
                         format!("{}/{}", path, name)
                     };
-                    self.collect_resources(&new_path, sub_resource, index);
+                    Schema::collect_resources(&new_path, sub_resource, index);
                 }
             }
             Resource::Parameter(parameter) => {
@@ -113,7 +112,7 @@ impl ParameterExt for Parameter {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
+#[derive(Default, Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Parameter {
     /// 파라미터 이름
@@ -134,18 +133,6 @@ pub struct Parameter {
     pub deprecated: bool,
 }
 
-impl Default for Parameter {
-    fn default() -> Self {
-        Self {
-            name: None,
-            description: None,
-            r#type: ParameterType::default(),
-            optional: false,
-            pg_specific: None,
-            deprecated: false,
-        }
-    }
-}
 
 impl Parameter {
     pub fn new(

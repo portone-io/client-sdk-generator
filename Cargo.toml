@@ -4,17 +4,17 @@ members = ["crates/*"]
 [package]
 name = "browser-sdk-generator"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [workspace.dependencies]
 better_scoped_tls = "1.0.0"
-biome_diagnostics = "0.5.7"
-biome_formatter = "0.5.7"
-biome_js_factory = "0.5.7"
-biome_js_formatter = "0.5.7"
-biome_js_parser = "0.5.7"
-biome_js_syntax = "0.5.7"
-biome_rowan = "0.5.7"
+biome_diagnostics = { git = "https://github.com/biomejs/biome.git", tag = "cli/v1.9.4" }
+biome_formatter = { git = "https://github.com/biomejs/biome.git", tag = "cli/v1.9.4" }
+biome_js_factory = { git = "https://github.com/biomejs/biome.git", tag = "cli/v1.9.4" }
+biome_js_formatter = { git = "https://github.com/biomejs/biome.git", tag = "cli/v1.9.4" }
+biome_js_parser = { git = "https://github.com/biomejs/biome.git", tag = "cli/v1.9.4" }
+biome_js_syntax = { git = "https://github.com/biomejs/biome.git", tag = "cli/v1.9.4" }
+biome_rowan = { git = "https://github.com/biomejs/biome.git", tag = "cli/v1.9.4" }
 convert_case = "0.6.0"
 indoc = "2"
 pretty_assertions = "1.4.0"
