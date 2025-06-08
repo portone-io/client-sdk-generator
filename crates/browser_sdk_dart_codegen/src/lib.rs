@@ -226,7 +226,7 @@ impl ResourceProcessor {
             .try_into()
             .unwrap();
         match &parameter.r#type {
-            ParameterType::Object { properties } => Some(Entity::Object(Object {
+            ParameterType::Object { properties, hide_if_empty: _ } => Some(Entity::Object(Object {
                 name: name.clone(),
                 description: parameter.description.clone().map(Comment),
                 fields: Self::build_field_list(properties.iter()),
@@ -257,14 +257,14 @@ impl ResourceProcessor {
                     .collect(),
                 union_parents: vec![],
             })),
-            ParameterType::OneOf { properties } => Some(Entity::Object(Object {
+            ParameterType::OneOf { properties, hide_if_empty: _ } => Some(Entity::Object(Object {
                 name: name.clone(),
                 description: parameter.description.clone().map(Comment),
                 fields: Self::build_field_list(properties.iter()),
                 is_one_of: true,
                 union_parents: vec![],
             })),
-            ParameterType::Union { types } => Some(Entity::Union(Union {
+            ParameterType::Union { types, hide_if_empty: _ } => Some(Entity::Union(Union {
                 name: name.clone(),
                 description: parameter.description.clone().map(Comment),
                 variants: types
@@ -287,7 +287,7 @@ impl ResourceProcessor {
                     })
                     .collect(),
             })),
-            ParameterType::Intersection { types } => Some(Entity::Intersection(Intersection {
+            ParameterType::Intersection { types, hide_if_empty: _ } => Some(Entity::Intersection(Intersection {
                 name: name.clone(),
                 description: parameter.description.clone().map(Comment),
                 constituents: types
@@ -315,6 +315,7 @@ impl ResourceProcessor {
                 types,
                 discriminator,
                 optional,
+                hide_if_empty: _,
             } => Some(Entity::DiscriminatedUnion(DiscriminatedUnion {
                 name: name.clone(),
                 description: parameter.description.clone().map(Comment),

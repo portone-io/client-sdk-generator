@@ -125,7 +125,7 @@ fn generate_parameter_type(
             );
             format!("{}[]", item_type)
         }
-        schema::ParameterType::Object { properties } => {
+        schema::ParameterType::Object { properties, hide_if_empty: _ } => {
             let properties = generate_parameter_type_properties(
                 properties,
                 decls,
@@ -140,7 +140,7 @@ fn generate_parameter_type(
         schema::ParameterType::Enum { .. } => {
             format!("(typeof {parent_name}[keyof typeof {parent_name}] | string & {{}})")
         }
-        schema::ParameterType::OneOf { properties } => {
+        schema::ParameterType::OneOf { properties, hide_if_empty: _ } => {
             let type_path = resource_ref_to_path("../utils", resource_base_path);
             imports.insert(ImportEntry {
                 type_name: "OneOfType".to_string(),
@@ -162,7 +162,7 @@ fn generate_parameter_type(
             props.push_str("}>");
             props
         }
-        schema::ParameterType::Union { types } => {
+        schema::ParameterType::Union { types, hide_if_empty: _ } => {
             let mut type_names = Vec::new();
             for (i, param) in types.iter().enumerate() {
                 let type_name = generate_parameter(
@@ -178,7 +178,7 @@ fn generate_parameter_type(
             type_names.join(" | ")
         }
         schema::ParameterType::Json => String::from("Record<string, any>"),
-        schema::ParameterType::Intersection { types } => {
+        schema::ParameterType::Intersection { types, hide_if_empty: _ } => {
             let mut type_names = Vec::new();
             for (i, param) in types.iter().enumerate() {
                 let type_name = generate_parameter(
@@ -197,6 +197,7 @@ fn generate_parameter_type(
             types,
             discriminator,
             optional,
+            hide_if_empty: _,
         } => {
             let mut variant_types = Vec::new();
             for (variant_name, variant_param) in types {
@@ -555,7 +556,10 @@ mod tests {
             ),
         );
 
-        let object_param = schema::ParameterType::Object { properties };
+        let object_param = schema::ParameterType::Object {
+            properties,
+            hide_if_empty: false,
+        };
 
         let type_def = generate_parameter_type(
             &object_param,
@@ -743,7 +747,10 @@ mod tests {
             ),
         );
 
-        let oneof_param = schema::ParameterType::OneOf { properties };
+        let oneof_param = schema::ParameterType::OneOf {
+            properties,
+            hide_if_empty: false,
+        };
 
         let type_def = generate_parameter_type(
             &oneof_param,
@@ -798,6 +805,7 @@ mod tests {
                     false,
                 ),
             ],
+            hide_if_empty: false,
         };
 
         let type_def = generate_parameter_type(
@@ -838,6 +846,7 @@ mod tests {
                         );
                         props
                     },
+                    hide_if_empty: false,
                 },
                 false,
                 None,
@@ -877,6 +886,7 @@ mod tests {
                         );
                         props
                     },
+                    hide_if_empty: false,
                 },
                 false,
                 None,
@@ -888,6 +898,7 @@ mod tests {
             types,
             discriminator: "type".to_string(),
             optional: false,
+            hide_if_empty: false,
         };
 
         assert!(decls.is_empty());

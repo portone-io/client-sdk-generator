@@ -183,9 +183,13 @@ pub enum ParameterType {
         items: Box<Parameter>,
     },
     #[schemars(title = "object")]
+    #[serde(rename_all = "camelCase")]
     Object {
         /// Object의 프로퍼티 목록
         properties: IndexMap<String, Parameter>,
+        /// Object가 비어있을 때 숨기기 여부
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        hide_if_empty: bool,
     },
     #[schemars(title = "emptyObject")]
     EmptyObject,
@@ -198,21 +202,34 @@ pub enum ParameterType {
         value_prefix: Option<String>,
     },
     #[schemars(title = "oneOf")]
+    #[serde(rename_all = "camelCase")]
     OneOf {
         /// OneOf의 타입 목록
         properties: IndexMap<String, Parameter>,
+        /// OneOf가 비어있을 때 숨기기 여부
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        hide_if_empty: bool,
     },
     #[schemars(title = "union")]
+    #[serde(rename_all = "camelCase")]
     Union {
         /// Union의 타입 목록
         types: Vec<Parameter>,
+        /// Union이 비어있을 때 숨기기 여부
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        hide_if_empty: bool,
     },
     #[schemars(title = "intersection")]
+    #[serde(rename_all = "camelCase")]
     Intersection {
         /// Intersection의 타입 목록
         types: Vec<Parameter>,
+        /// Intersection이 비어있을 때 숨기기 여부
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        hide_if_empty: bool,
     },
     #[schemars(title = "discriminatedUnion")]
+    #[serde(rename_all = "camelCase")]
     DiscriminatedUnion {
         /// DiscriminatedUnion의 타입 목록
         types: IndexMap<String, Parameter>,
@@ -221,6 +238,9 @@ pub enum ParameterType {
         /// Discriminator 프로퍼티 Optional 여부
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         optional: bool,
+        /// DiscriminatedUnion이 비어있을 때 숨기기 여부
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        hide_if_empty: bool,
     },
     #[schemars(title = "resourceRef")]
     ResourceRef(ResourceRef),
@@ -336,6 +356,7 @@ mod tests {
                 name: None,
                 description: Some("A person object".to_string()),
                 r#type: ParameterType::Object {
+                    hide_if_empty: false,
                     properties: {
                         let mut properties = IndexMap::new();
                         properties.insert(
