@@ -104,7 +104,7 @@ source = "git+https://github.com/biomejs/biome.git?tag=cli%2Fv1.9.4#fa93a147abe6
 dependencies = [
  "biome_markup",
  "biome_text_size",
- "schemars",
+ "schemars 0.8.22",
  "serde",
  "termcolor",
  "unicode-segmentation",
@@ -123,7 +123,7 @@ dependencies = [
  "biome_json_syntax",
  "biome_rowan",
  "enumflags2",
- "indexmap 2.9.0",
+ "indexmap",
  "serde",
 ]
 
@@ -195,7 +195,7 @@ dependencies = [
  "cfg-if",
  "countme",
  "drop_bomb",
- "indexmap 2.9.0",
+ "indexmap",
  "rustc-hash 1.1.0",
  "tracing",
  "unicode-width",
@@ -244,7 +244,7 @@ dependencies = [
  "biome_unicode_table",
  "drop_bomb",
  "enumflags2",
- "indexmap 2.9.0",
+ "indexmap",
  "rustc-hash 1.1.0",
  "serde",
  "serde_json",
@@ -366,7 +366,7 @@ name = "biome_text_size"
 version = "0.5.7"
 source = "git+https://github.com/biomejs/biome.git?tag=cli%2Fv1.9.4#fa93a147abe64e9c85908d317a8dd1de343ad132"
 dependencies = [
- "schemars",
+ "schemars 0.8.22",
  "serde",
 ]
 
@@ -418,9 +418,9 @@ name = "browser_sdk_schema"
 version = "0.1.0"
 dependencies = [
  "better_scoped_tls",
- "indexmap 2.9.0",
+ "indexmap",
  "pretty_assertions",
- "schemars",
+ "schemars 0.9.0",
  "serde",
  "serde_json",
  "serde_yaml_ng",
@@ -440,7 +440,7 @@ dependencies = [
  "browser_sdk_schema",
  "browser_sdk_ts_codegen_macros",
  "convert_case",
- "indexmap 2.9.0",
+ "indexmap",
  "indoc",
  "pathdiff",
  "pretty_assertions",
@@ -624,12 +624,6 @@ checksum = "07e28edb80900c19c28f1072f2e8aeca7fa06b23cd4169cefe1af5aa3260783f"
 
 [[package]]
 name = "hashbrown"
-version = "0.12.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
-
-[[package]]
-name = "hashbrown"
 version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
@@ -645,17 +639,6 @@ name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
-
-[[package]]
-name = "indexmap"
-version = "1.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd070e393353796e801d209ad339e89596eb4c8d430d18ede6a1cced8fafbd99"
-dependencies = [
- "autocfg",
- "hashbrown 0.12.3",
- "serde",
-]
 
 [[package]]
 name = "indexmap"
@@ -756,7 +739,7 @@ dependencies = [
  "cfg-if",
  "dashmap",
  "dunce",
- "indexmap 2.9.0",
+ "indexmap",
  "json-strip-comments",
  "once_cell",
  "rustc-hash 2.1.1",
@@ -853,6 +836,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "ref-cast"
+version = "1.0.24"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a0ae411dbe946a674d89546582cea4ba2bb8defac896622d6496f14c23ba5cf"
+dependencies = [
+ "ref-cast-impl",
+]
+
+[[package]]
+name = "ref-cast-impl"
+version = "1.0.24"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1165225c21bff1f3bbce98f5a1f889949bc902d3575308cc7b0de30b4f6d27c7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.101",
+]
+
+[[package]]
 name = "regex-automata"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -895,12 +898,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3fbf2ae1b8bc8e02df939598064d22402220cd5bbcca1c76f7d6a310974d5615"
 dependencies = [
  "dyn-clone",
- "indexmap 1.9.3",
- "indexmap 2.9.0",
- "schemars_derive",
+ "indexmap",
+ "schemars_derive 0.8.22",
  "serde",
  "serde_json",
  "smallvec",
+]
+
+[[package]]
+name = "schemars"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4cd191f9397d57d581cddd31014772520aa448f65ef991055d7f61582c65165f"
+dependencies = [
+ "dyn-clone",
+ "indexmap",
+ "ref-cast",
+ "schemars_derive 0.9.0",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -908,6 +924,18 @@ name = "schemars_derive"
 version = "0.8.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32e265784ad618884abaea0600a9adf15393368d840e0222d101a072f3f7534d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde_derive_internals",
+ "syn 2.0.101",
+]
+
+[[package]]
+name = "schemars_derive"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5016d94c77c6d32f0b8e08b781f7dc8a90c2007d4e77472cc2807bc10a8438fe"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -975,7 +1003,7 @@ version = "1.0.140"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "20068b6e96dc6c9bd23e01df8827e6c7e1f2fddd43c21810382803c136b99373"
 dependencies = [
- "indexmap 2.9.0",
+ "indexmap",
  "itoa",
  "memchr",
  "ryu",
@@ -988,7 +1016,7 @@ version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b4db627b98b36d4203a7b458cf3573730f2bb591b28871d916dfa9efabfd41f"
 dependencies = [
- "indexmap 2.9.0",
+ "indexmap",
  "itoa",
  "ryu",
  "serde",
