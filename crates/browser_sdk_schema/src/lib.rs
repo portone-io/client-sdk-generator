@@ -466,7 +466,7 @@ mod tests {
         };
 
         // Serialize the schema to YAML
-        let serialized = serde_yaml::to_string(&schema).unwrap();
+        let serialized = serde_yaml_ng::to_string(&schema).unwrap();
 
         // Expected YAML
         let expected_yaml = r#"
@@ -523,7 +523,7 @@ methods: {}
         assert_eq!(serialized.trim(), expected_yaml.trim());
 
         // Deserialize the YAML back to schema
-        let deserialized: Schema = serde_yaml::from_str(&serialized).unwrap();
+        let deserialized: Schema = serde_yaml_ng::from_str(&serialized).unwrap();
 
         // Compare the deserialized schema with the original schema
         assert_eq!(deserialized, schema);

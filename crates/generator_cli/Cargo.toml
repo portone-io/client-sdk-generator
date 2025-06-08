@@ -14,4 +14,4 @@ browser_sdk_schema = { workspace = true }
 browser_sdk_ts_codegen = { workspace = true }
 clap = { version = "4.5.16", features = ["derive"] }
 pretty_assertions = { workspace = true }
-serde_yaml = { workspace = true }
+serde_yaml_ng = { workspace = true }

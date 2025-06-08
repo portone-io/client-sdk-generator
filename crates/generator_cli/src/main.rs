@@ -36,7 +36,7 @@ enum Generator {
 
 fn load_schema(path: &PathBuf) -> Schema {
     let schema = std::fs::read_to_string(path).unwrap();
-    serde_yaml::from_str(&schema).unwrap()
+    serde_yaml_ng::from_str(&schema).unwrap()
 }
 
 fn main() {
