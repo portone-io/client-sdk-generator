@@ -80,7 +80,7 @@ impl ParameterExt for Parameter {
                     .get(resource_ref.resource_ref())
                     .and_then(|parameter| parameter.description().map(|s| s.to_string()))
             }),
-            (None, ParameterType::Array { items }) => items.description(),
+            (None, ParameterType::Array { items, hide_if_empty: _ }) => items.description(),
             (description, _) => description.map(|s| s.to_string()),
         }
     }
@@ -106,7 +106,7 @@ impl ParameterExt for Parameter {
                     .map(|parameter| parameter.deprecated())
                     .unwrap_or(false)
             }),
-            (_, ParameterType::Array { items }) => items.deprecated(),
+            (_, ParameterType::Array { items, hide_if_empty: _ }) => items.deprecated(),
             _ => false,
         }
     }
@@ -181,6 +181,9 @@ pub enum ParameterType {
     Array {
         /// Array의 item 타입
         items: Box<Parameter>,
+        /// Array가 비어있을 때 숨기기 여부
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        hide_if_empty: bool,
     },
     #[schemars(title = "object")]
     #[serde(rename_all = "camelCase")]
@@ -441,6 +444,7 @@ mod tests {
                         pg_specific: None,
                         deprecated: false,
                     }),
+                    hide_if_empty: false,
                 },
                 optional: false,
                 pg_specific: None,

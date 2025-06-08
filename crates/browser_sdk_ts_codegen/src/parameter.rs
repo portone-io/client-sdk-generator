@@ -114,7 +114,7 @@ fn generate_parameter_type(
         schema::ParameterType::StringLiteral { value } => format!("'{}'", value),
         schema::ParameterType::Integer => String::from("number"),
         schema::ParameterType::Boolean => String::from("boolean"),
-        schema::ParameterType::Array { items } => {
+        schema::ParameterType::Array { items, hide_if_empty: _ } => {
             let item_type = generate_parameter(
                 items,
                 decls,
@@ -515,6 +515,7 @@ mod tests {
         );
         let array_param = schema::ParameterType::Array {
             items: Box::new(array_item),
+            hide_if_empty: false,
         };
 
         let type_def = generate_parameter_type(

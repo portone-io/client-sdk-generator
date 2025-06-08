@@ -71,7 +71,7 @@ impl ResourceProcessor {
                 is_list: false,
                 is_required,
             },
-            ParameterType::Array { items } => {
+            ParameterType::Array { items, hide_if_empty: _ } => {
                 let scalar = match &items.r#type {
                     ParameterType::String | ParameterType::StringLiteral { .. } => {
                         ScalarType::String
