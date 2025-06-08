@@ -157,12 +157,9 @@ impl Parameter {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct PgSpecific {
-    /// PG사 파라미터 설명
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
-    /// Optional 여부
+    /// Visible 여부
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    optional: bool,
+    visible: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, PartialEq, Clone, JsonSchema)]

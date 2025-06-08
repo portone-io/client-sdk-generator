@@ -419,15 +419,8 @@
     "PgSpecific": {
       "type": "object",
       "properties": {
-        "description": {
-          "description": "PG사 파라미터 설명",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "optional": {
-          "description": "Optional 여부",
+        "visible": {
+          "description": "Visible 여부",
           "type": "boolean"
         }
       }
@@ -437,6 +430,12 @@
       "properties": {
         "description": {
           "description": "Enum variant 설명",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "alias": {
           "type": [
             "string",
             "null"
