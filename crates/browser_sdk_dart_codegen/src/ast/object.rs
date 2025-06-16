@@ -202,7 +202,7 @@ mod tests {
     fn empty_object() {
         let object = Object {
             name: Identifier::try_from("Test").unwrap(),
-            description: Some(Comment("Test Object".into())),
+            description: Some(Comment::try_from("Test Object").unwrap()),
             fields: vec![],
             is_one_of: false,
             union_parents: vec![UnionParent::Union {
@@ -229,7 +229,7 @@ class Test {
     fn object_with_fields() {
         let object = Object {
             name: Identifier::try_from("Address").unwrap(),
-            description: Some(Comment("주소 정보".into())),
+            description: Some(Comment::try_from("주소 정보").unwrap()),
             fields: vec![
                 ObjectField {
                     name: Identifier::try_from("country").unwrap(),
@@ -252,7 +252,7 @@ class Test {
                         is_list: false,
                         is_required: true,
                     },
-                    description: Some(Comment("**일반주소**".into())),
+                    description: Some(Comment::try_from("**일반주소**").unwrap()),
                 },
                 ObjectField {
                     name: Identifier::try_from("addressLine2").unwrap(),
@@ -262,7 +262,7 @@ class Test {
                         is_list: false,
                         is_required: true,
                     },
-                    description: Some(Comment("**상세주소**".into())),
+                    description: Some(Comment::try_from("**상세주소**").unwrap()),
                 },
                 ObjectField {
                     name: Identifier::try_from("city").unwrap(),
@@ -272,7 +272,7 @@ class Test {
                         is_list: false,
                         is_required: false,
                     },
-                    description: Some(Comment("**도시**".into())),
+                    description: Some(Comment::try_from("**도시**").unwrap()),
                 },
                 ObjectField {
                     name: Identifier::try_from("province").unwrap(),
@@ -282,7 +282,7 @@ class Test {
                         is_list: false,
                         is_required: false,
                     },
-                    description: Some(Comment("**주, 도, 시**".into())),
+                    description: Some(Comment::try_from("**주, 도, 시**").unwrap()),
                 },
             ],
             is_one_of: false,
@@ -326,7 +326,7 @@ class Address {
     fn one_of_object() {
         let object = Object {
             name: Identifier::try_from("MonthOption").unwrap(),
-            description: Some(Comment("**할부 개월 수 설정**".into())),
+            description: Some(Comment::try_from("**할부 개월 수 설정**").unwrap()),
             fields: vec![
                 ObjectField {
                     name: Identifier::try_from("fixedMonth").unwrap(),
@@ -336,9 +336,9 @@ class Address {
                         is_list: false,
                         is_required: true,
                     },
-                    description: Some(Comment(
-                        "**구매자가 선택할 수 없도록 고정된 할부 개월수**".into(),
-                    )),
+                    description: Some(Comment::try_from(
+                        "**구매자가 선택할 수 없도록 고정된 할부 개월수**",
+                    ).unwrap()),
                 },
                 ObjectField {
                     name: Identifier::try_from("availableMonthList").unwrap(),
@@ -348,9 +348,9 @@ class Address {
                         is_list: true,
                         is_required: true,
                     },
-                    description: Some(Comment(
-                        "**구매자가 선택할 수 있는 할부 개월수 리스트**".into(),
-                    )),
+                    description: Some(Comment::try_from(
+                        "**구매자가 선택할 수 있는 할부 개월수 리스트**",
+                    ).unwrap()),
                 },
             ],
             is_one_of: true,

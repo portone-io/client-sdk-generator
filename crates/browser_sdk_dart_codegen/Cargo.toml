@@ -5,4 +5,5 @@ edition = "2024"
 
 [dependencies]
 browser_sdk_schema.workspace = true
+browser_sdk_utils.workspace = true
 convert_case = { workspace = true }

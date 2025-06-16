@@ -1,3 +1,5 @@
+use browser_sdk_utils::{MdastNodeExt, ToMdastExt};
+
 pub(crate) trait JsDocExt<T: AsRef<str>> {
     fn to_jsdoc(&self, deprecated: bool) -> String;
 }
@@ -19,6 +21,11 @@ impl<T: AsRef<str>> JsDocExt<T> for Option<T> {
 
 pub fn generate_jsdoc_comment(comment: &str, deprecated: bool) -> String {
     let mut comment = comment
+        .to_mdast()
+        .unwrap()
+        .remove_jsx_elements()
+        .to_markdown_string()
+        .unwrap()
         .trim()
         .split('\n')
         .map(|line| format!("* {}", line))

@@ -6,6 +6,7 @@ mod intersection;
 mod object;
 mod union;
 
+use browser_sdk_utils::{MdastNodeExt, ToMdastExt};
 pub use r#enum::*;
 pub use ident::*;
 pub use intersection::*;
@@ -22,11 +23,33 @@ impl fmt::Display for Indent {
 }
 
 #[derive(Debug, Clone)]
-pub struct Comment(pub String);
+pub struct Comment(String);
 
 impl Comment {
     pub fn lines(&self) -> impl Iterator<Item = &str> {
         self.0.trim().lines().map(str::trim)
+    }
+}
+
+impl TryFrom<&str> for Comment {
+    type Error = String;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let cleaned = value
+            .to_mdast()
+            .map_err(|e| format!("Failed to parse markdown: {}", e))?
+            .remove_jsx_elements()
+            .to_markdown_string()
+            .map_err(|e| format!("Failed to convert markdown to string: {}", e))?;
+        Ok(Comment(cleaned))
+    }
+}
+
+impl TryFrom<String> for Comment {
+    type Error = String;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        Comment::try_from(value.as_str())
     }
 }
 
