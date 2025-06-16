@@ -1555,15 +1555,6 @@ resources:
         KCP_V2: {}
         HYPHEN: {}
         EXIMBAY_V2: {}
-    IsTestChannel:
-      type: boolean
-      deprecated: true
-      description: |
-        **테스트 채널 정보로 결제할지 여부** (2024년 09월 30일부터 사용이 불가능한 파라미터 입니다.)
-
-        미입력 시 기본값은 `false`입니다.
-
-        선택하신 채널이 테스트 채널이 아닌 경우 에러가 발생합니다.
     TaxFreeAmount:
       type: integer
       description: |
@@ -1679,7 +1670,7 @@ resources:
           description: 상점명 후리카나 (일본어 읽는법 표기)
         openingHours:
           type: resourceRef
-          $ref: "#/resources/entity/OpeningHours"
+          $ref: "#/resources/entity/StoreDetailsOpeningHours"
           optional: true
         contactName:
           type: string
@@ -1694,7 +1685,7 @@ resources:
         - KSNET 카카오페이의 경우 필수 입력
         - (신)나이스페이의 경우 매출 전표에 표기 할 용도로 선택 입력
         - 이니시스 일본결제의 경우 JPPG(gmoPayment) 결제의 상점정보로 사용되거나 편의점 결제 시 영수증 표시 정보로 사용됨.
-    OpeningHours:
+    StoreDetailsOpeningHours:
       type: object
       description: 상점 영업시간 (HH:mm)
       properties:
@@ -1891,6 +1882,15 @@ resources:
               optional: true
               description: |
                 DI를 생성할 때 사용할 salt
+            FRGNDInfo:
+              type: string
+              optional: true
+              description: |
+                **성별 및 외국인 정보 별도 입력 여부**
+
+                `Y`(기본값)인 경우 성별 및 외국인 정보를 제공하지 않는 일부 인증기관 사용 시 성별 및 외국인 정보 입력란을 표시합니다. **해당 정보는 인증 기관을 통해 검증되지 않습니다.**
+
+                `N`인 경우 네이버, 카카오에서 사용자가 성별 및 외국인 정보를 입력하는 칸을 표시하지 않습니다.
         InicisUnifiedDirectAgency:
           type: enum
           description: |
@@ -1937,6 +1937,17 @@ resources:
           variants:
             Y: {}
             N: {}
+        KcpV2:
+          type: object
+          name: KcpV2IdentityVerificationBypass
+          description: |
+            **KCP bypass 파라미터**
+          properties:
+            web_siteid:
+              type: string
+              optional: true
+              description: |
+                **DI 생성 시 사용할 사이트 ID**
       IdentityVerificationBypass:
         type: object
         description: |
@@ -1950,10 +1961,16 @@ resources:
             type: resourceRef
             optional: true
             $ref: "#/resources/entity/bypass/identityVerification/InicisUnified"
+          kcpV2:
+            type: resourceRef
+            optional: true
+            $ref: "#/resources/entity/bypass/identityVerification/KcpV2"
       issueBillingKey:
         SmartroV2:
           type: object
           name: SmartroV2IssueBillingKeyBypass
+          description: |
+            **스마트로 bypass 파라미터**
           properties:
             SkinColor:
               type: resourceRef
@@ -1966,6 +1983,8 @@ resources:
         InicisV2:
           type: object
           name: InicisV2IssueBillingKeyBypass
+          description: |
+            **KG이니시스 bypass 파라미터**
           properties:
             carduse:
               type: resourceRef
@@ -1974,6 +1993,8 @@ resources:
         KcpV2:
           type: object
           name: KcpV2IssueBillingKeyBypass
+          description: |
+            **KCP bypass 파라미터**
           properties:
             batch_soc_choice:
               type: resourceRef
@@ -1982,6 +2003,8 @@ resources:
         Naverpay:
           type: object
           name: NaverpayIssueBillingKeyBypass
+          description: |
+            **네이버페이 bypass 파라미터**
           properties:
             subMerchantName:
               type: string
@@ -1996,6 +2019,8 @@ resources:
         TosspayV2:
           type: object
           name: TosspayV2IssueBillingKeyBypass
+          description: |
+            **토스페이 bypass 파라미터**
           properties:
             encryptedUserCi:
               type: string
@@ -2005,6 +2030,8 @@ resources:
         Welcome:
           type: object
           name: WelcomeIssueBillingKeyBypass
+          description: |
+            **웰컴페이먼츠 bypass 파라미터**
           properties:
             logo_url:
               type: string
@@ -2093,6 +2120,8 @@ resources:
         Welcome:
           type: object
           name: WelcomeIssueBillingKeyAndPayBypass
+          description: |
+            **웰컴페이먼츠 bypass 파라미터**
           properties:
             acceptmethod:
               type: array
@@ -2142,6 +2171,151 @@ resources:
                 - 수정 불가능으로 설정하려면 `hpp_nofix=Y`를 전달합니다.
                 - 수정 가능으로 설정하려면 `hpp_nofix=N`를 전달합니다. (기본값)
               optional: true
+        EximbayV2:
+          type: object
+          name: EximbayV2IssueBillingKeyAndPayBypass
+          description: |
+            **엑심베이 bypass 파라미터**
+          properties:
+            merchant:
+              type: resourceRef
+              $ref: "#/resources/entity/bypass/issueBillingKeyAndPay/EximbayV2Merchant"
+              optional: true
+            surcharge:
+              type: array
+              description: |
+                **최대 3개의 추가 비용 목록**
+              items:
+                type: resourceRef
+                $ref: "#/resources/entity/bypass/issueBillingKeyAndPay/EximbayV2Surcharge"
+              optional: true
+            shipTo:
+              type: resourceRef
+              $ref: "#/resources/entity/bypass/issueBillingKeyAndPay/EximbayV2ShipTo"
+              optional: true
+            billTo:
+              type: resourceRef
+              $ref: "#/resources/entity/bypass/issueBillingKeyAndPay/EximbayV2BillTo"
+              optional: true
+        EximbayV2Merchant:
+          type: object
+          properties:
+            shop:
+              type: string
+              description: |
+                **상점명**
+        EximbayV2Surcharge:
+          type: object
+          properties:
+            name:
+              type: string
+              description: |
+                **항목명**
+            quantity:
+              type: string
+              description: |
+                **수량**
+            unit_price:
+              type: string
+              description: |
+                **단가 (음수 가능)**
+        EximbayV2ShipTo:
+          type: object
+          description: |
+            **배송지 정보**
+          properties:
+            city:
+              type: string
+              description: |
+                **배송지 도시**
+            country:
+              type: string
+              description: |
+                **배송지 국가 (ISO 3166 두 자리 국가 코드)**
+            first_name:
+              type: string
+              description: |
+                **수신인의 성을 제외한 이름**
+            last_name:
+              type: string
+              description: |
+                **수신인의 성**
+            phone_number:
+              type: string
+              description: |
+                **수신인 전화번호**
+            postal_code:
+              type: string
+              description: |
+                **배송지 우편번호**
+            state:
+              type: string
+              description: |
+                **배송지가 미국 혹은 캐나다인 경우, 배송지 주 정보**
+            street1:
+              type: string
+              description: |
+                **배송지 상세 주소**
+        EximbayV2BillTo:
+          type: object
+          description: |
+            **청구지 정보**
+          properties:
+            city:
+              type: string
+              description: |
+                **청구지 도시**
+            country:
+              type: string
+              description: |
+                **청구지 국가 (ISO 3166 두 자리 국가 코드)**
+            first_name:
+              type: string
+              description: |
+                **청구 카드 명의자의 성을 제외한 이름**
+            last_name:
+              type: string
+              description: |
+                **청구 카드 명의자의 성**
+            phone_number:
+              type: string
+              description: |
+                **청구 카드 명의자의 전화번호**
+            postal_code:
+              type: string
+              description: |
+                **청구지 우편번호**
+            state:
+              type: string
+              description: |
+                **청구지가 미국 혹은 캐나다인 경우, 청구지 주 정보**
+            street1:
+              type: string
+              description: |
+                **청구지 상세 주소**
+        PayletterGlobal:
+          type: object
+          description: |
+            **페이레터 해외결제 bypass 파라미터**
+          name: PayletterGlobalIssueBillingKeyAndPayBypass
+          properties:
+            pginfo:
+              type: string
+              description: |
+                **결제수단 지정용 파라미터**
+
+                - 해외카드 인증 : `PLCreditCard`
+                - 해외카드 비인증(3DS) : `PLCreditCardMpi`
+                - 유니온페이 : `PLUnionPay_HC`
+                - 위챗페이 PC결제: `WeChatPayQRCodePayment`
+                - 위챗페이 모바일결제 : `WeChatPayH5Payment`
+                - 알리페이 : `ICBAlipay`
+              optional: true
+            servicename:
+              type: string
+              description: |
+                고객사 서비스명, WeChatPay, Alipay 이용 시 필수 입력
+              optional: true
       IssueBillingKeyAndPayBypass:
         type: object
         properties:
@@ -2149,10 +2323,20 @@ resources:
             type: resourceRef
             optional: true
             $ref: "#/resources/entity/bypass/issueBillingKeyAndPay/Welcome"
+          payletter_global:
+            type: resourceRef
+            optional: true
+            $ref: "#/resources/entity/bypass/issueBillingKeyAndPay/PayletterGlobal"
+          eximbay_v2:
+            type: resourceRef
+            optional: true
+            $ref: "#/resources/entity/bypass/issueBillingKeyAndPay/EximbayV2"
       loadIssueBillingKeyUI:
         PaypalV2:
           type: object
           name: PaypalV2LoadIssueBillingKeyUIBypass
+          description: |
+            **Paypal bypass 파라미터**
           properties:
             style:
               type: resourceRef
@@ -2236,7 +2420,216 @@ resources:
               type: resourceRef
               description: |
                 국가 코드
-              $ref: "#/resources/entity/Country"
+              $ref: "#/resources/entity/bypass/loadIssueBillingKeyUI/PaypalV2Country"
+        PaypalV2Country:
+          type: enum
+          description: |
+            **페이팔 V2 국가 코드**
+          variants:
+            AL: {}
+            DZ: {}
+            AD: {}
+            AO: {}
+            AI: {}
+            AG: {}
+            AR: {}
+            AM: {}
+            AW: {}
+            AU: {}
+            AT: {}
+            AZ: {}
+            BS: {}
+            BH: {}
+            BB: {}
+            BY: {}
+            BE: {}
+            BZ: {}
+            BJ: {}
+            BM: {}
+            BT: {}
+            BO: {}
+            BA: {}
+            BW: {}
+            BR: {}
+            VG: {}
+            BN: {}
+            BG: {}
+            BF: {}
+            BI: {}
+            KH: {}
+            CM: {}
+            CA: {}
+            CV: {}
+            KY: {}
+            TD: {}
+            CL: {}
+            CN: {}
+            CO: {}
+            KM: {}
+            CG: {}
+            CD: {}
+            CK: {}
+            CR: {}
+            CI: {}
+            HR: {}
+            CY: {}
+            CZ: {}
+            DK: {}
+            DJ: {}
+            DM: {}
+            DO: {}
+            EC: {}
+            EG: {}
+            SV: {}
+            ER: {}
+            EE: {}
+            ET: {}
+            FK: {}
+            FO: {}
+            FJ: {}
+            FI: {}
+            FR: {}
+            GF: {}
+            PF: {}
+            GA: {}
+            GM: {}
+            GE: {}
+            DE: {}
+            GI: {}
+            GR: {}
+            GL: {}
+            GD: {}
+            GP: {}
+            GT: {}
+            GN: {}
+            GW: {}
+            GY: {}
+            HN: {}
+            HK: {}
+            HU: {}
+            IS: {}
+            IN: {}
+            ID: {}
+            IE: {}
+            IL: {}
+            IT: {}
+            JM: {}
+            JP: {}
+            JO: {}
+            KZ: {}
+            KE: {}
+            KI: {}
+            KW: {}
+            KG: {}
+            LA: {}
+            LV: {}
+            LS: {}
+            LI: {}
+            LT: {}
+            LU: {}
+            MK: {}
+            MG: {}
+            MW: {}
+            MY: {}
+            MV: {}
+            ML: {}
+            MT: {}
+            MH: {}
+            MQ: {}
+            MR: {}
+            MU: {}
+            YT: {}
+            MX: {}
+            FM: {}
+            MD: {}
+            MC: {}
+            MN: {}
+            ME: {}
+            MS: {}
+            MA: {}
+            MZ: {}
+            NA: {}
+            NR: {}
+            NP: {}
+            NL: {}
+            AN: {}
+            NC: {}
+            NZ: {}
+            NI: {}
+            NE: {}
+            NG: {}
+            NU: {}
+            NF: {}
+            NO: {}
+            OM: {}
+            PW: {}
+            PA: {}
+            PG: {}
+            PY: {}
+            PE: {}
+            PH: {}
+            PN: {}
+            PL: {}
+            PT: {}
+            QA: {}
+            RE: {}
+            RO: {}
+            RU: {}
+            RW: {}
+            WS: {}
+            SM: {}
+            ST: {}
+            SA: {}
+            SN: {}
+            RS: {}
+            SC: {}
+            SL: {}
+            SG: {}
+            SK: {}
+            SI: {}
+            SB: {}
+            SO: {}
+            ZA: {}
+            KR: {}
+            ES: {}
+            LK: {}
+            SH: {}
+            KN: {}
+            LC: {}
+            PM: {}
+            VC: {}
+            SR: {}
+            SJ: {}
+            SZ: {}
+            SE: {}
+            CH: {}
+            TW: {}
+            TJ: {}
+            TZ: {}
+            TH: {}
+            TG: {}
+            TO: {}
+            TT: {}
+            TN: {}
+            TM: {}
+            TC: {}
+            TV: {}
+            TR: {}
+            UG: {}
+            UA: {}
+            AE: {}
+            GB: {}
+            US: {}
+            UY: {}
+            VU: {}
+            VA: {}
+            VE: {}
+            VN: {}
+            WF: {}
+            YE: {}
+            ZM: {}
+            ZW: {}
+          valuePrefix: COUNTRY
         PaypalV2AdditionalData:
           type: object
           properties:
@@ -2291,6 +2684,8 @@ resources:
         PaypalV2:
           type: object
           name: PaypalV2LoadPaymentUIBypass
+          description: |
+            **Paypal bypass 파라미터**
           properties:
             style:
               type: resourceRef
@@ -2534,6 +2929,86 @@ resources:
               description: |
                 **KSNET 간편결제 다이렉트 여부**
               optional: true
+        PaypalV2:
+          type: object
+          name: PaypalV2PaymentBypass
+          description: |
+            **Paypal bypass 파라미터**
+          properties:
+            purchase_units:
+              type: array
+              description: |
+                create order API 호출에 필요한 파라미터
+              optional: true
+              items:
+                type: resourceRef
+                $ref: "#/resources/entity/bypass/loadPaymentUI/PaypalV2PurchaseUnit"
+            payer:
+              type: resourceRef
+              $ref: "#/resources/entity/bypass/loadPaymentUI/PaypalV2Payer"
+              optional: true
+            payment_source:
+              type: resourceRef
+              $ref: "#/resources/entity/bypass/payment/PaypalV2PaymentSource"
+              optional: true
+            additional_data:
+              type: array
+              items:
+                type: resourceRef
+                $ref: "#/resources/entity/bypass/loadPaymentUI/PaypalV2AdditionalData"
+              description: |
+                STC 파라미터
+              optional: true
+        PaypalV2PaymentSource:
+          type: object
+          optional: true
+          properties:
+            paypal:
+              type: resourceRef
+              optional: true
+              $ref: "#/resources/entity/bypass/payment/PaypalV2PaymentSourcePaypal"
+        PaypalV2PaymentSourcePaypal:
+          type: object
+          properties:
+            experience_context:
+              type: resourceRef
+              optional: true
+              $ref: "#/resources/entity/bypass/payment/PaypalV2PaymentSourcePaypalExperienceContext"
+        PaypalV2PaymentSourcePaypalExperienceContext:
+          type: object
+          properties:
+            brand_name:
+              type: string
+              optional: true
+            shipping_preference:
+              type: resourceRef
+              $ref: "#/resources/entity/bypass/payment/PaypalV2PaymentSourcePaypalExperienceContextShippingPreference"
+              optional: true
+            landing_page:
+              type: resourceRef
+              $ref: "#/resources/entity/bypass/payment/PaypalV2PaymentSourcePaypalExperienceContextLandingPage"
+              optional: true
+            payment_method_preference:
+              type: resourceRef
+              $ref: "#/resources/entity/bypass/payment/PaypalV2PaymentSourcePaypalExperienceContextPaymentMethodPreference"
+              optional: true
+        PaypalV2PaymentSourcePaypalExperienceContextShippingPreference:
+          type: enum
+          variants:
+            GET_FROM_FILE: {}
+            NO_SHIPPING: {}
+            SET_PROVIDED_ADDRESS: {}
+        PaypalV2PaymentSourcePaypalExperienceContextLandingPage:
+          type: enum
+          variants:
+            LOGIN: {}
+            GUEST_CHECKOUT: {}
+            NO_PREFERENCE: {}
+        PaypalV2PaymentSourcePaypalExperienceContextPaymentMethodPreference:
+          type: enum
+          variants:
+            UNRESTRICTED: {}
+            IMMEDIATE_PAYMENT_REQUIRED: {}
         Kakaopay:
           type: object
           description: "카카오페이 bypass 파라미터"
@@ -3079,11 +3554,9 @@ resources:
           type: enum
           variants:
             "1":
-              alias: SHOW_EASY_PAY
               description: |
                 간편 결제 표시
             "0":
-              alias: HIDE_EASY_PAY
               description: |
                 간편 결제 미표시
           description: |
@@ -3222,10 +3695,8 @@ resources:
           type: enum
           variants:
             "01":
-              alias: SAMSUNG_PAY_SHOP
               description: 삼성페이 內 쇼핑
             "99":
-              alias: OTHER
               description: 기타 (기본값)
           description: |
             삼성페이 고객사 유형 (01: 삼성페이 內 쇼핑 / 99: 기타 (기본값))
@@ -3276,7 +3747,6 @@ resources:
             GLOBAL:
               description: 해외카드
             11PAY:
-              alias: PAY11
               description: 11Pay
             LEGACY_AUTH:
               description: 구인증
@@ -3308,14 +3778,14 @@ resources:
             payment_method:
               type: string
               description: |
-                결제수단 다이렉트
+                결제수단 단독 노출
               optional: true
             multi_payment_method:
               type: array
               items:
                 type: string
               description: |
-                결제수단 다이렉트 목록
+                결제수단 노출 목록
               optional: true
         EximbayV2Merchant:
           type: object
@@ -3537,10 +4007,8 @@ resources:
           type: enum
           variants:
             default:
-              alias: DEFAULT
               description: 모서리가 둥글고 주변에 여백을 가진 버튼(기본값)
             full:
-              alias: FULL
               description: 하단 영역이 전부 채워지는 형태의 버튼
           description: |
             버튼 스타일
@@ -3634,6 +4102,10 @@ resources:
             type: resourceRef
             optional: true
             $ref: "#/resources/entity/bypass/payment/Ksnet"
+          paypal_v2:
+            type: resourceRef
+            optional: true
+            $ref: "#/resources/entity/bypass/payment/PaypalV2"
           kakaopay:
             type: resourceRef
             optional: true
@@ -4789,6 +5261,18 @@ resources:
           items:
             type: resourceRef
             $ref: "#/resources/entity/CardCompany"
+        easyPayProvider:
+          optional: true
+          type: resourceRef
+          $ref: "#/resources/entity/EasyPayProvider"
+        availablePayMethods:
+          optional: true
+          type: array
+          items:
+            type: resourceRef
+            $ref: "#/resources/entity/EasyPayPaymentMethod"
+          description: |
+            노출을 허용할 결제 수단의 종류
     IssueBillingKeyRequestUnionPaypal:
       type: emptyObject
     IssueBillingKeyAndPayRequestUnionMobile:
