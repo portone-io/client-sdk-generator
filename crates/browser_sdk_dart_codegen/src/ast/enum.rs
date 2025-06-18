@@ -66,7 +66,7 @@ mod tests {
     fn enum_with_variant() {
         let empty = Enum {
             name: Identifier::try_from("Test1").unwrap(),
-            description: Some(Comment("Test1 Enum".into())),
+            description: Some(Comment::try_from("Test1 Enum").unwrap()),
             variants: vec![
                 EnumVariant {
                     name: Identifier::try_from("VARIANT_A").unwrap(),
@@ -76,9 +76,9 @@ mod tests {
                 EnumVariant {
                     name: Identifier::try_from("VARIANT_B").unwrap(),
                     value: "value_b".into(),
-                    description: Some(Comment(
-                        "This is a variant\nwith a multi-line description".into(),
-                    )),
+                    description: Some(Comment::try_from(
+                        "This is a variant\nwith a multi-line description",
+                    ).unwrap()),
                 },
             ],
             union_parents: vec![],

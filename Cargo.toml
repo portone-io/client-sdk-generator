@@ -26,3 +26,6 @@ serde_yaml_ng = { version = "0.10" }
 browser_sdk_schema = { path = "./crates/browser_sdk_schema" }
 browser_sdk_ts_codegen = { path = "./crates/browser_sdk_ts_codegen" }
 browser_sdk_ts_codegen_macros = { path = "./crates/browser_sdk_ts_codegen_macros" }
+browser_sdk_utils = { path = "./crates/browser_sdk_utils" }
+markdown = { git = "https://github.com/cirnov/markdown-rs" }
+mdast_util_to_markdown = { git = "https://github.com/cirnov/markdown-rs" }

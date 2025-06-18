@@ -18,6 +18,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "512761e0bb2578dd7380c6baaa0f4ce03e84f95e960231d1dec8bf4d7d6e2627"
 
 [[package]]
+name = "aho-corasick"
+version = "1.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e60d3430d3a69478ad0993f19238d2df97c507009a52b3c10addcd7f6bcb916"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "anstream"
 version = "0.6.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -410,6 +419,7 @@ name = "browser_sdk_dart_codegen"
 version = "0.1.0"
 dependencies = [
  "browser_sdk_schema",
+ "browser_sdk_utils",
  "convert_case",
 ]
 
@@ -439,6 +449,7 @@ dependencies = [
  "biome_rowan",
  "browser_sdk_schema",
  "browser_sdk_ts_codegen_macros",
+ "browser_sdk_utils",
  "convert_case",
  "indexmap",
  "indoc",
@@ -453,6 +464,14 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.101",
+]
+
+[[package]]
+name = "browser_sdk_utils"
+version = "0.1.0"
+dependencies = [
+ "markdown",
+ "mdast_util_to_markdown",
 ]
 
 [[package]]
@@ -695,6 +714,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "markdown"
+version = "1.0.0"
+source = "git+https://github.com/cirnov/markdown-rs#db3af3ee0bb907e8329ba535b29121c0827b2289"
+dependencies = [
+ "unicode-id",
+]
+
+[[package]]
+name = "mdast_util_to_markdown"
+version = "0.0.2"
+source = "git+https://github.com/cirnov/markdown-rs#db3af3ee0bb907e8329ba535b29121c0827b2289"
+dependencies = [
+ "markdown",
+ "regex",
+]
+
+[[package]]
 name = "memchr"
 version = "2.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -856,10 +892,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "regex"
+version = "1.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b544ef1b4eac5dc2db33ea63606ae9ffcfac26c1416a2806ae0bf5f56b201191"
+dependencies = [
+ "aho-corasick",
+ "memchr",
+ "regex-automata",
+ "regex-syntax",
+]
+
+[[package]]
 name = "regex-automata"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "809e8dc61f6de73b46c85f4c96486310fe304c434cfa43669d7b40f711150908"
+dependencies = [
+ "aho-corasick",
+ "memchr",
+ "regex-syntax",
+]
+
+[[package]]
+name = "regex-syntax"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 
 [[package]]
 name = "result"
@@ -1141,6 +1200,12 @@ name = "unicode-bom"
 version = "2.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7eec5d1121208364f6793f7d2e222bf75a915c19557537745b195b253dd64217"
+
+[[package]]
+name = "unicode-id"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10103c57044730945224467c09f71a4db0071c123a0648cc3e818913bde6b561"
 
 [[package]]
 name = "unicode-ident"

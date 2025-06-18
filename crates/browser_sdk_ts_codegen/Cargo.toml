@@ -18,5 +18,6 @@ indexmap = { workspace = true }
 indoc = { workspace = true }
 browser_sdk_schema = { workspace = true }
 browser_sdk_ts_codegen_macros = { workspace = true }
+browser_sdk_utils.workspace = true
 pretty_assertions = { workspace = true }
 pathdiff = "0.2.1"
