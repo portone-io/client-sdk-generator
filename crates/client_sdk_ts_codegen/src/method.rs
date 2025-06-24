@@ -32,7 +32,7 @@ pub fn generate_method_module(
     let mut imports = IndexSet::new();
     imports.insert(ImportEntry {
         type_name: "loadScript".to_string(),
-        path: PathBuf::from("loader.js"),
+        path: resource_base_path.join("loader.js"),
         is_type_only: false,
         alias: None,
     });
