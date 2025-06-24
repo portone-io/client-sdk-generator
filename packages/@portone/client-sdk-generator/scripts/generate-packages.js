@@ -72,11 +72,51 @@ function copyBinaryToNativePackage(platform, arch) {
   fs.chmodSync(binaryTarget, 0o755);
 }
 
+/**
+ * Updates the version in the `package.json` for the given `packageName` to
+ * match the version specified in the `rootManifest`.
+ */
+function updateVersionInJsPackage(packageName) {
+	const packageRoot = resolve(PACKAGES_ROOT, packageName);
+	const manifestPath = resolve(packageRoot, "package.json");
+
+	const { version } = rootManifest;
+
+	const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+	manifest.version = version;
+	updateVersionInDependencies(manifest.dependencies, version);
+	updateVersionInDependencies(manifest.devDependencies, version);
+	updateVersionInDependencies(manifest.optionalDependencies, version);
+	updateVersionInDependencies(
+		manifest.peerDependencies,
+		// Versions with a suffix shouldn't get the `^` prefix.
+		version.includes("-") ? version : `^${version}`,
+	);
+
+	console.info(`Update manifest ${manifestPath}`);
+	fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+}
+
+function updateVersionInDependencies(dependencies, version) {
+	if (dependencies) {
+		for (const dependency of Object.keys(dependencies)) {
+			if (dependency.startsWith("@portone/")) {
+				dependencies[dependency] = version;
+			}
+		}
+	}
+}
+
 const PLATFORMS = ["win32-%s", "darwin-%s", "linux-%s", "linux-%s-musl"];
 const ARCHITECTURES = ["x64", "arm64"];
+const JS_PACKAGES = ["client-sdk-generator"];
 
 for (const platform of PLATFORMS) {
   for (const arch of ARCHITECTURES) {
     copyBinaryToNativePackage(platform, arch);
   }
+}
+
+for (const jsPackage of JS_PACKAGES) {
+	updateVersionInJsPackage(jsPackage);
 }
