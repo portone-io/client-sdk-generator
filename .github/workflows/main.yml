@@ -12,6 +12,7 @@ on:
 env:
   RUST_LOG: info
   RUST_BACKTRACE: 1
+  RUSTUP_WINDOWS_PATH_ADD_BIN: 1
 
 jobs:
   format:
@@ -24,10 +25,15 @@ jobs:
         run: git config core.longpaths true
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Free Disk Space
+        uses: ./.github/actions/free-disk-space
       - name: Install toolchain
         uses: moonrepo/setup-rust@ba15899a518b8408a1f0b703d793ec1e5015a2a4 # v1.2.2
         with:
           components: rustfmt
+          cache-base: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run rustfmt
         run: |
           cargo fmt --all --verbose -- --check
@@ -38,10 +44,15 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: Free Disk Space
+      uses: ./.github/actions/free-disk-space
     - name: Install toolchain
       uses: moonrepo/setup-rust@ba15899a518b8408a1f0b703d793ec1e5015a2a4 # v1.2.2
       with:
         components: clippy
+        cache-base: main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Run cargo check
       run: cargo check --workspace --all-targets --release
     - name: Run clippy
@@ -53,10 +64,15 @@ jobs:
       steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Free Disk Space
+        uses: ./.github/actions/free-disk-space
       - name: Install toolchain
         uses: moonrepo/setup-rust@ba15899a518b8408a1f0b703d793ec1e5015a2a4 # v1.2.2
         with:
           channel: nightly
+          cache: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install udeps
         run: cargo install cargo-udeps --locked
       - name: Run udeps
@@ -68,17 +84,21 @@ jobs:
     strategy:
       matrix:
         include:
-        - os: windows-latest
-        - os: ubuntu-latest
+        - os: windows-2025
+        - os: ubuntu-24.04
         - os: macos-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: Free Disk Space
+      uses: ./.github/actions/free-disk-space
     - name: Install toolchain
       uses: moonrepo/setup-rust@ba15899a518b8408a1f0b703d793ec1e5015a2a4 # v1.2.2
       with:
-        bins: cargo-nextest
+        cache-base: main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Run tests on ${{ matrix.os }}
-      run: cargo nextest run --workspace --verbose
+      run: cargo test --workspace
     - name: Clean cache
       run: cargo cache --autoclean
