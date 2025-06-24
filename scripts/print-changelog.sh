@@ -1,11 +1,13 @@
 #!/bin/bash
 
+# Based on https://github.com/biomejs/biome/blob/a27b8253b2f0d5e5618e9b26eebaaa5da55ed69a/scripts/print-changelog.sh
+
 # Script to extract changelog section for a specific version
 # Usage: ./print-changelog.sh [version] [changelog-file]
 
 # Default values
 VERSION=""
-CHANGELOG_FILE="packages/@biomejs/biome/CHANGELOG.md"
+CHANGELOG_FILE="packages/@portone/sdk-generator/CHANGELOG.md"
 
 # Parse arguments
 if [ $# -eq 0 ]; then
