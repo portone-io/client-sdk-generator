@@ -1,22 +1,22 @@
 {
-  "name": "@portone-io/sdk-generator-darwin-x64",
+  "name": "@portone/sdk-generator-win32-arm64",
   "version": "0.0.0",
   "type": "module",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/portone-io/browser-sdk-generator.git",
-    "directory": "packages/@portone-io/sdk-generator-darwin-x64"
+    "directory": "packages/@portone/sdk-generator-win32-arm64"
   },
   "engines": {
     "node": ">=22"
   },
   "homepage": "https://portone.io",
   "os": [
-    "darwin"
+    "win32"
   ],
   "cpu": [
-    "x64"
+    "arm64"
   ],
   "publishConfig": {
     "provenance": true

@@ -1,25 +1,22 @@
 {
-  "name": "@portone-io/sdk-generator-linux-arm64-musl",
+  "name": "@portone/sdk-generator-darwin-arm64",
   "version": "0.0.0",
   "type": "module",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/portone-io/browser-sdk-generator.git",
-    "directory": "packages/@portone-io/sdk-generator-linux-arm64-musl"
+    "directory": "packages/@portone/sdk-generator-darwin-arm64"
   },
   "engines": {
     "node": ">=22"
   },
   "homepage": "https://portone.io",
   "os": [
-    "linux"
+    "darwin"
   ],
   "cpu": [
     "arm64"
-  ],
-  "libc": [
-    "musl"
   ],
   "publishConfig": {
     "provenance": true

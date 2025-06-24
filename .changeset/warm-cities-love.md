@@ -1,5 +1,5 @@
 ---
-"@portone-io/sdk-generator": minor
+"@portone/sdk-generator": minor
 ---
 
 Release

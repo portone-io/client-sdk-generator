@@ -1,22 +1,25 @@
 {
-  "name": "@portone-io/sdk-generator-win32-arm64",
+  "name": "@portone/sdk-generator-linux-arm64-musl",
   "version": "0.0.0",
   "type": "module",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/portone-io/browser-sdk-generator.git",
-    "directory": "packages/@portone-io/sdk-generator-win32-arm64"
+    "directory": "packages/@portone/sdk-generator-linux-arm64-musl"
   },
   "engines": {
     "node": ">=22"
   },
   "homepage": "https://portone.io",
   "os": [
-    "win32"
+    "linux"
   ],
   "cpu": [
     "arm64"
+  ],
+  "libc": [
+    "musl"
   ],
   "publishConfig": {
     "provenance": true

@@ -47,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Retrieve version of `@portone-io/sdk-generator`
+  # Retrieve version of `@portone/sdk-generator`
   version:
     runs-on: ubuntu-24.04
     needs: changesets
@@ -65,7 +65,7 @@ jobs:
         uses: EndBug/version-check@36ff30f37c7deabe56a30caa043d127be658c425 # v2.1.5
         with:
           diff-search: true
-          file-name: packages/@portone-io/sdk-generator/package.json
+          file-name: packages/@portone/sdk-generator/package.json
 
   # Building jobs
 
@@ -231,21 +231,21 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate npm packages
-        run: node packages/@portone-io/sdk-generator/scripts/generate-packages.js
+        run: node packages/@portone/sdk-generator/scripts/generate-packages.js
 
       - name: Publish npm packages as latest
         run: |
-          for package in packages/@portone-io/*; do
+          for package in packages/@portone/*; do
             npm publish $package --tag latest --access public --provenance
           done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish release for @portone-io/sdk-generator
+      - name: Publish release for @portone/sdk-generator
         run: |
           bash scripts/print-changelog.sh ${{ needs.build-binaries.outputs.version }} >| ${{ github.workspace }}/RELEASE_NOTES
 
-      - name: Create GitHub @portone-io/sdk-generator release and tag
+      - name: Create GitHub @portone/sdk-generator release and tag
         uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -253,7 +253,7 @@ jobs:
           name: |
             PortOne SDK Generator v${{ needs.build-binaries.outputs.version }}
           tag_name: |
-            @portone-io/sdk-generator@${{ needs.build-binaries.outputs.version }}
+            @portone/sdk-generator@${{ needs.build-binaries.outputs.version }}
           draft: false
           body_path: ${{ github.workspace }}/RELEASE_NOTES
           files: |

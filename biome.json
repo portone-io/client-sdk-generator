@@ -8,7 +8,7 @@
   "files": {
     "ignoreUnknown": false,
     "includes": [
-      "**/packages/@portone-io/**",
+      "**/packages/@portone/**",
       "!**/crates/browser_sdk_ts_codegen/templates",
       "!**/browser-sdk.schema.json"
     ],

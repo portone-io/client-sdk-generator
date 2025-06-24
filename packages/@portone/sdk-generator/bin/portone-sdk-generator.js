@@ -19,20 +19,20 @@ function isMusl() {
 
 const PLATFORMS = {
   win32: {
-    x64: "@portone-io/sdk-generator-win32-x64/portone-sdk-generator.exe",
-    arm64: "@portone-io/sdk-generator-win32-arm64/portone-sdk-generator.exe",
+    x64: "@portone/sdk-generator-win32-x64/portone-sdk-generator.exe",
+    arm64: "@portone/sdk-generator-win32-arm64/portone-sdk-generator.exe",
   },
   darwin: {
-    x64: "@portone-io/sdk-generator-darwin-x64/portone-sdk-generator",
-    arm64: "@portone-io/sdk-generator-darwin-arm64/portone-sdk-generator",
+    x64: "@portone/sdk-generator-darwin-x64/portone-sdk-generator",
+    arm64: "@portone/sdk-generator-darwin-arm64/portone-sdk-generator",
   },
   linux: {
-    x64: "@portone-io/sdk-generator-linux-x64/portone-sdk-generator",
-    arm64: "@portone-io/sdk-generator-linux-arm64/portone-sdk-generator",
+    x64: "@portone/sdk-generator-linux-x64/portone-sdk-generator",
+    arm64: "@portone/sdk-generator-linux-arm64/portone-sdk-generator",
   },
   "linux-musl": {
-    x64: "@portone-io/sdk-generator-linux-x64-musl/portone-sdk-generator",
-    arm64: "@portone-io/sdk-generator-linux-arm64-musl/portone-sdk-generator",
+    x64: "@portone/sdk-generator-linux-x64-musl/portone-sdk-generator",
+    arm64: "@portone/sdk-generator-linux-arm64-musl/portone-sdk-generator",
   },
 };
 

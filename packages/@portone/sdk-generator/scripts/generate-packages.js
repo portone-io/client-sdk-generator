@@ -20,7 +20,7 @@ function copyBinaryToNativePackage(platform, arch) {
   const os = platform.split("-")[0];
   const buildName = getName(platform, arch);
   const packageRoot = resolve(PACKAGES_ROOT, buildName);
-  const packageName = `@portone-io/${buildName}`;
+  const packageName = `@portone/${buildName}`;
 
   // Update the package.json manifest
   const { version, license, repository, engines, homepage } = rootManifest;

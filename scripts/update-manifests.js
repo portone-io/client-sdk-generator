@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { format } from "node:util";
 
 const REPO_ROOT = resolve(fileURLToPath(import.meta.url), "../..");
-const PACKAGES_ROOT = resolve(REPO_ROOT, "packages/@portone-io");
+const PACKAGES_ROOT = resolve(REPO_ROOT, "packages/@portone");
 const PORTONE_SDK_GENERATOR_LIB_PATH = resolve(PACKAGES_ROOT, "sdk-generator");
 const MANIFEST_PATH = resolve(PORTONE_SDK_GENERATOR_LIB_PATH, "package.json");
 
@@ -29,7 +29,7 @@ function updateOptionalDependencies(platform, arch) {
 	const os = platform.split("-")[0];
 	const buildName = getName(platform, arch);
 	const packageRoot = resolve(PACKAGES_ROOT, buildName);
-	const packageName = `@portone-io/${buildName}`;
+	const packageName = `@portone/${buildName}`;
 
 	// Update the package.json manifest
 	const { version, license, repository, engines, homepage } = rootManifest;

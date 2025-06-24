@@ -1,12 +1,12 @@
 {
-  "name": "@portone-io/sdk-generator-linux-arm64",
+  "name": "@portone/sdk-generator-linux-x64",
   "version": "0.0.0",
   "type": "module",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/portone-io/browser-sdk-generator.git",
-    "directory": "packages/@portone-io/sdk-generator-linux-arm64"
+    "directory": "packages/@portone/sdk-generator-linux-x64"
   },
   "engines": {
     "node": ">=22"
@@ -16,7 +16,7 @@
     "linux"
   ],
   "cpu": [
-    "arm64"
+    "x64"
   ],
   "libc": [
     "glibc"
