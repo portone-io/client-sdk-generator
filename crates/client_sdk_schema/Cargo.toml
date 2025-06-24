@@ -1,0 +1,17 @@
+[package]
+name = "client_sdk_schema"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "generate_schema"
+path = "bin/generate_schema.rs"
+
+[dependencies]
+better_scoped_tls = { workspace = true }
+indexmap = { workspace = true }
+pretty_assertions = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml_ng = { workspace = true }

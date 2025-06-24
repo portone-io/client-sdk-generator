@@ -1,0 +1,38 @@
+{
+  "name": "@portone/client-sdk-generator",
+  "version": "0.0.0",
+  "type": "module",
+  "bin": {
+    "portone-client-sdk-generator": "bin/portone-client-sdk-generator.js"
+  },
+  "homepage": "https://portone.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/portone-io/client-sdk-generator.git",
+    "directory": "packages/@portone/client-sdk-generator"
+  },
+  "author": "portone-dx <support@portone.io>",
+  "license": "AGPL-3.0-or-later",
+  "bugs": "https://github.com/portone-io/client-sdk-generator/issues",
+  "description": "PortOne SDK Generator",
+  "files": [
+    "bin/portone-client-sdk-generator.js",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "optionalDependencies": {
+    "@portone/client-sdk-generator-win32-x64": "workspace:*",
+    "@portone/client-sdk-generator-win32-arm64": "workspace:*",
+    "@portone/client-sdk-generator-darwin-x64": "workspace:*",
+    "@portone/client-sdk-generator-darwin-arm64": "workspace:*",
+    "@portone/client-sdk-generator-linux-x64": "workspace:*",
+    "@portone/client-sdk-generator-linux-arm64": "workspace:*",
+    "@portone/client-sdk-generator-linux-x64-musl": "workspace:*",
+    "@portone/client-sdk-generator-linux-arm64-musl": "workspace:*"
+  }
+}

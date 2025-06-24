@@ -1,4 +1,4 @@
-# browser-sdk-generator
+# client-sdk-generator
 
 YAML 스키마 파일을 기반으로 다양한 환경의 포트원 SDK 코드를 자동 생성하는 도구입니다.
 
@@ -6,10 +6,10 @@ YAML 스키마 파일을 기반으로 다양한 환경의 포트원 SDK 코드�
 
 ```
 crates/
-├── browser_sdk_schema/          # 핵심 스키마 정의 및 파싱 라이브러리
-├── generator_cli/               # 메인 CLI 애플리케이션
-├── browser_sdk_ts_codegen/      # TypeScript 코드 생성기
-├── browser_sdk_dart_codegen/    # Dart 코드 생성기
+├── client_sdk_schema/           # 핵심 스키마 정의 및 파싱 라이브러리
+├── client_sdk_generator/        # 메인 CLI 애플리케이션
+├── client_sdk_ts_codegen/       # TypeScript 코드 생성기
+├── client_sdk_dart_codegen/     # Dart 코드 생성기
 └── ...
 ```
 
@@ -25,23 +25,23 @@ cargo install cargo-nextest
 ### 개발 워크플로우
 
 ```sh
-# browser-sdk.schema.json 재생성
-cargo run -p browser_sdk_schema --bin generate_schema
+# portone-client-sdk.schema.json 재생성
+cargo run -p client_sdk_schema --bin generate_schema
 
 # 테스트 실행
 cargo nextest run --workspace
 
 # TypeScript 코드 생성
-cargo run -p generator_cli generate --schema ./browser-sdk.yml --generator typescript ./output
+cargo run -p client_sdk_generator generate --schema ./portone-client-sdk.yml --generator typescript ./output
 
 # Dart 코드 생성
-cargo run -p generator_cli generate --schema ./browser-sdk.yml --generator dart ./output
+cargo run -p client_sdk_generator generate --schema ./portone-client-sdk.yml --generator dart ./output
 ```
 
 ## 스키마 파일
 
-- `browser-sdk.yml`: 메인 스키마 정의 파일
-- `browser-sdk.schema.json`: IDE 지원을 위한 JSON 스키마 파일
+- `portone-client-sdk.yml`: 메인 스키마 정의 파일
+- `portone-client-sdk.schema.json`: IDE 지원을 위한 JSON 스키마 파일
 
 ## 지원 언어
 

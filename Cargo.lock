@@ -404,66 +404,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b8e56985ec62d17e9c1001dc89c88ecd7dc08e47eba5ec7c29c7b5eeecde967"
 
 [[package]]
-name = "browser_sdk_dart_codegen"
-version = "0.1.0"
-dependencies = [
- "browser_sdk_schema",
- "browser_sdk_utils",
- "convert_case",
-]
-
-[[package]]
-name = "browser_sdk_schema"
-version = "0.1.0"
-dependencies = [
- "better_scoped_tls",
- "indexmap",
- "pretty_assertions",
- "schemars",
- "serde",
- "serde_json",
- "serde_yaml_ng",
-]
-
-[[package]]
-name = "browser_sdk_ts_codegen"
-version = "0.1.5"
-dependencies = [
- "biome_diagnostics",
- "biome_formatter",
- "biome_js_factory",
- "biome_js_formatter",
- "biome_js_parser",
- "biome_js_syntax",
- "biome_rowan",
- "browser_sdk_schema",
- "browser_sdk_ts_codegen_macros",
- "browser_sdk_utils",
- "convert_case",
- "indexmap",
- "indoc",
- "pathdiff",
- "pretty_assertions",
-]
-
-[[package]]
-name = "browser_sdk_ts_codegen_macros"
-version = "0.1.1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.104",
-]
-
-[[package]]
-name = "browser_sdk_utils"
-version = "0.1.0"
-dependencies = [
- "markdown",
- "mdast_util_to_markdown",
-]
-
-[[package]]
 name = "bstr"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -525,6 +465,79 @@ name = "clap_lex"
 version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
+
+[[package]]
+name = "client_sdk_dart_codegen"
+version = "0.1.0"
+dependencies = [
+ "client_sdk_schema",
+ "client_sdk_utils",
+ "convert_case",
+]
+
+[[package]]
+name = "client_sdk_generator"
+version = "0.1.0"
+dependencies = [
+ "better_scoped_tls",
+ "clap",
+ "client_sdk_dart_codegen",
+ "client_sdk_schema",
+ "client_sdk_ts_codegen",
+ "pretty_assertions",
+ "serde_yaml_ng",
+]
+
+[[package]]
+name = "client_sdk_schema"
+version = "0.1.0"
+dependencies = [
+ "better_scoped_tls",
+ "indexmap",
+ "pretty_assertions",
+ "schemars",
+ "serde",
+ "serde_json",
+ "serde_yaml_ng",
+]
+
+[[package]]
+name = "client_sdk_ts_codegen"
+version = "0.1.5"
+dependencies = [
+ "biome_diagnostics",
+ "biome_formatter",
+ "biome_js_factory",
+ "biome_js_formatter",
+ "biome_js_parser",
+ "biome_js_syntax",
+ "biome_rowan",
+ "client_sdk_schema",
+ "client_sdk_ts_codegen_macros",
+ "client_sdk_utils",
+ "convert_case",
+ "indexmap",
+ "indoc",
+ "pathdiff",
+ "pretty_assertions",
+]
+
+[[package]]
+name = "client_sdk_ts_codegen_macros"
+version = "0.1.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.104",
+]
+
+[[package]]
+name = "client_sdk_utils"
+version = "0.1.0"
+dependencies = [
+ "markdown",
+ "mdast_util_to_markdown",
+]
 
 [[package]]
 name = "colorchoice"
@@ -594,19 +607,6 @@ checksum = "778e2ac28f6c47af28e4907f13ffd1e1ddbd400980a9abd7c8df189bf578a5ad"
 dependencies = [
  "libc",
  "windows-sys 0.60.2",
-]
-
-[[package]]
-name = "generator_cli"
-version = "0.1.0"
-dependencies = [
- "better_scoped_tls",
- "browser_sdk_dart_codegen",
- "browser_sdk_schema",
- "browser_sdk_ts_codegen",
- "clap",
- "pretty_assertions",
- "serde_yaml_ng",
 ]
 
 [[package]]

@@ -1,4 +1,4 @@
-# Reference: https://github.com/biomejs/biome/blob/99ddb2d0fb7558879355d510f96b7243c769da82/.github/workflows/main.yml
+# Based on https://github.com/biomejs/biome/blob/99ddb2d0fb7558879355d510f96b7243c769da82/.github/workflows/main.yml
 name: CI on main
 
 on:
@@ -19,13 +19,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Support longpaths
         run: git config core.longpaths true
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Install toolchain
-        uses: moonrepo/setup-rust@v1
+        uses: moonrepo/setup-rust@ba15899a518b8408a1f0b703d793ec1e5015a2a4 # v1.2.2
         with:
           components: rustfmt
       - name: Run rustfmt
@@ -37,9 +37,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Install toolchain
-      uses: moonrepo/setup-rust@v1
+      uses: moonrepo/setup-rust@ba15899a518b8408a1f0b703d793ec1e5015a2a4 # v1.2.2
       with:
         components: clippy
     - name: Run cargo check
@@ -52,9 +52,9 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Install toolchain
-        uses: moonrepo/setup-rust@v1
+        uses: moonrepo/setup-rust@ba15899a518b8408a1f0b703d793ec1e5015a2a4 # v1.2.2
         with:
           channel: nightly
       - name: Install udeps
@@ -73,9 +73,9 @@ jobs:
         - os: macos-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Install toolchain
-      uses: moonrepo/setup-rust@v1
+      uses: moonrepo/setup-rust@ba15899a518b8408a1f0b703d793ec1e5015a2a4 # v1.2.2
       with:
         bins: cargo-nextest
     - name: Run tests on ${{ matrix.os }}

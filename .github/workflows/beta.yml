@@ -1,79 +1,37 @@
-# Based on https://github.com/biomejs/biome/blob/ca81e98ffd9aa648db6b746e26d0dfcce3d3c8c1/.github/workflows/release.yml
-name: Release
-
+# Based on https://github.com/biomejs/biome/blob/a27b8253b2f0d5e5618e9b26eebaaa5da55ed69a/.github/workflows/beta.yml
+name: Beta release Client SDK Generator
 on:
-  push:
-    branches:
-      - master
-
-concurrency: ${{ github.workflow }}-${{ github.ref }}
-
-permissions:
-  actions: write
-  contents: write
-  pull-requests: write
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: true
+        description: The version to release
 
 env:
+  INPUT_VERSION: ${{ inputs.version }}
   CARGO_TERM_COLOR: always
 
 jobs:
-  changesets:
-    name: Release
-    outputs:
-      hasChangesets: ${{ steps.changesets-action.outputs.hasChangesets }}
+  version:
+    name: Generate version
     runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ env.version }}
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Node.js 22.x
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+      - name: Set beta version
+        run: |
+          echo "version=$(node packages/@portone/client-sdk-generator/scripts/update-beta-version.js)" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Create Release Pull Request
-        id: changesets-action
-        uses: changesets/action@e0145edc7d9d8679003495b11f87bd8ef63c0cba # v1.5.3
-        with:
-          version: pnpm run version
-          commit: "ci: release"
-          title: "ci: release"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Retrieve version of `@portone/client-sdk-generator`
-  version:
-    runs-on: ubuntu-24.04
-    needs: changesets
-    if: needs.changesets.outputs.hasChangesets == 'false'
-    outputs:
-      client-sdk-generator-version: ${{ steps.client-sdk-generator-version-changed.outputs.version }}
-      client-sdk-generator-version-changed: ${{ steps.client-sdk-generator-version-changed.outputs.changed }}
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Check Client SDK Generator version changes
-        id: client-sdk-generator-version-changed
-        uses: EndBug/version-check@36ff30f37c7deabe56a30caa043d127be658c425 # v2.1.5
-        with:
-          diff-search: true
-          file-name: packages/@portone/client-sdk-generator/package.json
-
-  # Building jobs
-
-  build-binaries:
+  build:
     needs: version
-    if: needs.version.outputs.client-sdk-generator-version-changed == 'true'
-    outputs:
-      version: ${{ needs.version.outputs.client-sdk-generator-version }}
     strategy:
       matrix:
         include:
@@ -86,9 +44,9 @@ jobs:
           - os: ubuntu-24.04
             target: x86_64-unknown-linux-musl
             code-target: linux-x64-musl
-          - os: ubuntu-24.04-arm
-            target: aarch64-unknown-linux-musl
-            code-target: linux-arm64-musl
+          # - os: ubuntu-24.04-arm
+          #   target: aarch64-unknown-linux-musl
+          #   code-target: linux-arm64-musl
           - os: macos-14
             target: x86_64-apple-darwin
             code-target: darwin-x64
@@ -98,6 +56,11 @@ jobs:
 
     name: Package ${{ matrix.code-target }}
     runs-on: ${{ matrix.os }}
+
+    env:
+      version: ${{ needs.version.outputs.version }}
+    outputs:
+      version: ${{ env.version }}
 
     steps:
       - name: Checkout repository
@@ -150,23 +113,27 @@ jobs:
           if-no-files-found: error
 
   # Build GNU/Linux binaries in Docker, using Debian 11 (bullseye), to support older versions of glibc.
-  build-binaries-gnu:
+  build-gnu:
     needs: version
-    if: needs.version.outputs.client-sdk-generator-version
     strategy:
       matrix:
         include:
           - os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
             code-target: linux-x64
-          - os: ubuntu-24.04-arm
-            target: aarch64-unknown-linux-gnu
-            code-target: linux-arm64
+          # - os: ubuntu-24.04-arm
+          #   target: aarch64-unknown-linux-gnu
+          #   code-target: linux-arm64
 
     name: Package ${{ matrix.code-target }}
     runs-on: ${{ matrix.os }}
     container:
       image: rust:1.87.0-bullseye@sha256:af1a29a166198e1295ca667007e95d2e70c866e3928ba9b25f3907035581c39e
+
+    env:
+      version: ${{ needs.version.outputs.version }}
+    outputs:
+      version: ${{ env.version }}
 
     steps:
       - name: Checkout repository
@@ -198,15 +165,12 @@ jobs:
           path: ./dist/portone-client-sdk-generator-*
           if-no-files-found: error
 
-  # Publishing jobs
-
-  publish-client-sdk-generator:
-    name: Publish Client SDK Generator
+  publish:
+    name: Publish
     runs-on: ubuntu-24.04
     needs:
-      - build-binaries
-      - build-binaries-gnu
-    if: needs.build-binaries.outputs.version
+      - build
+      - build-gnu
     environment: npm-publish
     permissions:
       contents: write
@@ -228,35 +192,29 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Set beta version
+        run: node packages/@portone/client-sdk-generator/scripts/update-beta-version.js
 
       - name: Generate npm packages
         run: node packages/@portone/client-sdk-generator/scripts/generate-packages.js
 
-      - name: Publish npm packages as latest
+      - name: Publish npm packages as beta
         run: |
           for package in packages/@portone/*; do
-            npm publish $package --tag latest --access public --provenance
+            npm publish $package --tag beta --access public --provenance
           done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish release for @portone/client-sdk-generator
-        run: |
-          bash scripts/print-changelog.sh ${{ needs.build-binaries.outputs.version }} >| ${{ github.workspace }}/RELEASE_NOTES
-
-      - name: Create GitHub @portone/client-sdk-generator release and tag
-        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
+      - name: Create GitHub release and tag
+        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: |
-            PortOne Client SDK Generator v${{ needs.build-binaries.outputs.version }}
-          tag_name: |
-            @portone/client-sdk-generator@${{ needs.build-binaries.outputs.version }}
+          name: Client SDK Generator v${{ needs.build.outputs.version }}
+          tag_name: "@portone/client-sdk-generator@${{ needs.build.outputs.version }}"
           draft: false
-          body_path: ${{ github.workspace }}/RELEASE_NOTES
+          prerelease: true
           files: |
             portone-client-sdk-generator-*
           fail_on_unmatched_files: true
