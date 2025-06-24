@@ -1,149 +1,262 @@
-# Reference: https://github.com/BurntSushi/ripgrep/blob/827082a33ae7d86846a103ef14fb9ff297587049/.github/workflows/ci.yml
-name: release
+# Based on https://github.com/biomejs/biome/blob/ca81e98ffd9aa648db6b746e26d0dfcce3d3c8c1/.github/workflows/release.yml
+name: Release
 
 on:
   push:
-    tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
+    branches:
+      - master
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  create-release:
-    name: create-release
-    runs-on: ubuntu-latest
+  changesets:
+    name: Release
+    outputs:
+      hasChangesets: ${{ steps.changesets-action.outputs.hasChangesets }}
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - name: Get the release version from the tag
-        if: env.VERSION == ''
-        run: echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
-      - name: Show the version
-        run: |
-          echo "version is: $VERSION"
-      - name: Check that tag version and Cargo.toml version are the same
-        shell: bash
-        run: |
-          if ! grep -q "version = \"$VERSION\"" Cargo.toml; then
-            echo "version does not match Cargo.toml" >&2
-            exit 1
-          fi
-      - name: Create GitHub release
+      - name: Checkout Repo
+        uses: actions/checkout@4
+
+      - name: Setup Node.js 22.x
+        uses: actions/setup-node@4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create Release Pull Request
+        id: changesets-action
+        uses: changesets/action@1
+        with:
+          version: pnpm run version
+          commit: "ci: release"
+          title: "ci: release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create $VERSION --draft --verify-tag --title $VERSION
-    outputs:
-      version: ${{ env.VERSION }}
 
-  build-release:
-    name: build-release
-    needs: ["create-release"]
-    runs-on: ${{ matrix.os }}
-    env:
-      RUST_BACKTRACE: 1
+  # Retrieve version of `@portone-io/sdk-generator`
+  version:
+    runs-on: ubuntu-24.04
+    needs: changesets
+    if: needs.changesets.outputs.hasChangesets == 'false'
+    outputs:
+      sdk-generator-version: ${{ steps.sdk-generator-version-changed.outputs.version }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@4
+
+      - name: Setup Node.js 22.x
+        uses: actions/setup-node@4
+        with:
+          node-version: 22
+
+      - name: Check SDK Generator version changes
+        id: sdk-generator-version-changed
+        run: |
+          version=$(node --experimental-strip-types scripts/version-check.ts packages/@portone-io/sdk-generator/package.json)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+  # Building jobs
+
+  build-binaries:
+    needs: version
+    if: needs.version.outputs.sdk-generator-version
+    outputs:
+      version: ${{ needs.version.outputs.sdk-generator-version }}
     strategy:
-      fail-fast: false
       matrix:
         include:
-          - build: linux-x64
-            os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            rust: stable
-          - build: linux-arm64
-            os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            rust: stable
-          - build: win-msvc-x64
-            os: windows-latest
+          - os: windows-2025
             target: x86_64-pc-windows-msvc
-            rust: stable
-          - build: win-msvc-arm64
-            os: windows-latest
+            code-target: win32-x64
+          - os: windows-2025
             target: aarch64-pc-windows-msvc
-            rust: stable
-          - build: macos-x64
-            os: macos-11
+            code-target: win32-arm64
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-musl
+            code-target: linux-x64-musl
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            code-target: linux-arm64-musl
+          - os: macos-14
             target: x86_64-apple-darwin
-            rust: stable
-          - build: macos-arm64
-            os: macos-11
+            code-target: darwin-x64
+          - os: macos-14
             target: aarch64-apple-darwin
-            rust: stable
+            code-target: darwin-arm64
+
+    name: Package ${{ matrix.code-target }}
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ matrix.rust }}
-          target: ${{ matrix.target }}
+      - name: Install Rust toolchain
+        run: rustup target add ${{ matrix.target }}
 
-      - name: Install arm64 toolchain
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
+      - name: Install musl toolchain
+        if: matrix.code-target == 'linux-x64-musl' || matrix.code-target == 'linux-arm64-musl'
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu
+          sudo apt-get install -y musl-tools
 
-      - name: Set target variables
-        shell: bash
-        run: |
-          echo "TARGET_FLAGS=--target ${{ matrix.target }}" >> $GITHUB_ENV
-          echo "TARGET_DIR=./target/${{ matrix.target }}" >> $GITHUB_ENV
+      - name: Install cargo-audit
+        uses: taiki-e/install-action@2
+        if: matrix.code-target == 'linux-x64-musl'
+        with:
+          tool: cargo-audit
 
-      - name: Show command used for Cargo
-        shell: bash
-        run: |
-          echo "target flag is: ${{ env.TARGET_FLAGS }}"
-          echo "target dir is: ${{ env.TARGET_DIR }}"
+      - name: Audit crates.io dependencies
+        if: matrix.code-target == 'linux-x64-musl'
+        run: cargo audit
 
-      - name: Build release binary
-        shell: bash
+      # Build the SDK Generator binary
+      - name: Build binaries
+        run: cargo build -p sdk_generator --release --target ${{ matrix.target }}
         env:
-          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
-        run: |
-          cargo build --package generator_cli --verbose --release --target ${{ matrix.target }}
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            bin="target/${{ matrix.target }}/release/generator-cli.exe"
-          else
-            bin="target/${{ matrix.target }}/release/generator-cli"
-          fi
-          echo "BIN=$bin" >> $GITHUB_ENV
+          # Strip all debug symbols from the resulting binaries
+          RUSTFLAGS: "-C strip=symbols -C codegen-units=1"
 
-      - name: Determine archive name
-        shell: bash
+      # Copy the SDK Generator binary and rename it to include the name of the target platform
+      - name: Copy SDK Generator binary
+        if: matrix.os == 'windows-2025'
         run: |
-          version="${{ needs.create-release.outputs.version }}"
-          echo "ARCHIVE=generator-cli-$version-${{ matrix.target }}" >> $GITHUB_ENV
-
-      - name: Creating directory for archive
-        shell: bash
+          mkdir dist
+          cp target/${{ matrix.target }}/release/portone-sdk-generator.exe ./dist/portone-sdk-generator-${{ matrix.code-target }}.exe
+      - name: Copy SDK Generator binary
+        if: matrix.os != 'windows-2025'
         run: |
-          mkdir -p "$ARCHIVE"/
-          cp "$BIN" "$ARCHIVE"/
+          mkdir dist
+          cp target/${{ matrix.target }}/release/portone-sdk-generator ./dist/portone-sdk-generator-${{ matrix.code-target }}
 
-      - name: Build archive (Windows)
-        shell: bash
-        if: matrix.os == 'windows-latest'
+      # Upload the SDK Generator binary as a build artifact
+      - name: Upload SDK Generator artifact
+        uses: actions/upload-artifact@4
+        with:
+          name: sdk-generator-${{ matrix.target }}
+          path: ./dist/portone-sdk-generator-*
+          if-no-files-found: error
+
+  # Build GNU/Linux binaries in Docker, using Debian 11 (bullseye), to support older versions of glibc.
+  build-binaries-gnu:
+    needs: version
+    if: needs.version.outputs.sdk-generator-version
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            code-target: linux-x64
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            code-target: linux-arm64
+
+    name: Package ${{ matrix.code-target }}
+    runs-on: ${{ matrix.os }}
+    container:
+      image: rust:1.87.0-bullseye@sha256:af1a29a166198e1295ca667007e95d2e70c866e3928ba9b25f3907035581c39e
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@4
+
+      - name: Set jemalloc page size for linux-arm64
+        if: matrix.code-target == 'linux-arm64'
         run: |
-          7z a "$ARCHIVE.zip" "$ARCHIVE"
-          certutil -hashfile "$ARCHIVE.zip" SHA256 > "$ARCHIVE.zip.sha256"
-          echo "ASSET=$ARCHIVE.zip" >> $GITHUB_ENV
-          echo "ASSET_SUM=$ARCHIVE.zip.sha256" >> $GITHUB_ENV
+          echo "JEMALLOC_SYS_WITH_LG_PAGE=16" >> $GITHUB_ENV
 
-      - name: Build archive (Unix)
-        shell: bash
-        if: matrix.os != 'windows-latest'
+      # Build the SDK Generator binary
+      - name: Build binaries
+        run: cargo build -p sdk_generator --release --target ${{ matrix.target }}
+        env:
+          # Strip all debug symbols from the resulting binaries
+          RUSTFLAGS: "-C strip=symbols -C codegen-units=1"
+
+      # Copy the SDK Generator binary and rename it to include the name of the target platform
+      - name: Copy SDK Generator binary
         run: |
-          tar czf "$ARCHIVE.tar.gz" "$ARCHIVE"
-          shasum -a 256 "$ARCHIVE.tar.gz" > "$ARCHIVE.tar.gz.sha256"
-          echo "ASSET=$ARCHIVE.tar.gz" >> $GITHUB_ENV
-          echo "ASSET_SUM=$ARCHIVE.tar.gz.sha256" >> $GITHUB_ENV
+          mkdir dist
+          cp target/${{ matrix.target }}/release/portone-sdk-generator ./dist/portone-sdk-generator-${{ matrix.code-target }}
 
-      - name: Upload release archive
+      # Upload the SDK Generator binary as a build artifact
+      - name: Upload SDK Generator artifact
+        uses: actions/upload-artifact@4
+        with:
+          name: sdk-generator-${{ matrix.target }}
+          path: ./dist/portone-sdk-generator-*
+          if-no-files-found: error
+
+  # Publishing jobs
+
+  publish-sdk-generator:
+    name: Publish SDK Generator
+    runs-on: ubuntu-24.04
+    needs:
+      - build-binaries
+      - build-binaries-gnu
+    if: needs.build-binaries.outputs.version
+    environment: npm-publish
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@4
+
+      - name: Download SDK Generator artifacts
+        uses: actions/download-artifact@4
+        with:
+          pattern: sdk-generator-*
+          merge-multiple: true
+      - name: Install Node.js
+        uses: actions/setup-node@4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate npm packages
+        run: node packages/@portone-io/sdk-generator/scripts/generate-packages.js
+
+      - name: Publish npm packages as latest
+        run: for package in packages/@portone-io/*; do npm publish $package --tag latest --access public --provenance; done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish release for @portone-io/sdk-generator
+        run: |
+          bash scripts/print-changelog.sh ${{ needs.build-binaries.outputs.version }} >| ${{ github.workspace }}/RELEASE_NOTES
+
+      - name: Create GitHub @portone-io/sdk-generator release and tag
+        uses: softprops/action-gh-release@2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        run: |
-          version="${{ needs.create-release.outputs.version }}"
-          gh release upload "$version" ${{ env.ASSET }} ${{ env.ASSET_SUM }}
+        with:
+          name: |
+            PortOne SDK Generator v${{ needs.build-binaries.outputs.version }}
+          tag_name: |
+            @portone-io/sdk-generator@${{ needs.build-binaries.outputs.version }}
+          draft: false
+          body_path: ${{ github.workspace }}/RELEASE_NOTES
+          files: |
+            portone-sdk-generator-*
+          fail_on_unmatched_files: true
+          generate_release_notes: true

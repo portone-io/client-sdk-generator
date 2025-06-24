@@ -619,19 +619,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
-name = "generator_cli"
-version = "0.1.0"
-dependencies = [
- "better_scoped_tls",
- "browser_sdk_dart_codegen",
- "browser_sdk_schema",
- "browser_sdk_ts_codegen",
- "clap",
- "pretty_assertions",
- "serde_yaml_ng",
-]
-
-[[package]]
 name = "gimli"
 version = "0.31.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1009,6 +996,19 @@ name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
+
+[[package]]
+name = "sdk_generator"
+version = "0.1.0"
+dependencies = [
+ "better_scoped_tls",
+ "browser_sdk_dart_codegen",
+ "browser_sdk_schema",
+ "browser_sdk_ts_codegen",
+ "clap",
+ "pretty_assertions",
+ "serde_yaml_ng",
+]
 
 [[package]]
 name = "serde"

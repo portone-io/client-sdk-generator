@@ -1,0 +1,38 @@
+{
+  "name": "@portone-io/sdk-generator",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "portone-sdk-generator": "bin/portone-sdk-generator.js"
+  },
+  "homepage": "https://portone.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/portone-io/browser-sdk-generator.git",
+    "directory": "packages/@portone-io/sdk-generator"
+  },
+  "author": "portone-dx <support@portone.io>",
+  "license": "AGPL-3.0-or-later",
+  "bugs": "https://github.com/portone-io/browser-sdk-generator/issues",
+  "description": "PortOne SDK Generator",
+  "files": [
+    "bin/portone-sdk-generator.js",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "optionalDependencies": {
+    "@portone-io/sdk-generator-win32-x64": "workspace:*",
+    "@portone-io/sdk-generator-win32-arm64": "workspace:*",
+    "@portone-io/sdk-generator-darwin-x64": "workspace:*",
+    "@portone-io/sdk-generator-darwin-arm64": "workspace:*",
+    "@portone-io/sdk-generator-linux-x64": "workspace:*",
+    "@portone-io/sdk-generator-linux-arm64": "workspace:*",
+    "@portone-io/sdk-generator-linux-x64-musl": "workspace:*",
+    "@portone-io/sdk-generator-linux-arm64-musl": "workspace:*"
+  }
+}

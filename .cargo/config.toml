@@ -1,6 +1,6 @@
 [alias]
-generator-cli = "run -p generator_cli --release --"
-generator-cli-dev = "run -p generator_cli --"
+sdk-generator = "run -p sdk_generator --release --"
+sdk-generator-dev = "run -p sdk_generator --"
 create-schema = "run -p browser_sdk_schema --"
 format = "fmt --all --verbose"
 lint = "clippy --workspace --all-targets -- --deny warnings"

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": ["@changesets/changelog-github", { "repo": "portone-io/browser-sdk-generator" }],
+  "commit": false,
+  "fixed": [
+    [
+      "@portone-io/sdk-generator",
+      "@portone-io/sdk-generator-darwin-arm64",
+      "@portone-io/sdk-generator-darwin-x64",
+      "@portone-io/sdk-generator-linux-arm64",
+      "@portone-io/sdk-generator-linux-arm64-musl",
+      "@portone-io/sdk-generator-linux-x64",
+      "@portone-io/sdk-generator-linux-x64-musl",
+      "@portone-io/sdk-generator-win32-arm64",
+      "@portone-io/sdk-generator-win32-x64"
+    ]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "master",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}

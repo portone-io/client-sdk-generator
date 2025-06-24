@@ -1,4 +1,4 @@
-# Reference: https://github.com/biomejs/biome/blob/99ddb2d0fb7558879355d510f96b7243c769da82/.github/workflows/main.yml
+# Based on https://github.com/biomejs/biome/blob/99ddb2d0fb7558879355d510f96b7243c769da82/.github/workflows/main.yml
 name: CI on main
 
 on:

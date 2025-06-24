@@ -7,7 +7,7 @@ YAML 스키마 파일을 기반으로 다양한 환경의 포트원 SDK 코드�
 ```
 crates/
 ├── browser_sdk_schema/          # 핵심 스키마 정의 및 파싱 라이브러리
-├── generator_cli/               # 메인 CLI 애플리케이션
+├── sdk_generator/               # 메인 CLI 애플리케이션
 ├── browser_sdk_ts_codegen/      # TypeScript 코드 생성기
 ├── browser_sdk_dart_codegen/    # Dart 코드 생성기
 └── ...
@@ -32,10 +32,10 @@ cargo run -p browser_sdk_schema --bin generate_schema
 cargo nextest run --workspace
 
 # TypeScript 코드 생성
-cargo run -p generator_cli generate --schema ./browser-sdk.yml --generator typescript ./output
+cargo run -p sdk_generator generate --schema ./browser-sdk.yml --generator typescript ./output
 
 # Dart 코드 생성
-cargo run -p generator_cli generate --schema ./browser-sdk.yml --generator dart ./output
+cargo run -p sdk_generator generate --schema ./browser-sdk.yml --generator dart ./output
 ```
 
 ## 스키마 파일

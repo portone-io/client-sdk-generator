@@ -8,7 +8,7 @@ use browser_sdk_ts_codegen::{
 use clap::{Parser as ClapParser, Subcommand, ValueEnum};
 
 #[derive(ClapParser, Debug)]
-#[clap(name = "generator-cli")]
+#[clap(name = "sdk-generator")]
 struct Args {
     #[command(subcommand)]
     command: Commands,
