@@ -21,19 +21,23 @@ function isMusl() {
 const PLATFORMS = {
   win32: {
     x64: "@portone/client-sdk-generator-win32-x64/portone-client-sdk-generator.exe",
-    arm64: "@portone/client-sdk-generator-win32-arm64/portone-client-sdk-generator.exe",
+    arm64:
+      "@portone/client-sdk-generator-win32-arm64/portone-client-sdk-generator.exe",
   },
   darwin: {
     x64: "@portone/client-sdk-generator-darwin-x64/portone-client-sdk-generator",
-    arm64: "@portone/client-sdk-generator-darwin-arm64/portone-client-sdk-generator",
+    arm64:
+      "@portone/client-sdk-generator-darwin-arm64/portone-client-sdk-generator",
   },
   linux: {
     x64: "@portone/client-sdk-generator-linux-x64/portone-client-sdk-generator",
-    arm64: "@portone/client-sdk-generator-linux-arm64/portone-client-sdk-generator",
+    arm64:
+      "@portone/client-sdk-generator-linux-arm64/portone-client-sdk-generator",
   },
   "linux-musl": {
     x64: "@portone/client-sdk-generator-linux-x64-musl/portone-client-sdk-generator",
-    arm64: "@portone/client-sdk-generator-linux-arm64-musl/portone-client-sdk-generator",
+    arm64:
+      "@portone/client-sdk-generator-linux-arm64-musl/portone-client-sdk-generator",
   },
 };
 
