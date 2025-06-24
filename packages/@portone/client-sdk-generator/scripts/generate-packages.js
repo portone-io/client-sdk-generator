@@ -23,7 +23,15 @@ function copyBinaryToNativePackage(platform, arch) {
   const packageName = `@portone/${buildName}`;
 
   // Update the package.json manifest
-  const { version, license, repository, engines, homepage, type, publishConfig } = rootManifest;
+  const {
+    version,
+    license,
+    repository,
+    engines,
+    homepage,
+    type,
+    publishConfig,
+  } = rootManifest;
 
   const manifest = JSON.stringify(
     {
@@ -58,7 +66,10 @@ function copyBinaryToNativePackage(platform, arch) {
     REPO_ROOT,
     `${getName(platform, arch, "portone-client-sdk-generator")}${ext}`,
   );
-  const binaryTarget = resolve(packageRoot, `portone-client-sdk-generator${ext}`);
+  const binaryTarget = resolve(
+    packageRoot,
+    `portone-client-sdk-generator${ext}`,
+  );
 
   if (!fs.existsSync(binarySource)) {
     console.error(
@@ -77,34 +88,34 @@ function copyBinaryToNativePackage(platform, arch) {
  * match the version specified in the `rootManifest`.
  */
 function updateVersionInJsPackage(packageName) {
-	const packageRoot = resolve(PACKAGES_ROOT, packageName);
-	const manifestPath = resolve(packageRoot, "package.json");
+  const packageRoot = resolve(PACKAGES_ROOT, packageName);
+  const manifestPath = resolve(packageRoot, "package.json");
 
-	const { version } = rootManifest;
+  const { version } = rootManifest;
 
-	const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
-	manifest.version = version;
-	updateVersionInDependencies(manifest.dependencies, version);
-	updateVersionInDependencies(manifest.devDependencies, version);
-	updateVersionInDependencies(manifest.optionalDependencies, version);
-	updateVersionInDependencies(
-		manifest.peerDependencies,
-		// Versions with a suffix shouldn't get the `^` prefix.
-		version.includes("-") ? version : `^${version}`,
-	);
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+  manifest.version = version;
+  updateVersionInDependencies(manifest.dependencies, version);
+  updateVersionInDependencies(manifest.devDependencies, version);
+  updateVersionInDependencies(manifest.optionalDependencies, version);
+  updateVersionInDependencies(
+    manifest.peerDependencies,
+    // Versions with a suffix shouldn't get the `^` prefix.
+    version.includes("-") ? version : `^${version}`,
+  );
 
-	console.info(`Update manifest ${manifestPath}`);
-	fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+  console.info(`Update manifest ${manifestPath}`);
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
 }
 
 function updateVersionInDependencies(dependencies, version) {
-	if (dependencies) {
-		for (const dependency of Object.keys(dependencies)) {
-			if (dependency.startsWith("@portone/")) {
-				dependencies[dependency] = version;
-			}
-		}
-	}
+  if (dependencies) {
+    for (const dependency of Object.keys(dependencies)) {
+      if (dependency.startsWith("@portone/")) {
+        dependencies[dependency] = version;
+      }
+    }
+  }
 }
 
 const PLATFORMS = ["win32-%s", "darwin-%s", "linux-%s", "linux-%s-musl"];
@@ -118,5 +129,5 @@ for (const platform of PLATFORMS) {
 }
 
 for (const jsPackage of JS_PACKAGES) {
-	updateVersionInJsPackage(jsPackage);
+  updateVersionInJsPackage(jsPackage);
 }

@@ -10,15 +10,15 @@ const MANIFEST_PATH = resolve(SDK_GENERATOR_ROOT, "package.json");
 const rootManifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, "utf-8"));
 
 if (
-	typeof process.env.GITHUB_SHA !== "string" ||
-	process.env.GITHUB_SHA === ""
+  typeof process.env.GITHUB_SHA !== "string" ||
+  process.env.GITHUB_SHA === ""
 ) {
-	throw new Error("GITHUB_SHA environment variable is undefined");
+  throw new Error("GITHUB_SHA environment variable is undefined");
 }
 
 const version = process.env.INPUT_VERSION;
 if (typeof version !== "string" || version === "") {
-	throw new Error("INPUT_VERSION environment variable is undefined");
+  throw new Error("INPUT_VERSION environment variable is undefined");
 }
 
 rootManifest.version = version;
