@@ -411,10 +411,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "browser-sdk-generator"
-version = "0.1.0"
-
-[[package]]
 name = "browser_sdk_dart_codegen"
 version = "0.1.0"
 dependencies = [

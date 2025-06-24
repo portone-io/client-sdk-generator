@@ -1,10 +1,13 @@
 [workspace]
 members = ["crates/*"]
+resolver = "3"
 
-[package]
-name = "browser-sdk-generator"
-version = "0.1.0"
-edition = "2024"
+[workspace.package]
+authors    = ["portone-dx <support@portone.io>"]
+edition    = "2024"
+keywords   = ["PortOne", "payment", "포트원", "결제 연동"]
+license    = "AGPL-3.0-or-later"
+repository = "https://github.com/portone-io/browser-sdk-generator"
 
 [workspace.dependencies]
 better_scoped_tls = "1.0.0"
