@@ -27,7 +27,7 @@ macro_rules! js_export {
 #[macro_export]
 macro_rules! node_text {
     ($node:expr) => {
-        $node.syntax().text()
+        $node.syntax().text_with_trivia()
     };
 }
 
