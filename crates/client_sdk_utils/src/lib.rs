@@ -1,5 +1,5 @@
 use markdown::{ParseOptions, mdast::Node, to_mdast};
-use mdast_util_to_markdown::{ to_markdown_with_options, Options};
+use mdast_util_to_markdown::{Options, to_markdown_with_options};
 
 pub trait ToMdastExt {
     fn to_mdast(&self) -> Result<Node, markdown::message::Message>;
@@ -24,10 +24,13 @@ pub trait MdastNodeExt {
 
 impl MdastNodeExt for Node {
     fn to_markdown_string(&self) -> Result<String, markdown::message::Message> {
-        to_markdown_with_options(self, &Options {
-          bullet: '-',
-          ..Default::default()
-        })
+        to_markdown_with_options(
+            self,
+            &Options {
+                bullet: '-',
+                ..Default::default()
+            },
+        )
     }
 
     fn remove_jsx_elements(&mut self) -> &mut Self {
