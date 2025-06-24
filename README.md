@@ -25,7 +25,7 @@ cargo install cargo-nextest
 ### 개발 워크플로우
 
 ```sh
-# portone-client-sdk.schema.json 재생성
+# schema.json 재생성
 cargo run -p client_sdk_schema --bin generate_schema
 
 # 테스트 실행
@@ -40,8 +40,7 @@ cargo run -p client_sdk_generator generate --schema ./portone-client-sdk.yml --g
 
 ## 스키마 파일
 
-- `portone-client-sdk.yml`: 메인 스키마 정의 파일
-- `portone-client-sdk.schema.json`: IDE 지원을 위한 JSON 스키마 파일
+- `schema.json`: IDE 지원을 위한 JSON 스키마 파일
 
 ## 지원 언어
 

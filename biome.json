@@ -10,7 +10,7 @@
     "includes": [
       "**/packages/@portone/**",
       "!**/crates/client_sdk_ts_codegen/templates",
-      "!**/portone-client-sdk.schema.json"
+      "!**/schema.json"
     ],
     "experimentalScannerIgnores": [".cargo", ".git", "target"]
   },
