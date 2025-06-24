@@ -72,13 +72,15 @@ function copyBinaryToNativePackage(platform, arch) {
   fs.chmodSync(binaryTarget, 0o755);
 }
 
-const PLATFORMS = ["linux-%s-musl"];
-const ARCHITECTURES = ["x64"];
-// const PLATFORMS = ["win32-%s", "darwin-%s", "linux-%s", "linux-%s-musl"];
-// const ARCHITECTURES = ["x64", "arm64"];
+const PLATFORMS = ["win32-%s", "darwin-%s", "linux-%s", "linux-%s-musl"];
+const ARCHITECTURES = ["x64", "arm64"];
 
 for (const platform of PLATFORMS) {
   for (const arch of ARCHITECTURES) {
+    // TODO: Add support for arm64 linux
+    if (platform.includes("linux") && arch === "arm64") {
+      continue;
+    }
     copyBinaryToNativePackage(platform, arch);
   }
 }
