@@ -80,7 +80,7 @@ const PaymentStatus = {
 /**
  * 결제 상태
  */
-type PaymentStatus = (typeof PaymentStatus[keyof typeof PaymentStatus] | string & {});
+type PaymentStatus = (typeof PaymentStatus[keyof typeof PaymentStatus]);
 ```
 
 ### value_prefix가 있는 경우
@@ -110,7 +110,7 @@ const PaymentStatus = {
 /**
  * 결제 상태
  */
-type PaymentStatus = (typeof PaymentStatus[keyof typeof PaymentStatus] | string & {});
+type PaymentStatus = (typeof PaymentStatus[keyof typeof PaymentStatus]);
 ```
 
 ## OneOf

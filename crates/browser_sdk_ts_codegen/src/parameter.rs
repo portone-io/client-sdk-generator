@@ -138,7 +138,7 @@ fn generate_parameter_type(
         }
         schema::ParameterType::EmptyObject => String::from("Record<string, never>"),
         schema::ParameterType::Enum { .. } => {
-            format!("(typeof {parent_name}[keyof typeof {parent_name}] | string & {{}})")
+            format!("(typeof {parent_name}[keyof typeof {parent_name}])")
         }
         schema::ParameterType::OneOf { properties, hide_if_empty: _ } => {
             let type_path = resource_ref_to_path("../utils", resource_base_path);
@@ -707,7 +707,7 @@ mod tests {
                     /**
                     * User role
                     */
-                    type UserRole = (typeof UserRole[keyof typeof UserRole] | string & {});"#
+                    type UserRole = (typeof UserRole[keyof typeof UserRole]);"#
                 }
             );
         } else {
