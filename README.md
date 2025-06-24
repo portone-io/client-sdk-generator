@@ -11,15 +11,22 @@ crates/
 ├── client_sdk_ts_codegen/       # TypeScript 코드 생성기
 ├── client_sdk_dart_codegen/     # Dart 코드 생성기
 └── ...
+schema.json                      # IDE 지원을 위한 JSON 스키마 파일
 ```
 
 ## 빠른 시작
 
-### 사전 요구사항
+### 설치
 
 ```sh
-# nextest 설치
-cargo install cargo-nextest
+# 설치
+pnpm add -D -E @portone/client-sdk-generator
+
+# TypeScript 코드 생성
+pnpm portone-client-sdk-generator generate --schema ./client-sdk.yml --generator typescript ./output
+
+# Dart 코드 생성
+pnpm portone-client-sdk-generator generate --schema ./client-sdk.yml --generator dart ./output
 ```
 
 ### 개발 워크플로우
@@ -29,18 +36,11 @@ cargo install cargo-nextest
 cargo run -p client_sdk_schema --bin generate_schema
 
 # 테스트 실행
-cargo nextest run --workspace
+cargo test --workspace
 
-# TypeScript 코드 생성
-cargo run -p client_sdk_generator generate --schema ./portone-client-sdk.yml --generator typescript ./output
-
-# Dart 코드 생성
-cargo run -p client_sdk_generator generate --schema ./portone-client-sdk.yml --generator dart ./output
+# CLI 사용
+cargo run -p client_sdk_generator
 ```
-
-## 스키마 파일
-
-- `schema.json`: IDE 지원을 위한 JSON 스키마 파일
 
 ## 지원 언어
 
