@@ -1,6 +1,6 @@
 {
   "name": "@portone-io/sdk-generator",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "type": "module",
   "bin": {
     "portone-sdk-generator": "bin/portone-sdk-generator.js"

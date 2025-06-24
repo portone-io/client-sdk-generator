@@ -54,6 +54,7 @@ jobs:
     if: needs.changesets.outputs.hasChangesets == 'false'
     outputs:
       sdk-generator-version: ${{ steps.sdk-generator-version-changed.outputs.version }}
+      sdk-generator-version-changed: ${{ steps.sdk-generator-version-changed.outputs.changed }}
 
     steps:
       - name: Checkout Repo
@@ -75,7 +76,7 @@ jobs:
 
   build-binaries:
     needs: version
-    if: needs.version.outputs.sdk-generator-version
+    if: needs.version.outputs.sdk-generator-version-changed == 'true'
     outputs:
       version: ${{ needs.version.outputs.sdk-generator-version }}
     strategy:
