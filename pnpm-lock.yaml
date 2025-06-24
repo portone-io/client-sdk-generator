@@ -18,48 +18,48 @@ importers:
         specifier: ^2.29.5
         version: 2.29.5
 
-  packages/@portone/sdk-generator:
+  packages/@portone/client-sdk-generator:
     optionalDependencies:
-      '@portone/sdk-generator-darwin-arm64':
+      '@portone/client-sdk-generator-darwin-arm64':
         specifier: workspace:*
-        version: link:../sdk-generator-darwin-arm64
-      '@portone/sdk-generator-darwin-x64':
+        version: link:../client-sdk-generator-darwin-arm64
+      '@portone/client-sdk-generator-darwin-x64':
         specifier: workspace:*
-        version: link:../sdk-generator-darwin-x64
-      '@portone/sdk-generator-linux-arm64':
+        version: link:../client-sdk-generator-darwin-x64
+      '@portone/client-sdk-generator-linux-arm64':
         specifier: workspace:*
-        version: link:../sdk-generator-linux-arm64
-      '@portone/sdk-generator-linux-arm64-musl':
+        version: link:../client-sdk-generator-linux-arm64
+      '@portone/client-sdk-generator-linux-arm64-musl':
         specifier: workspace:*
-        version: link:../sdk-generator-linux-arm64-musl
-      '@portone/sdk-generator-linux-x64':
+        version: link:../client-sdk-generator-linux-arm64-musl
+      '@portone/client-sdk-generator-linux-x64':
         specifier: workspace:*
-        version: link:../sdk-generator-linux-x64
-      '@portone/sdk-generator-linux-x64-musl':
+        version: link:../client-sdk-generator-linux-x64
+      '@portone/client-sdk-generator-linux-x64-musl':
         specifier: workspace:*
-        version: link:../sdk-generator-linux-x64-musl
-      '@portone/sdk-generator-win32-arm64':
+        version: link:../client-sdk-generator-linux-x64-musl
+      '@portone/client-sdk-generator-win32-arm64':
         specifier: workspace:*
-        version: link:../sdk-generator-win32-arm64
-      '@portone/sdk-generator-win32-x64':
+        version: link:../client-sdk-generator-win32-arm64
+      '@portone/client-sdk-generator-win32-x64':
         specifier: workspace:*
-        version: link:../sdk-generator-win32-x64
+        version: link:../client-sdk-generator-win32-x64
 
-  packages/@portone/sdk-generator-darwin-arm64: {}
+  packages/@portone/client-sdk-generator-darwin-arm64: {}
 
-  packages/@portone/sdk-generator-darwin-x64: {}
+  packages/@portone/client-sdk-generator-darwin-x64: {}
 
-  packages/@portone/sdk-generator-linux-arm64: {}
+  packages/@portone/client-sdk-generator-linux-arm64: {}
 
-  packages/@portone/sdk-generator-linux-arm64-musl: {}
+  packages/@portone/client-sdk-generator-linux-arm64-musl: {}
 
-  packages/@portone/sdk-generator-linux-x64: {}
+  packages/@portone/client-sdk-generator-linux-x64: {}
 
-  packages/@portone/sdk-generator-linux-x64-musl: {}
+  packages/@portone/client-sdk-generator-linux-x64-musl: {}
 
-  packages/@portone/sdk-generator-win32-arm64: {}
+  packages/@portone/client-sdk-generator-win32-arm64: {}
 
-  packages/@portone/sdk-generator-win32-x64: {}
+  packages/@portone/client-sdk-generator-win32-x64: {}
 
 packages:
 

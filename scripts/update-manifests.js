@@ -7,8 +7,8 @@ import { format } from "node:util";
 
 const REPO_ROOT = resolve(fileURLToPath(import.meta.url), "../..");
 const PACKAGES_ROOT = resolve(REPO_ROOT, "packages/@portone");
-const PORTONE_SDK_GENERATOR_LIB_PATH = resolve(PACKAGES_ROOT, "sdk-generator");
-const MANIFEST_PATH = resolve(PORTONE_SDK_GENERATOR_LIB_PATH, "package.json");
+const PORTONE_CLIENT_SDK_GENERATOR_LIB_PATH = resolve(PACKAGES_ROOT, "client-sdk-generator");
+const MANIFEST_PATH = resolve(PORTONE_CLIENT_SDK_GENERATOR_LIB_PATH, "package.json");
 
 const PLATFORMS = ["win32-%s", "darwin-%s", "linux-%s", "linux-%s-musl"];
 const ARCHITECTURES = ["x64", "arm64"];
@@ -23,7 +23,7 @@ for (const platform of PLATFORMS) {
 	}
 }
 
-function getName(platform, arch, prefix = "sdk-generator") {
+function getName(platform, arch, prefix = "client-sdk-generator") {
 	return format(`${prefix}-${platform}`, arch);
 }
 

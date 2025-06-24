@@ -411,66 +411,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "browser_sdk_dart_codegen"
-version = "0.1.0"
-dependencies = [
- "browser_sdk_schema",
- "browser_sdk_utils",
- "convert_case",
-]
-
-[[package]]
-name = "browser_sdk_schema"
-version = "0.1.0"
-dependencies = [
- "better_scoped_tls",
- "indexmap",
- "pretty_assertions",
- "schemars 0.9.0",
- "serde",
- "serde_json",
- "serde_yaml_ng",
-]
-
-[[package]]
-name = "browser_sdk_ts_codegen"
-version = "0.1.5"
-dependencies = [
- "biome_diagnostics",
- "biome_formatter",
- "biome_js_factory",
- "biome_js_formatter",
- "biome_js_parser",
- "biome_js_syntax",
- "biome_rowan",
- "browser_sdk_schema",
- "browser_sdk_ts_codegen_macros",
- "browser_sdk_utils",
- "convert_case",
- "indexmap",
- "indoc",
- "pathdiff",
- "pretty_assertions",
-]
-
-[[package]]
-name = "browser_sdk_ts_codegen_macros"
-version = "0.1.1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.101",
-]
-
-[[package]]
-name = "browser_sdk_utils"
-version = "0.1.0"
-dependencies = [
- "markdown",
- "mdast_util_to_markdown",
-]
-
-[[package]]
 name = "bstr"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -526,6 +466,79 @@ name = "clap_lex"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f46ad14479a25103f283c0f10005961cf086d8dc42205bb44c46ac563475dca6"
+
+[[package]]
+name = "client_sdk_dart_codegen"
+version = "0.1.0"
+dependencies = [
+ "client_sdk_schema",
+ "client_sdk_utils",
+ "convert_case",
+]
+
+[[package]]
+name = "client_sdk_generator"
+version = "0.1.0"
+dependencies = [
+ "better_scoped_tls",
+ "clap",
+ "client_sdk_dart_codegen",
+ "client_sdk_schema",
+ "client_sdk_ts_codegen",
+ "pretty_assertions",
+ "serde_yaml_ng",
+]
+
+[[package]]
+name = "client_sdk_schema"
+version = "0.1.0"
+dependencies = [
+ "better_scoped_tls",
+ "indexmap",
+ "pretty_assertions",
+ "schemars 0.9.0",
+ "serde",
+ "serde_json",
+ "serde_yaml_ng",
+]
+
+[[package]]
+name = "client_sdk_ts_codegen"
+version = "0.1.5"
+dependencies = [
+ "biome_diagnostics",
+ "biome_formatter",
+ "biome_js_factory",
+ "biome_js_formatter",
+ "biome_js_parser",
+ "biome_js_syntax",
+ "biome_rowan",
+ "client_sdk_schema",
+ "client_sdk_ts_codegen_macros",
+ "client_sdk_utils",
+ "convert_case",
+ "indexmap",
+ "indoc",
+ "pathdiff",
+ "pretty_assertions",
+]
+
+[[package]]
+name = "client_sdk_ts_codegen_macros"
+version = "0.1.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.101",
+]
+
+[[package]]
+name = "client_sdk_utils"
+version = "0.1.0"
+dependencies = [
+ "markdown",
+ "mdast_util_to_markdown",
+]
 
 [[package]]
 name = "colorchoice"
@@ -996,19 +1009,6 @@ name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
-
-[[package]]
-name = "sdk_generator"
-version = "0.1.0"
-dependencies = [
- "better_scoped_tls",
- "browser_sdk_dart_codegen",
- "browser_sdk_schema",
- "browser_sdk_ts_codegen",
- "clap",
- "pretty_assertions",
- "serde_yaml_ng",
-]
 
 [[package]]
 name = "serde"

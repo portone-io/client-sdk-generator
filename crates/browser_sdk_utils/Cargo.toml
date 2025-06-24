@@ -1,8 +1,0 @@
-[package]
-name = "browser_sdk_utils"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-markdown.workspace = true
-mdast_util_to_markdown.workspace = true

@@ -4,7 +4,7 @@
   "type": "module",
   "license": "AGPL-3.0-or-later",
   "author": "portone-dx <support@portone.io>",
-  "repository": "https://github.com/portone-io/browser-sdk-generator",
+  "repository": "https://github.com/portone-io/client-sdk-generator",
   "packageManager": "pnpm@10.12.1",
   "scripts": {
     "version": "changeset version && pnpm i --lockfile-only"

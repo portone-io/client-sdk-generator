@@ -7,7 +7,7 @@
 
 # Default values
 VERSION=""
-CHANGELOG_FILE="packages/@portone/sdk-generator/CHANGELOG.md"
+CHANGELOG_FILE="packages/@portone/client-sdk-generator/CHANGELOG.md"
 
 # Parse arguments
 if [ $# -eq 0 ]; then

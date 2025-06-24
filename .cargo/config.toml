@@ -1,7 +1,7 @@
 [alias]
-sdk-generator = "run -p sdk_generator --release --"
-sdk-generator-dev = "run -p sdk_generator --"
-create-schema = "run -p browser_sdk_schema --"
+client-sdk-generator = "run -p client_sdk_generator --release --"
+client-sdk-generator-dev = "run -p client_sdk_generator --"
+create-schema = "run -p client_sdk_schema --"
 format = "fmt --all --verbose"
 lint = "clippy --workspace --all-targets -- --deny warnings"
 

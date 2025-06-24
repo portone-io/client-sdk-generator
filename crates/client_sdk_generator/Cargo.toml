@@ -1,0 +1,17 @@
+[package]
+name = "client_sdk_generator"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "portone-client-sdk-generator"
+path = "src/main.rs"
+
+[dependencies]
+better_scoped_tls = { workspace = true }
+client_sdk_dart_codegen = { version = "0.1.0", path = "../client_sdk_dart_codegen" }
+client_sdk_schema = { workspace = true }
+client_sdk_ts_codegen = { workspace = true }
+clap = { version = "4.5.16", features = ["derive"] }
+pretty_assertions = { workspace = true }
+serde_yaml_ng = { workspace = true }

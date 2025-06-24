@@ -9,8 +9,8 @@
     "ignoreUnknown": false,
     "includes": [
       "**/packages/@portone/**",
-      "!**/crates/browser_sdk_ts_codegen/templates",
-      "!**/browser-sdk.schema.json"
+      "!**/crates/client_sdk_ts_codegen/templates",
+      "!**/portone-client-sdk.schema.json"
     ],
     "experimentalScannerIgnores": [".cargo", ".git", "target"]
   },
