@@ -23,12 +23,13 @@ function copyBinaryToNativePackage(platform, arch) {
   const packageName = `@portone/${buildName}`;
 
   // Update the package.json manifest
-  const { version, license, repository, engines, homepage } = rootManifest;
+  const { version, license, repository, engines, homepage, type, publishConfig } = rootManifest;
 
   const manifest = JSON.stringify(
     {
       name: packageName,
       version,
+      type,
       license,
       repository,
       engines,
@@ -41,6 +42,7 @@ function copyBinaryToNativePackage(platform, arch) {
             ? ["musl"]
             : ["glibc"]
           : undefined,
+      publishConfig,
     },
     null,
     2,
@@ -70,8 +72,10 @@ function copyBinaryToNativePackage(platform, arch) {
   fs.chmodSync(binaryTarget, 0o755);
 }
 
-const PLATFORMS = ["win32-%s", "darwin-%s", "linux-%s", "linux-%s-musl"];
-const ARCHITECTURES = ["x64", "arm64"];
+const PLATFORMS = ["linux-%s-musl"];
+const ARCHITECTURES = ["x64"];
+// const PLATFORMS = ["win32-%s", "darwin-%s", "linux-%s", "linux-%s-musl"];
+// const ARCHITECTURES = ["x64", "arm64"];
 
 for (const platform of PLATFORMS) {
   for (const arch of ARCHITECTURES) {
