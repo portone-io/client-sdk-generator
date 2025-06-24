@@ -1,6 +1,7 @@
 // Based on https://github.com/biomejs/biome/blob/ca81e98ffd9aa648db6b746e26d0dfcce3d3c8c1/packages/%40biomejs/biome/bin/biome
 import { execSync, spawnSync } from "node:child_process";
 import { arch, env, platform } from "node:process";
+import { fileURLToPath } from "node:url";
 
 function isMusl() {
   let stderr;
@@ -43,7 +44,7 @@ const binPath =
 
 if (binPath) {
   const result = spawnSync(
-    import.meta.resolve(binPath),
+    fileURLToPath(import.meta.resolve(binPath)),
     process.argv.slice(2),
     {
       shell: false,
