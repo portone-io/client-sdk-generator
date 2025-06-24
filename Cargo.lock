@@ -484,7 +484,6 @@ dependencies = [
  "client_sdk_dart_codegen",
  "client_sdk_schema",
  "client_sdk_ts_codegen",
- "pretty_assertions",
  "serde_yaml_ng",
 ]
 
