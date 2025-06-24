@@ -22,11 +22,7 @@ impl Schema {
         index
     }
 
-    fn collect_resources(
-        path: &str,
-        resource: &Resource,
-        index: &mut IndexMap<String, Parameter>,
-    ) {
+    fn collect_resources(path: &str, resource: &Resource, index: &mut IndexMap<String, Parameter>) {
         match resource {
             Resource::SubResources(sub_resources) => {
                 for (name, sub_resource) in sub_resources {
@@ -80,7 +76,13 @@ impl ParameterExt for Parameter {
                     .get(resource_ref.resource_ref())
                     .and_then(|parameter| parameter.description().map(|s| s.to_string()))
             }),
-            (None, ParameterType::Array { items, hide_if_empty: _ }) => items.description(),
+            (
+                None,
+                ParameterType::Array {
+                    items,
+                    hide_if_empty: _,
+                },
+            ) => items.description(),
             (description, _) => description.map(|s| s.to_string()),
         }
     }
@@ -106,7 +108,13 @@ impl ParameterExt for Parameter {
                     .map(|parameter| parameter.deprecated())
                     .unwrap_or(false)
             }),
-            (_, ParameterType::Array { items, hide_if_empty: _ }) => items.deprecated(),
+            (
+                _,
+                ParameterType::Array {
+                    items,
+                    hide_if_empty: _,
+                },
+            ) => items.deprecated(),
             _ => false,
         }
     }
@@ -132,7 +140,6 @@ pub struct Parameter {
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub deprecated: bool,
 }
-
 
 impl Parameter {
     pub fn new(

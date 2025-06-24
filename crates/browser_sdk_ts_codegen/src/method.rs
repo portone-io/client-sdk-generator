@@ -10,7 +10,7 @@ use browser_sdk_ts_codegen_macros::ts_parse;
 use indexmap::{IndexMap, IndexSet};
 
 use crate::comment::JsDocExt;
-use crate::import::{generate_import_statements, ImportEntry};
+use crate::import::{ImportEntry, generate_import_statements};
 use crate::parameter::generate_parameter;
 use crate::{js_export, print};
 

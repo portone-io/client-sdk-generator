@@ -7,7 +7,7 @@ use browser_sdk_ts_codegen_macros::ts_parse;
 use convert_case::Casing;
 use indexmap::{IndexMap, IndexSet};
 
-use crate::{import::resource_ref_to_path, ImportEntry};
+use crate::{ImportEntry, import::resource_ref_to_path};
 
 use super::comment::JsDocExt;
 
@@ -114,7 +114,10 @@ fn generate_parameter_type(
         schema::ParameterType::StringLiteral { value } => format!("'{}'", value),
         schema::ParameterType::Integer => String::from("number"),
         schema::ParameterType::Boolean => String::from("boolean"),
-        schema::ParameterType::Array { items, hide_if_empty: _ } => {
+        schema::ParameterType::Array {
+            items,
+            hide_if_empty: _,
+        } => {
             let item_type = generate_parameter(
                 items,
                 decls,
@@ -125,7 +128,10 @@ fn generate_parameter_type(
             );
             format!("{}[]", item_type)
         }
-        schema::ParameterType::Object { properties, hide_if_empty: _ } => {
+        schema::ParameterType::Object {
+            properties,
+            hide_if_empty: _,
+        } => {
             let properties = generate_parameter_type_properties(
                 properties,
                 decls,
@@ -140,7 +146,10 @@ fn generate_parameter_type(
         schema::ParameterType::Enum { .. } => {
             format!("(typeof {parent_name}[keyof typeof {parent_name}])")
         }
-        schema::ParameterType::OneOf { properties, hide_if_empty: _ } => {
+        schema::ParameterType::OneOf {
+            properties,
+            hide_if_empty: _,
+        } => {
             let type_path = resource_ref_to_path("../utils", resource_base_path);
             imports.insert(ImportEntry {
                 type_name: "OneOfType".to_string(),
@@ -162,7 +171,10 @@ fn generate_parameter_type(
             props.push_str("}>");
             props
         }
-        schema::ParameterType::Union { types, hide_if_empty: _ } => {
+        schema::ParameterType::Union {
+            types,
+            hide_if_empty: _,
+        } => {
             let mut type_names = Vec::new();
             for (i, param) in types.iter().enumerate() {
                 let type_name = generate_parameter(
@@ -178,7 +190,10 @@ fn generate_parameter_type(
             type_names.join(" | ")
         }
         schema::ParameterType::Json => String::from("Record<string, any>"),
-        schema::ParameterType::Intersection { types, hide_if_empty: _ } => {
+        schema::ParameterType::Intersection {
+            types,
+            hide_if_empty: _,
+        } => {
             let mut type_names = Vec::new();
             for (i, param) in types.iter().enumerate() {
                 let type_name = generate_parameter(

@@ -71,7 +71,10 @@ impl ResourceProcessor {
                 is_list: false,
                 is_required,
             },
-            ParameterType::Array { items, hide_if_empty: _ } => {
+            ParameterType::Array {
+                items,
+                hide_if_empty: _,
+            } => {
                 let scalar = match &items.r#type {
                     ParameterType::String | ParameterType::StringLiteral { .. } => {
                         ScalarType::String
@@ -114,7 +117,10 @@ impl ResourceProcessor {
                                     name: field_name,
                                     serialized_name: name.to_string(),
                                     value_type,
-                                    description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                                    description: parameter
+                                        .description
+                                        .clone()
+                                        .map(|d| Comment::try_from(d).unwrap()),
                                 };
                             }
                             ParameterType::ResourceRef(r) => {
@@ -135,7 +141,10 @@ impl ResourceProcessor {
             name: field_name,
             serialized_name: name.to_string(),
             value_type,
-            description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+            description: parameter
+                .description
+                .clone()
+                .map(|d| Comment::try_from(d).unwrap()),
         }
     }
 
@@ -226,23 +235,35 @@ impl ResourceProcessor {
             .try_into()
             .unwrap();
         match &parameter.r#type {
-            ParameterType::Object { properties, hide_if_empty: _ } => Some(Entity::Object(Object {
+            ParameterType::Object {
+                properties,
+                hide_if_empty: _,
+            } => Some(Entity::Object(Object {
                 name: name.clone(),
-                description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                description: parameter
+                    .description
+                    .clone()
+                    .map(|d| Comment::try_from(d).unwrap()),
                 fields: Self::build_field_list(properties.iter()),
                 is_one_of: false,
                 union_parents: vec![],
             })),
             ParameterType::EmptyObject => Some(Entity::Object(Object {
                 name: name.clone(),
-                description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                description: parameter
+                    .description
+                    .clone()
+                    .map(|d| Comment::try_from(d).unwrap()),
                 fields: vec![],
                 is_one_of: false,
                 union_parents: vec![],
             })),
             ParameterType::Enum { variants, .. } => Some(Entity::Enum(Enum {
                 name: name.clone(),
-                description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                description: parameter
+                    .description
+                    .clone()
+                    .map(|d| Comment::try_from(d).unwrap()),
                 variants: variants
                     .iter()
                     .map(|(value, variant)| EnumVariant {
@@ -252,21 +273,36 @@ impl ResourceProcessor {
                             Identifier::try_from(value.as_str()).unwrap()
                         },
                         value: value.clone(),
-                        description: variant.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                        description: variant
+                            .description
+                            .clone()
+                            .map(|d| Comment::try_from(d).unwrap()),
                     })
                     .collect(),
                 union_parents: vec![],
             })),
-            ParameterType::OneOf { properties, hide_if_empty: _ } => Some(Entity::Object(Object {
+            ParameterType::OneOf {
+                properties,
+                hide_if_empty: _,
+            } => Some(Entity::Object(Object {
                 name: name.clone(),
-                description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                description: parameter
+                    .description
+                    .clone()
+                    .map(|d| Comment::try_from(d).unwrap()),
                 fields: Self::build_field_list(properties.iter()),
                 is_one_of: true,
                 union_parents: vec![],
             })),
-            ParameterType::Union { types, hide_if_empty: _ } => Some(Entity::Union(Union {
+            ParameterType::Union {
+                types,
+                hide_if_empty: _,
+            } => Some(Entity::Union(Union {
                 name: name.clone(),
-                description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                description: parameter
+                    .description
+                    .clone()
+                    .map(|d| Comment::try_from(d).unwrap()),
                 variants: types
                     .iter()
                     .map(|parameter| match &parameter.r#type {
@@ -279,7 +315,10 @@ impl ResourceProcessor {
                                     .to_case(Case::Camel)
                                     .try_into()
                                     .unwrap(),
-                                description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                                description: parameter
+                                    .description
+                                    .clone()
+                                    .map(|d| Comment::try_from(d).unwrap()),
                                 type_name: type_reference,
                             }
                         }
@@ -287,9 +326,15 @@ impl ResourceProcessor {
                     })
                     .collect(),
             })),
-            ParameterType::Intersection { types, hide_if_empty: _ } => Some(Entity::Intersection(Intersection {
+            ParameterType::Intersection {
+                types,
+                hide_if_empty: _,
+            } => Some(Entity::Intersection(Intersection {
                 name: name.clone(),
-                description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                description: parameter
+                    .description
+                    .clone()
+                    .map(|d| Comment::try_from(d).unwrap()),
                 constituents: types
                     .iter()
                     .map(|parameter| match &parameter.r#type {
@@ -318,7 +363,10 @@ impl ResourceProcessor {
                 hide_if_empty: _,
             } => Some(Entity::DiscriminatedUnion(DiscriminatedUnion {
                 name: name.clone(),
-                description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                description: parameter
+                    .description
+                    .clone()
+                    .map(|d| Comment::try_from(d).unwrap()),
                 discriminator: Identifier::try_from(discriminator.as_str()).unwrap(),
                 variants: types
                     .iter()
@@ -329,7 +377,10 @@ impl ResourceProcessor {
                                 discriminator_value: value.clone(),
                                 name: value.to_case(Case::Camel).try_into().unwrap(),
                                 type_name: type_reference,
-                                description: parameter.description.clone().map(|d| Comment::try_from(d).unwrap()),
+                                description: parameter
+                                    .description
+                                    .clone()
+                                    .map(|d| Comment::try_from(d).unwrap()),
                             }
                         }
                         _ => unreachable!(),

@@ -15,7 +15,7 @@ use biome_rowan::AstNode;
 
 use browser_sdk_schema as schema;
 use browser_sdk_ts_codegen_macros::ts_parse;
-use import::{generate_import_statements, ImportEntry};
+use import::{ImportEntry, generate_import_statements};
 use indexmap::IndexSet;
 use parameter::generate_named_parameter;
 

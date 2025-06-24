@@ -336,9 +336,10 @@ class Address {
                         is_list: false,
                         is_required: true,
                     },
-                    description: Some(Comment::try_from(
-                        "**구매자가 선택할 수 없도록 고정된 할부 개월수**",
-                    ).unwrap()),
+                    description: Some(
+                        Comment::try_from("**구매자가 선택할 수 없도록 고정된 할부 개월수**")
+                            .unwrap(),
+                    ),
                 },
                 ObjectField {
                     name: Identifier::try_from("availableMonthList").unwrap(),
@@ -348,9 +349,10 @@ class Address {
                         is_list: true,
                         is_required: true,
                     },
-                    description: Some(Comment::try_from(
-                        "**구매자가 선택할 수 있는 할부 개월수 리스트**",
-                    ).unwrap()),
+                    description: Some(
+                        Comment::try_from("**구매자가 선택할 수 있는 할부 개월수 리스트**")
+                            .unwrap(),
+                    ),
                 },
             ],
             is_one_of: true,

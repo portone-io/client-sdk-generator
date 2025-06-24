@@ -1,4 +1,4 @@
-use markdown::{mdast::Node, to_mdast, ParseOptions};
+use markdown::{ParseOptions, mdast::Node, to_mdast};
 use mdast_util_to_markdown::to_markdown;
 
 pub trait ToMdastExt {
@@ -29,13 +29,11 @@ impl MdastNodeExt for Node {
 
     fn remove_jsx_elements(&mut self) -> &mut Self {
         if let Some(children) = self.children_mut() {
-            children.retain_mut(|child| {
-                match child {
-                    Node::MdxJsxFlowElement(_) | Node::MdxJsxTextElement(_) => false,
-                    _ => {
-                        child.remove_jsx_elements();
-                        true
-                    }
+            children.retain_mut(|child| match child {
+                Node::MdxJsxFlowElement(_) | Node::MdxJsxTextElement(_) => false,
+                _ => {
+                    child.remove_jsx_elements();
+                    true
                 }
             });
         }

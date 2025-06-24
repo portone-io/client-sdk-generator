@@ -76,9 +76,10 @@ mod tests {
                 EnumVariant {
                     name: Identifier::try_from("VARIANT_B").unwrap(),
                     value: "value_b".into(),
-                    description: Some(Comment::try_from(
-                        "This is a variant\nwith a multi-line description",
-                    ).unwrap()),
+                    description: Some(
+                        Comment::try_from("This is a variant\nwith a multi-line description")
+                            .unwrap(),
+                    ),
                 },
             ],
             union_parents: vec![],

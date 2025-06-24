@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use browser_sdk_schema::{Schema, RESOURCE_INDEX};
+use browser_sdk_schema::{RESOURCE_INDEX, Schema};
 use browser_sdk_ts_codegen::{
     entrypoint::generate_entrypoint_module, generate_resource_module, loader::generate_loader,
     method::generate_method_modules,

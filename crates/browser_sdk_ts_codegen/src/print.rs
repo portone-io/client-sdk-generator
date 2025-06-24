@@ -1,6 +1,6 @@
 use biome_formatter::{IndentStyle, IndentWidth, QuoteStyle};
 use biome_js_formatter::{
-    context::{trailing_commas::TrailingCommas, JsFormatOptions, Semicolons},
+    context::{JsFormatOptions, Semicolons, trailing_commas::TrailingCommas},
     format_node,
 };
 use biome_js_syntax::{JsFileSource, JsSyntaxNode};
