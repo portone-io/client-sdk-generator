@@ -1,11 +1,11 @@
 use std::path::PathBuf;
 
+use clap::{Parser as ClapParser, Subcommand, ValueEnum};
 use client_sdk_schema::{RESOURCE_INDEX, Schema};
 use client_sdk_ts_codegen::{
     entrypoint::generate_entrypoint_module, generate_resource_module, loader::generate_loader,
     method::generate_method_modules,
 };
-use clap::{Parser as ClapParser, Subcommand, ValueEnum};
 
 #[derive(ClapParser, Debug)]
 #[clap(name = "client-sdk-generator")]
