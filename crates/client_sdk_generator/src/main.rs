@@ -41,8 +41,6 @@ fn load_schema(path: &PathBuf) -> Schema {
 
 fn main() {
     let args = Args::parse();
-    println!("{:?}", args);
-
     match args.command {
         Commands::Generate { out_dir, generator } => {
             println!("Generating code to {:?}", out_dir);
