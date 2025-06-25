@@ -9,7 +9,7 @@ use indexmap::{IndexMap, IndexSet};
 use crate::import::generate_import_statements;
 use crate::method::generate_callbacks;
 use crate::parameter::generate_parameter;
-use crate::print;
+use crate::{print, write_generated_ts_file};
 
 pub fn generate_loader(path: &PathBuf, methods: &IndexMap<String, schema::Method>) {
     let loader = include_str!("../templates/loader.ts");
@@ -93,5 +93,5 @@ pub fn generate_loader(path: &PathBuf, methods: &IndexMap<String, schema::Method
     );
     let module = print::print_node(&module.into());
     fs::create_dir_all(path).unwrap();
-    fs::write(&current_module_path, module).unwrap();
+    write_generated_ts_file(&current_module_path, module).unwrap();
 }
