@@ -6,7 +6,7 @@ use indexmap::IndexMap;
 
 use client_sdk_schema::{self as schema};
 
-use crate::print;
+use crate::{print, write_generated_ts_file};
 
 pub fn generate_entrypoint_module(path: &PathBuf, methods: &IndexMap<String, schema::Method>) {
     let current_module_path = path.join("index.ts");
@@ -56,5 +56,5 @@ pub fn generate_entrypoint_module(path: &PathBuf, methods: &IndexMap<String, sch
     );
     let module = print::print_node(&module.into());
     fs::create_dir_all(path).unwrap();
-    fs::write(&current_module_path, module).unwrap();
+    write_generated_ts_file(&current_module_path, module).unwrap();
 }
