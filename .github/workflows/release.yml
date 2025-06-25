@@ -152,7 +152,7 @@ jobs:
   # Build GNU/Linux binaries in Docker, using Debian 11 (bullseye), to support older versions of glibc.
   build-binaries-gnu:
     needs: version
-    if: needs.version.outputs.client-sdk-generator-version
+    if: needs.version.outputs.client-sdk-generator-version-changed == 'true'
     strategy:
       matrix:
         include:
