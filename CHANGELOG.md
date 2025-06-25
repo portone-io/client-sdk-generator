@@ -1,0 +1,1 @@
+packages/@portone/client-sdk-generator/CHANGELOG.md
