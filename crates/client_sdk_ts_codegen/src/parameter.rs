@@ -62,6 +62,17 @@ pub(crate) fn generate_named_parameter(
     match parameter.r#type() {
         schema::ParameterType::Error { .. } => (),
         _ => {
+            if let schema::ParameterType::ResourceRef(resource_ref) = parameter.r#type() {
+                RESOURCE_INDEX.with(|index| {
+                    let parameter = index.get(resource_ref.resource_ref()).unwrap();
+                    if let schema::ParameterType::Enum { .. } = parameter.r#type() {
+                        let const_decl = ts_parse!(
+                            "{description}const {type_name} = {type_def};" as JsVariableDeclaration,
+                        );
+                        decls.push(const_decl.into());
+                    }
+                });
+            }
             let type_alias =
                 ts_parse!("{description}type {type_name} = {type_def};" as TsTypeAliasDeclaration);
 
@@ -243,10 +254,18 @@ fn generate_parameter_type(
         schema::ParameterType::ResourceRef(resource) => {
             // 참조된 리소스의 타입 이름과 경로를 추출
             let resource_ref = resource.resource_ref();
-            let type_name = RESOURCE_INDEX.with(|resource_index| {
-                match resource_index.get(resource_ref).map(|r| r.name()) {
-                    Some(Some(name)) => name.to_string(),
-                    _ => resource_ref.split('/').next_back().unwrap().to_string(),
+            let (type_name, is_type_only) = RESOURCE_INDEX.with(|resource_index| {
+                let parameter = resource_index.get(resource_ref);
+                match (parameter, parameter.and_then(|p| p.name())) {
+                    (Some(parameter), Some(name)) => {
+                        let is_enum =
+                            matches!(parameter.r#type(), schema::ParameterType::Enum { .. });
+                        (name.to_string(), !is_enum)
+                    }
+                    _ => (
+                        resource_ref.split('/').next_back().unwrap().to_string(),
+                        true,
+                    ),
                 }
             });
 
@@ -257,7 +276,7 @@ fn generate_parameter_type(
             imports.insert(ImportEntry {
                 type_name: type_name.clone(),
                 path: type_path,
-                is_type_only: true,
+                is_type_only,
                 alias: None,
             });
 
