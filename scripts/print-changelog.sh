@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Based on https://github.com/biomejs/biome/blob/a27b8253b2f0d5e5618e9b26eebaaa5da55ed69a/scripts/print-changelog.sh
+# Based on: https://github.com/biomejs/biome/blob/a27b8253b2f0d5e5618e9b26eebaaa5da55ed69a/scripts/print-changelog.sh
+# Copyright (c) 2025 Biome Developers and Contributors (MIT License)
 
 # Script to extract changelog section for a specific version
 # Usage: ./print-changelog.sh [version] [changelog-file]

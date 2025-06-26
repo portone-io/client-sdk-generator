@@ -1,4 +1,5 @@
-# Based on https://github.com/biomejs/biome/blob/a27b8253b2f0d5e5618e9b26eebaaa5da55ed69a/.github/actions/free-disk-space/action.yaml
+# Based on: https://github.com/biomejs/biome/blob/a27b8253b2f0d5e5618e9b26eebaaa5da55ed69a/.github/actions/free-disk-space/action.yaml
+# Copyright (c) 2025 Biome Developers and Contributors (MIT License)
 
 name: Free Disk Space
 description: Free up disk space on the runner

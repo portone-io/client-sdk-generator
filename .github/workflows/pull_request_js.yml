@@ -1,4 +1,5 @@
-# Based on https://github.com/biomejs/biome/blob/a27b8253b2f0d5e5618e9b26eebaaa5da55ed69a/.github/workflows/pull_request_js.yml
+# Based on: https://github.com/biomejs/biome/blob/a27b8253b2f0d5e5618e9b26eebaaa5da55ed69a/.github/workflows/pull_request_js.yml
+# Copyright (c) 2025 Biome Developers and Contributors (MIT License)
 
 # Jobs run on pull request in js folders
 name: Pull request JS
