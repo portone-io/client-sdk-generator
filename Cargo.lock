@@ -504,6 +504,7 @@ dependencies = [
 name = "client_sdk_ts_codegen"
 version = "0.1.5"
 dependencies = [
+ "biome_console",
  "biome_diagnostics",
  "biome_formatter",
  "biome_js_factory",
@@ -519,6 +520,7 @@ dependencies = [
  "indoc",
  "pathdiff",
  "pretty_assertions",
+ "termcolor",
 ]
 
 [[package]]
