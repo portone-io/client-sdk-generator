@@ -1,5 +1,11 @@
 # @portone/client-sdk-generator
 
+## 0.1.2
+
+### Patch Changes
+
+- [`b6af13a`](https://github.com/portone-io/client-sdk-generator/commit/b6af13ad35a4ca486144caaaa0a2ae4fa89b324a) Thanks [@CirnoV](https://github.com/CirnoV)! - Enum 타입 파라미터를 참조하는 referenceRef 생성 시, 항상 ImportEntry의 `is\_type\_only` 를 false로 함
+
 ## 0.1.1
 
 ### Patch Changes
