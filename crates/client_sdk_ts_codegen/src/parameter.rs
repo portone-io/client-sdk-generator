@@ -256,15 +256,14 @@ fn generate_parameter_type(
             let resource_ref = resource.resource_ref();
             let (type_name, is_type_only) = RESOURCE_INDEX.with(|resource_index| {
                 let parameter = resource_index.get(resource_ref);
-                match (parameter, parameter.and_then(|p| p.name())) {
-                    (Some(parameter), Some(name)) => {
-                        let is_enum =
-                            matches!(parameter.r#type(), schema::ParameterType::Enum { .. });
+                let is_enum = matches!(parameter, Some(parameter) if matches!(parameter.r#type(), schema::ParameterType::Enum { .. }));
+                match parameter.and_then(|p| p.name()) {
+                    Some(name) => {
                         (name.to_string(), !is_enum)
                     }
                     _ => (
                         resource_ref.split('/').next_back().unwrap().to_string(),
-                        true,
+                        !is_enum,
                     ),
                 }
             });
