@@ -122,7 +122,7 @@ fn generate_parameter_type(
 ) -> String {
     match parameter_type {
         schema::ParameterType::String => String::from("string"),
-        schema::ParameterType::StringLiteral { value } => format!("'{}'", value),
+        schema::ParameterType::StringLiteral { value } => format!("'{value}'"),
         schema::ParameterType::Integer => String::from("number"),
         schema::ParameterType::Boolean => String::from("boolean"),
         schema::ParameterType::Array {
@@ -133,11 +133,11 @@ fn generate_parameter_type(
                 items,
                 decls,
                 imports,
-                &format!("{}Item", parent_name),
+                &format!("{parent_name}Item"),
                 current_module_path,
                 resource_base_path,
             );
-            format!("{}[]", item_type)
+            format!("[{item_type}]")
         }
         schema::ParameterType::Object {
             properties,
@@ -151,7 +151,7 @@ fn generate_parameter_type(
                 current_module_path,
                 resource_base_path,
             );
-            format!("{{{}}}", properties)
+            format!("{{{properties}}}")
         }
         schema::ParameterType::EmptyObject => String::from("Record<string, never>"),
         schema::ParameterType::Enum { .. } => {
@@ -192,7 +192,7 @@ fn generate_parameter_type(
                     param,
                     decls,
                     imports,
-                    &format!("{}Union{}", parent_name, i),
+                    &format!("{parent_name}Union{i}"),
                     current_module_path,
                     resource_base_path,
                 );
@@ -211,7 +211,7 @@ fn generate_parameter_type(
                     param,
                     decls,
                     imports,
-                    &format!("{}Intersection{}", parent_name, i),
+                    &format!("{parent_name}Intersection{i}"),
                     current_module_path,
                     resource_base_path,
                 );
@@ -416,7 +416,7 @@ fn generate_parameter_type_property(
     let description = parameter.description().to_jsdoc(parameter.deprecated());
     let optional_marker = if parameter.optional() { "?" } else { "" };
     let property_name = if property_name.contains('-') {
-        format!("'{}'", property_name)
+        format!("'{property_name}'")
     } else {
         property_name.to_string()
     };
@@ -440,7 +440,7 @@ fn generate_const_enum_declaration(
                     let description = variant.description.to_jsdoc(false);
                     let value_prefix = value_prefix
                         .as_ref()
-                        .map_or_else(String::new, |p| format!("{}_", p));
+                        .map_or_else(String::new, |p| format!("{p}_"));
                     writeln!(
                         output,
                         "{description}'{identifier}': '{value_prefix}{variant_name}',",

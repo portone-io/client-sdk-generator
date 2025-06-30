@@ -37,10 +37,10 @@ impl TryFrom<&str> for Comment {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let cleaned = value
             .to_mdast()
-            .map_err(|e| format!("Failed to parse markdown: {}", e))?
+            .map_err(|e| format!("Failed to parse markdown: {e}"))?
             .remove_jsx_elements()
             .to_markdown_string()
-            .map_err(|e| format!("Failed to convert markdown to string: {}", e))?;
+            .map_err(|e| format!("Failed to convert markdown to string: {e}"))?;
         Ok(Comment(cleaned))
     }
 }

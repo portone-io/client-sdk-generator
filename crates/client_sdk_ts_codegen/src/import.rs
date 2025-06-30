@@ -65,7 +65,7 @@ pub(crate) fn generate_import_statements(
 
             // ../로 시작하지 않는 상대 경로는 ./로 시작하도록 변경
             let relative_path = if !relative_path.starts_with("../") {
-                format!("./{}", relative_path)
+                format!("./{relative_path}")
             } else {
                 relative_path
             };

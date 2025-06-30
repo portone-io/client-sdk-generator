@@ -43,7 +43,7 @@ fn main() {
     let args = Args::parse();
     match args.command {
         Commands::Generate { out_dir, generator } => {
-            println!("Generating code to {:?}", out_dir);
+            println!("Generating code to {out_dir:?}");
             match generator {
                 Generator::TypeScript => {
                     println!("Generating TypeScript code");

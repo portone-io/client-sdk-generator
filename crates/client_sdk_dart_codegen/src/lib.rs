@@ -426,7 +426,7 @@ impl ResourceProcessor {
                     use std::fmt::Write;
                     let mut content = String::new();
                     for import in imports {
-                        writeln!(&mut content, "import '{}';", import).unwrap();
+                        writeln!(&mut content, "import '{import}';").unwrap();
                     }
                     writeln!(content).unwrap();
                     write!(content, "{object}").unwrap();
@@ -446,7 +446,7 @@ impl ResourceProcessor {
                     use std::fmt::Write;
                     let mut content = String::new();
                     for import in imports {
-                        writeln!(&mut content, "import '{}';", import).unwrap();
+                        writeln!(&mut content, "import '{import}';").unwrap();
                     }
                     writeln!(content).unwrap();
                     write!(content, "{union}").unwrap();
@@ -468,7 +468,7 @@ impl ResourceProcessor {
                     use std::fmt::Write;
                     let mut content = String::new();
                     for import in imports {
-                        writeln!(&mut content, "import '{}';", import).unwrap();
+                        writeln!(&mut content, "import '{import}';").unwrap();
                     }
                     writeln!(content).unwrap();
                     write!(content, "{discriminated_union}").unwrap();
@@ -496,7 +496,7 @@ impl ResourceProcessor {
                     use std::fmt::Write;
                     let mut content = String::new();
                     for import in imports {
-                        writeln!(&mut content, "import '{}';", import).unwrap();
+                        writeln!(&mut content, "import '{import}';").unwrap();
                     }
                     writeln!(content).unwrap();
                     write!(content, "{intersection}").unwrap();

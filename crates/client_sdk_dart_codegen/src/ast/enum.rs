@@ -31,7 +31,7 @@ impl fmt::Display for Enum {
                 for comment in variant.description.iter().flat_map(Comment::lines) {
                     writeln!(f, "{indent}/// {comment}")?;
                 }
-                writeln!(f, "{indent}{variant}{terminator}", variant = variant)?;
+                writeln!(f, "{indent}{variant}{terminator}")?;
             }
             writeln!(f)?;
             writeln!(f, "{indent}final String _value;")?;

@@ -26,7 +26,7 @@ pub fn generate_method_module(
     method: &schema::Method,
     resource_base_path: &PathBuf, // 리소스의 기본 경로
 ) {
-    let current_module_path = path.join(format!("{}.ts", method_name));
+    let current_module_path = path.join(format!("{method_name}.ts"));
 
     let mut decls = Vec::new();
     let mut imports = IndexSet::new();

@@ -29,7 +29,7 @@ impl Schema {
                     let new_path = if path.is_empty() {
                         name.clone()
                     } else {
-                        format!("{}/{}", path, name)
+                        format!("{path}/{name}")
                     };
                     Schema::collect_resources(&new_path, sub_resource, index);
                 }

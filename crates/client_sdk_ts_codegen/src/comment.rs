@@ -28,7 +28,7 @@ pub fn generate_jsdoc_comment(comment: &str, deprecated: bool) -> String {
         .unwrap()
         .trim()
         .split('\n')
-        .map(|line| format!("* {}", line))
+        .map(|line| format!("* {line}"))
         .collect::<Vec<_>>();
 
     if deprecated {
@@ -37,5 +37,5 @@ pub fn generate_jsdoc_comment(comment: &str, deprecated: bool) -> String {
 
     let comment = comment.join("\n");
 
-    format!("\n/**\n{}\n*/\n", comment)
+    format!("\n/**\n{comment}\n*/\n")
 }

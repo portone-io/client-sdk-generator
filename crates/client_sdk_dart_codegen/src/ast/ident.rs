@@ -14,7 +14,7 @@ impl TryFrom<String> for Identifier {
         if value.is_ascii() && !value.contains('-') {
             Ok(Identifier(value))
         } else {
-            Err(format!("non-identifier: {}", value))
+            Err(format!("non-identifier: {value}"))
         }
     }
 }
@@ -26,7 +26,7 @@ impl TryFrom<&str> for Identifier {
         if value.is_ascii() {
             Ok(Identifier(value.into()))
         } else {
-            Err(format!("non-ascii identifier: {}", value))
+            Err(format!("non-ascii identifier: {value}"))
         }
     }
 }
