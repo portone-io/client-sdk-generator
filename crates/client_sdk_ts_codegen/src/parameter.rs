@@ -556,7 +556,7 @@ mod tests {
             &PathBuf::new(),
             &PathBuf::new(),
         );
-        assert_eq!(type_def, "number[]");
+        assert_eq!(type_def, "[number]");
         assert!(decls.is_empty());
     }
 
