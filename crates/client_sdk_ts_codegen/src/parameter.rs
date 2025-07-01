@@ -154,8 +154,14 @@ fn generate_parameter_type(
             format!("{{{properties}}}")
         }
         schema::ParameterType::EmptyObject => String::from("Record<string, never>"),
-        schema::ParameterType::Enum { .. } => {
-            format!("(typeof {parent_name}[keyof typeof {parent_name}])")
+        schema::ParameterType::Enum { value_prefix, .. } => {
+            let inline_type = format!("(typeof {parent_name}[keyof typeof {parent_name}])");
+            match value_prefix {
+                Some(value_prefix) => {
+                    format!("{inline_type} | `{value_prefix}_${{{inline_type}}}`")
+                }
+                _ => inline_type,
+            }
         }
         schema::ParameterType::OneOf {
             properties,
@@ -428,25 +434,16 @@ fn generate_const_enum_declaration(
     description: Option<&str>,
     parameter: &schema::ParameterType,
 ) -> Option<JsVariableDeclaration> {
-    if let schema::ParameterType::Enum {
-        variants,
-        value_prefix,
-    } = &parameter
-    {
+    if let schema::ParameterType::Enum { variants, .. } = &parameter {
         let variants =
             variants
                 .iter()
                 .fold(String::new(), |mut output, (variant_name, variant)| {
                     let description = variant.description.to_jsdoc(false);
-                    let value_prefix = value_prefix
-                        .as_ref()
-                        .map_or_else(String::new, |p| format!("{p}_"));
-                    writeln!(
-                        output,
-                        "{description}'{identifier}': '{value_prefix}{variant_name}',",
-                        identifier = variant.alias.as_deref().unwrap_or(variant_name)
-                    )
-                    .unwrap();
+                    let identifier = variant.alias.as_deref().unwrap_or(variant_name);
+
+                    writeln!(output, "{description}'{identifier}': '{variant_name}',").unwrap();
+
                     output
                 });
         let description = description.to_jsdoc(false);
