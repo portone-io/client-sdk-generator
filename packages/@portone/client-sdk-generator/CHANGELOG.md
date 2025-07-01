@@ -1,5 +1,15 @@
 # @portone/client-sdk-generator
 
+## 0.1.3
+
+### Patch Changes
+
+- [#21](https://github.com/portone-io/client-sdk-generator/pull/21) [`23c20c4`](https://github.com/portone-io/client-sdk-generator/commit/23c20c4af341bfd8f4f4f75810764b70cbad400b) Thanks [@CirnoV](https://github.com/CirnoV)! - Enum 타입이 prefix가 있는 값과 없는 값을 모두 허용하도록 개선
+
+  - Enum 타입 정의가 이제 두 가지 형태의 값을 모두 받을 수 있습니다
+    - prefix 없는 값: `'CARD'`
+    - prefix 있는 값: `'PG_CARD'` (value_prefix가 'PG'인 경우)
+
 ## 0.1.2
 
 ### Patch Changes
