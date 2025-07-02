@@ -1,6 +1,6 @@
 {
   "name": "@portone/client-sdk-generator-linux-arm64",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
   "license": "AGPL-3.0-or-later",
   "repository": {
