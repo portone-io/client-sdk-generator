@@ -1,5 +1,11 @@
 # @portone/client-sdk-generator
 
+## 0.1.4
+
+### Patch Changes
+
+- [#23](https://github.com/portone-io/client-sdk-generator/pull/23) [`6c20637`](https://github.com/portone-io/client-sdk-generator/commit/6c2063749d786661a14662cc2ef4b8c81c09c671) Thanks [@CirnoV](https://github.com/CirnoV)! - \[TypeScript\] Array 타입이 Tuple 형태로 생성되는 문제 해결
+
 ## 0.1.3
 
 ### Patch Changes
