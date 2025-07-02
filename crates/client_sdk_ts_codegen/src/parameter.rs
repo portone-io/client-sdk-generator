@@ -137,7 +137,7 @@ fn generate_parameter_type(
                 current_module_path,
                 resource_base_path,
             );
-            format!("[{item_type}]")
+            format!("{item_type}[]")
         }
         schema::ParameterType::Object {
             properties,
@@ -556,7 +556,7 @@ mod tests {
             &PathBuf::new(),
             &PathBuf::new(),
         );
-        assert_eq!(type_def, "[number]");
+        assert_eq!(type_def, "number[]");
         assert!(decls.is_empty());
     }
 

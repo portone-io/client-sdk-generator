@@ -11,14 +11,14 @@ repository = "https://github.com/portone-io/client-sdk-generator"
 
 [workspace.dependencies]
 better_scoped_tls = "1.0.0"
-biome_console = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.5" }
-biome_diagnostics = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.5" }
-biome_formatter = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.5" }
-biome_js_factory = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.5" }
-biome_js_formatter = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.5" }
-biome_js_parser = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.5" }
-biome_js_syntax = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.5" }
-biome_rowan = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.5" }
+biome_console = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.6" }
+biome_diagnostics = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.6" }
+biome_formatter = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.6" }
+biome_js_factory = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.6" }
+biome_js_formatter = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.6" }
+biome_js_parser = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.6" }
+biome_js_syntax = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.6" }
+biome_rowan = { git = "https://github.com/biomejs/biome.git", tag = "@biomejs/biome@2.0.6" }
 convert_case = "0.6.0"
 indoc = "2"
 pretty_assertions = "1.4.0"
