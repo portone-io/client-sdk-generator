@@ -168,64 +168,6 @@ type UserProfile = (
 );
 ```
 
-## DiscriminatedUnion
-
-`types`, `discriminator`, `optional` 속성을 바탕으로 식별 가능한 유니온 타입을 생성합니다.
-
-`discriminator` 값은 camelCase로 변환되어 하위 프로퍼티의 이름으로 사용됩니다.
-
-### discriminator만 있는 경우 (optional: false)
-
-```typescript
-/**
- * 결제 방법
- */
-type PaymentMethod = 
-  ({ method: 'CARD' } & { 
-    /**
-     * 카드 정보
-     */
-    card: {
-      /**
-       * 카드 번호
-       */
-      cardNumber: string;
-    } 
-  }) | 
-  ({ method: 'VIRTUAL_ACCOUNT' } & { 
-    /**
-     * 가상계좌 정보
-     */
-    virtualAccount: {
-      /**
-       * 은행 코드
-       */
-      bankCode: string;
-    } 
-  });
-```
-
-### discriminator가 optional: true인 경우
-
-```typescript
-/**
- * 결제 방법
- */
-type PaymentMethod = 
-  ({ method: 'CARD' } & { 
-    card: {
-      cardNumber: string;
-    } 
-  }) | 
-  ({ method: 'VIRTUAL_ACCOUNT' } & { 
-    virtualAccount: {
-      bankCode: string;
-    } 
-  }) |
-  // optional인 경우에 추가됨
-  ({ method?: undefined });
-```
-
 ## ResourceRef
 
 다른 리소스를 참조하는 타입으로, 해당 리소스의 타입을 가져오고 필요한 import 구문을 생성합니다.
