@@ -355,10 +355,10 @@ impl ResourceProcessor {
                             None
                         }
                     });
-                    let union_parents_refs = object.union_parents.iter().map(|parent| {
-                        let UnionParent::Union { parent, .. } = parent;
-                        parent
-                    });
+                    let union_parents_refs = object
+                        .union_parents
+                        .iter()
+                        .map(|UnionParent::Union { parent, .. }| parent);
                     let mut imports = fields_refs
                         .chain(union_parents_refs)
                         .map(|reference| {
@@ -403,10 +403,10 @@ impl ResourceProcessor {
                         .constituents
                         .iter()
                         .map(|constituent| &constituent.type_name);
-                    let union_parents_refs = intersection.union_parents.iter().map(|parent| {
-                        let UnionParent::Union { parent, .. } = parent;
-                        parent
-                    });
+                    let union_parents_refs = intersection
+                        .union_parents
+                        .iter()
+                        .map(|UnionParent::Union { parent, .. }| parent);
                     let mut imports = constituents_refs
                         .chain(union_parents_refs)
                         .map(|reference| {
