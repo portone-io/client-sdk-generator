@@ -147,45 +147,6 @@ enum IssueBillingKeyUIType {
 }
 ```
 
-## Discriminated Union
-
-현재는 각 variant가 한 union에서만 쓰이고 있지만, 여러 union에서 공유하는
-variant가 생길 수 있으므로 discriminator을 union에 귀속시킴
-
-```dart
-// Usage
-PaymentRequestUnion unionValue = PaymentRequestUnionCard().toPaymentRequestUnion();
-
-class PaymentRequestUnion {
-    // discriminator
-    final String? payMethod;
-    final PaymentRequestUnionCard? card;
-    // ...
-
-    PaymentRequestUnion.internal(
-        this.payMethod,
-        {
-            this.card,
-            // ...
-        }
-    );
-
-    PaymentRequestUnion.empty() : this.internal(null);
-
-    Map<String, dynamic> toJson() => {
-        'payMethod': payMethod,
-        ...?card?.toJson(),
-    };
-}
-
-/// **카드 정보**
-class PaymentRequestUnionCard {
-    // ...
-
-    PaymentRequestUnion toPaymentRequestUnion() => PaymentRequestUnion.internal("CARD", card: this);
-}
-```
-
 ## Intersection
 
 ```dart

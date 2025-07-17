@@ -310,40 +310,6 @@
           ]
         },
         {
-          "title": "discriminatedUnion",
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "discriminatedUnion"
-            },
-            "types": {
-              "description": "DiscriminatedUnion의 타입 목록",
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/$defs/Parameter"
-              }
-            },
-            "discriminator": {
-              "description": "Discriminator 프로퍼티 이름",
-              "type": "string"
-            },
-            "optional": {
-              "description": "Discriminator 프로퍼티 Optional 여부",
-              "type": "boolean"
-            },
-            "hideIfEmpty": {
-              "description": "DiscriminatedUnion이 비어있을 때 숨기기 여부",
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "type",
-            "types",
-            "discriminator"
-          ]
-        },
-        {
           "title": "resourceRef",
           "type": "object",
           "properties": {

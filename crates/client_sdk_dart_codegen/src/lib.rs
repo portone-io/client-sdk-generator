@@ -1,9 +1,8 @@
 use std::{collections::HashMap, path::Path};
 
 use ast::{
-    Comment, CompositeType, DiscriminatedUnion, DiscriminatedUnionVariant, Enum, EnumVariant,
-    Identifier, Intersection, IntersectionConstituent, Object, ObjectField, ScalarType,
-    TypeReference, Union, UnionParent, UnionVariant,
+    Comment, CompositeType, Enum, EnumVariant, Identifier, Intersection, IntersectionConstituent,
+    Object, ObjectField, ScalarType, TypeReference, Union, UnionParent, UnionVariant,
 };
 use client_sdk_schema::{Parameter, ParameterType, RESOURCE_INDEX, Resource, ResourceRef};
 use convert_case::{Case, Casing};
@@ -14,7 +13,6 @@ enum Entity {
     Object(Object),
     Enum(Enum),
     Union(Union),
-    DiscriminatedUnion(DiscriminatedUnion),
     Intersection(Intersection),
 }
 
@@ -104,8 +102,7 @@ impl ResourceProcessor {
                             | ParameterType::Enum { .. }
                             | ParameterType::Union { .. }
                             | ParameterType::OneOf { .. }
-                            | ParameterType::Intersection { .. }
-                            | ParameterType::DiscriminatedUnion { .. } => {
+                            | ParameterType::Intersection { .. } => {
                                 let value_type = CompositeType {
                                     scalar: ScalarType::TypeReference(
                                         Self::resource_ref_to_type_reference(resource_ref),
@@ -180,39 +177,20 @@ impl ResourceProcessor {
     fn connect_union_parents(&mut self) {
         let mut union_parents = HashMap::new();
         for (path, entity) in self.entities.iter_mut() {
-            match entity {
-                Entity::Union(parent) => {
-                    let parent_ref = TypeReference {
-                        path: path.clone(),
-                        name: parent.name.clone(),
-                    };
-                    for variant in parent.variants.iter() {
-                        union_parents
-                            .entry(variant.type_name.path.clone())
-                            .or_insert(vec![])
-                            .push(UnionParent::Union {
-                                parent: parent_ref.clone(),
-                                variant_name: variant.name.clone(),
-                            });
-                    }
+            if let Entity::Union(parent) = entity {
+                let parent_ref = TypeReference {
+                    path: path.clone(),
+                    name: parent.name.clone(),
+                };
+                for variant in parent.variants.iter() {
+                    union_parents
+                        .entry(variant.type_name.path.clone())
+                        .or_insert(vec![])
+                        .push(UnionParent::Union {
+                            parent: parent_ref.clone(),
+                            variant_name: variant.name.clone(),
+                        });
                 }
-                Entity::DiscriminatedUnion(parent) => {
-                    let parent_ref = TypeReference {
-                        path: path.clone(),
-                        name: parent.name.clone(),
-                    };
-                    for variant in parent.variants.iter() {
-                        union_parents
-                            .entry(variant.type_name.path.clone())
-                            .or_insert(vec![])
-                            .push(UnionParent::DiscriminatedUnion {
-                                parent: parent_ref.clone(),
-                                variant_name: variant.name.clone(),
-                                discriminator_value: variant.discriminator_value.clone(),
-                            });
-                    }
-                }
-                _ => {}
             }
         }
         for (path, parents) in union_parents {
@@ -356,38 +334,6 @@ impl ResourceProcessor {
                     .collect(),
                 union_parents: vec![],
             })),
-            ParameterType::DiscriminatedUnion {
-                types,
-                discriminator,
-                optional,
-                hide_if_empty: _,
-            } => Some(Entity::DiscriminatedUnion(DiscriminatedUnion {
-                name: name.clone(),
-                description: parameter
-                    .description
-                    .clone()
-                    .map(|d| Comment::try_from(d).unwrap()),
-                discriminator: Identifier::try_from(discriminator.as_str()).unwrap(),
-                variants: types
-                    .iter()
-                    .map(|(value, parameter)| match &parameter.r#type {
-                        ParameterType::ResourceRef(resource_ref) => {
-                            let type_reference = Self::resource_ref_to_type_reference(resource_ref);
-                            DiscriminatedUnionVariant {
-                                discriminator_value: value.clone(),
-                                name: value.to_case(Case::Camel).try_into().unwrap(),
-                                type_name: type_reference,
-                                description: parameter
-                                    .description
-                                    .clone()
-                                    .map(|d| Comment::try_from(d).unwrap()),
-                            }
-                        }
-                        _ => unreachable!(),
-                    })
-                    .collect(),
-                allow_empty: *optional,
-            })),
             _ => None,
         }
     }
@@ -409,11 +355,10 @@ impl ResourceProcessor {
                             None
                         }
                     });
-                    let union_parents_refs = object.union_parents.iter().map(|parent| {
-                        let (UnionParent::Union { parent, .. }
-                        | UnionParent::DiscriminatedUnion { parent, .. }) = parent;
-                        parent
-                    });
+                    let union_parents_refs = object
+                        .union_parents
+                        .iter()
+                        .map(|UnionParent::Union { parent, .. }| parent);
                     let mut imports = fields_refs
                         .chain(union_parents_refs)
                         .map(|reference| {
@@ -452,38 +397,16 @@ impl ResourceProcessor {
                     write!(content, "{union}").unwrap();
                     content
                 }
-                Entity::DiscriminatedUnion(discriminated_union) => {
-                    let variants_refs = discriminated_union
-                        .variants
-                        .iter()
-                        .map(|variant| &variant.type_name);
-                    let mut imports = variants_refs
-                        .map(|reference| {
-                            Self::type_reference_to_import_path(reference, import_base_path)
-                        })
-                        .collect::<Vec<_>>();
-                    imports.sort();
-                    imports.dedup();
 
-                    use std::fmt::Write;
-                    let mut content = String::new();
-                    for import in imports {
-                        writeln!(&mut content, "import '{import}';").unwrap();
-                    }
-                    writeln!(content).unwrap();
-                    write!(content, "{discriminated_union}").unwrap();
-                    content
-                }
                 Entity::Intersection(intersection) => {
                     let constituents_refs = intersection
                         .constituents
                         .iter()
                         .map(|constituent| &constituent.type_name);
-                    let union_parents_refs = intersection.union_parents.iter().map(|parent| {
-                        let (UnionParent::Union { parent, .. }
-                        | UnionParent::DiscriminatedUnion { parent, .. }) = parent;
-                        parent
-                    });
+                    let union_parents_refs = intersection
+                        .union_parents
+                        .iter()
+                        .map(|UnionParent::Union { parent, .. }| parent);
                     let mut imports = constituents_refs
                         .chain(union_parents_refs)
                         .map(|reference| {

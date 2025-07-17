@@ -122,19 +122,6 @@ impl fmt::Display for Object {
                                 variant_name = variant_name.as_ref(),
                             )?;
                         }
-                        UnionParent::DiscriminatedUnion {
-                            parent,
-                            variant_name,
-                            discriminator_value,
-                        } => {
-                            writeln!(
-                                f,
-                                "{indent}{parent_name} to{parent_name}() => {parent_name}.internal('{discriminator_value}', {variant_name}: this);",
-                                parent_name = parent.name.as_ref(),
-                                variant_name = variant_name.as_ref(),
-                                discriminator_value = discriminator_value,
-                            )?;
-                        }
                     }
                 }
             }

@@ -238,20 +238,6 @@ pub enum ParameterType {
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         hide_if_empty: bool,
     },
-    #[schemars(title = "discriminatedUnion")]
-    #[serde(rename_all = "camelCase")]
-    DiscriminatedUnion {
-        /// DiscriminatedUnion의 타입 목록
-        types: IndexMap<String, Parameter>,
-        /// Discriminator 프로퍼티 이름
-        discriminator: String,
-        /// Discriminator 프로퍼티 Optional 여부
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        optional: bool,
-        /// DiscriminatedUnion이 비어있을 때 숨기기 여부
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        hide_if_empty: bool,
-    },
     #[schemars(title = "resourceRef")]
     ResourceRef(ResourceRef),
     #[schemars(title = "error")]
