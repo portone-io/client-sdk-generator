@@ -27,6 +27,8 @@ schemars = { version = "1.0.4", features = ["preserve_order", "indexmap2"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_yaml_ng = { version = "0.10" }
+client_sdk_dart_codegen = { path = "./crates/client_sdk_dart_codegen" }
+client_sdk_kotlin_codegen = { path = "./crates/client_sdk_kotlin_codegen" }
 client_sdk_schema = { path = "./crates/client_sdk_schema" }
 client_sdk_ts_codegen = { path = "./crates/client_sdk_ts_codegen" }
 client_sdk_ts_codegen_macros = { path = "./crates/client_sdk_ts_codegen_macros" }

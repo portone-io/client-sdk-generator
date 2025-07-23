@@ -32,6 +32,8 @@ enum Generator {
     TypeScript,
     #[clap(name = "dart")]
     Dart,
+    #[clap(name = "kotlin")]
+    Kotlin,
 }
 
 fn load_schema(path: &PathBuf) -> Schema {
@@ -73,6 +75,31 @@ fn main() {
                         .spawn()
                         .unwrap();
                     child.wait().unwrap();
+                }
+                Generator::Kotlin => {
+                    println!("Generating Kotlin code");
+                    let schema: Schema = load_schema(&args.schema);
+                    let resource_index = schema.build_resource_index();
+                    RESOURCE_INDEX.set(&resource_index, || {
+                        client_sdk_kotlin_codegen::generate_resources_module(
+                            &schema.resources,
+                            &out_dir,
+                            "io/portone/sdk/android/__generated__",
+                        );
+                    });
+                    // Optional: Run ktlint formatter if available
+                    if std::process::Command::new("ktlint")
+                        .arg("--version")
+                        .output()
+                        .is_ok()
+                    {
+                        let mut child = std::process::Command::new("ktlint")
+                            .arg("-F")
+                            .arg(&out_dir)
+                            .spawn()
+                            .unwrap();
+                        child.wait().unwrap();
+                    }
                 }
             }
         }
