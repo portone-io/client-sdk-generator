@@ -33,7 +33,11 @@ impl fmt::Display for Object {
         } else if self.is_one_of {
             // OneOf (sealed interface) case
             writeln!(f, "@Parcelize")?;
-            writeln!(f, "sealed interface {name} : Parcelable {{", name = self.name.as_ref())?;
+            writeln!(
+                f,
+                "sealed interface {name} : Parcelable {{",
+                name = self.name.as_ref()
+            )?;
             {
                 let indent = Indent(1);
                 for field in self.fields.iter() {
@@ -173,7 +177,7 @@ impl fmt::Display for ObjectField {
         } else {
             self.value_type.scalar.to_identifier().to_string()
         };
-        
+
         // Add @RawValue annotation for JSON fields
         match &self.value_type.scalar {
             ScalarType::Json => {

@@ -39,7 +39,11 @@ impl fmt::Display for Union {
 
         // Sealed class declaration
         writeln!(f, "@Parcelize")?;
-        writeln!(f, "sealed class {name} : Parcelable {{", name = self.name.as_ref())?;
+        writeln!(
+            f,
+            "sealed class {name} : Parcelable {{",
+            name = self.name.as_ref()
+        )?;
         {
             let indent = Indent(1);
 

@@ -12,7 +12,8 @@ use indexmap::{IndexMap, IndexSet};
 use crate::comment::JsDocExt;
 use crate::import::{ImportEntry, generate_import_statements};
 use crate::parameter::generate_parameter;
-use crate::{js_export, print, write_generated_ts_file};
+use crate::{js_export, print};
+use client_sdk_utils::write_generated_file;
 
 pub fn generate_method_modules(path: &PathBuf, methods: &IndexMap<String, schema::Method>) {
     for (method_name, method) in methods {
@@ -112,7 +113,7 @@ pub fn generate_method_module(
     let module = make::js_module(make::js_directive_list([]), module_items, make::eof()).build();
     let module = print::print_node(&module.into());
     fs::create_dir_all(path).unwrap();
-    write_generated_ts_file(&current_module_path, module).unwrap();
+    write_generated_file(&current_module_path, module).unwrap();
 }
 
 pub(crate) fn generate_callbacks(

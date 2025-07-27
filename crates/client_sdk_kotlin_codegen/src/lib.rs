@@ -5,6 +5,7 @@ use ast::{
     Object, ObjectField, ScalarType, TypeReference, Union, UnionParent, UnionVariant,
 };
 use client_sdk_schema::{Parameter, ParameterType, RESOURCE_INDEX, Resource, ResourceRef};
+use client_sdk_utils::write_generated_file;
 use convert_case::{Case, Casing};
 
 pub mod ast;
@@ -430,19 +431,20 @@ impl ResourceProcessor {
                             Self::type_reference_to_import_path(reference, import_base_path)
                         })
                         .collect::<Vec<_>>();
-                    
+
                     // Add Parcelize imports
                     imports.push("android.os.Parcelable".to_string());
                     imports.push("kotlinx.parcelize.Parcelize".to_string());
-                    
+
                     // Add RawValue import if any field is JSON type
-                    let has_json_field = object.fields.iter().any(|field| {
-                        matches!(field.value_type.scalar, ScalarType::Json)
-                    });
+                    let has_json_field = object
+                        .fields
+                        .iter()
+                        .any(|field| matches!(field.value_type.scalar, ScalarType::Json));
                     if has_json_field {
                         imports.push("kotlinx.parcelize.RawValue".to_string());
                     }
-                    
+
                     imports.sort();
                     imports.dedup();
 
@@ -532,11 +534,11 @@ impl ResourceProcessor {
                             Self::type_reference_to_import_path(reference, import_base_path)
                         })
                         .collect::<Vec<_>>();
-                    
+
                     // Add Parcelize imports
                     imports.push("android.os.Parcelable".to_string());
                     imports.push("kotlinx.parcelize.Parcelize".to_string());
-                    
+
                     imports.sort();
                     imports.dedup();
 
@@ -602,19 +604,20 @@ impl ResourceProcessor {
                             Self::type_reference_to_import_path(reference, import_base_path)
                         })
                         .collect::<Vec<_>>();
-                    
+
                     // Add Parcelize imports
                     imports.push("android.os.Parcelable".to_string());
                     imports.push("kotlinx.parcelize.Parcelize".to_string());
-                    
+
                     // Add RawValue import if any field is JSON type
-                    let has_json_field = intersection.fields.iter().any(|field| {
-                        matches!(field.value_type.scalar, ScalarType::Json)
-                    });
+                    let has_json_field = intersection
+                        .fields
+                        .iter()
+                        .any(|field| matches!(field.value_type.scalar, ScalarType::Json));
                     if has_json_field {
                         imports.push("kotlinx.parcelize.RawValue".to_string());
                     }
-                    
+
                     imports.sort();
                     imports.dedup();
 
@@ -665,7 +668,7 @@ impl ResourceProcessor {
             let mut file_path = file_base_path.join(path.to_case(Case::Camel));
             file_path.set_extension("kt");
             std::fs::create_dir_all(file_path.parent().unwrap()).unwrap();
-            std::fs::write(file_path, content).unwrap();
+            write_generated_file(file_path, content).unwrap();
         }
     }
 }
