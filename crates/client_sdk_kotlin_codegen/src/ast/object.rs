@@ -173,11 +173,24 @@ impl fmt::Display for ObjectField {
         } else {
             self.value_type.scalar.to_identifier().to_string()
         };
-        write!(
-            f,
-            "val {name}: {field_type}{nullable}",
-            name = self.name.as_ref()
-        )
+        
+        // Add @RawValue annotation for JSON fields
+        match &self.value_type.scalar {
+            ScalarType::Json => {
+                write!(
+                    f,
+                    "val {name}: @RawValue {field_type}{nullable}",
+                    name = self.name.as_ref()
+                )
+            }
+            _ => {
+                write!(
+                    f,
+                    "val {name}: {field_type}{nullable}",
+                    name = self.name.as_ref()
+                )
+            }
+        }
     }
 }
 
@@ -372,6 +385,70 @@ sealed interface MonthOption : Parcelable {
         is FixedMonth -> mapOf("fixedMonth" to value)
         is AvailableMonthList -> mapOf("availableMonthList" to value)
     }
+}
+"#
+        );
+    }
+
+    #[test]
+    fn object_with_json_field() {
+        let object = Object {
+            name: Identifier::try_from("CustomData").unwrap(),
+            description: Some(Comment::try_from("커스텀 데이터").unwrap()),
+            fields: vec![
+                ObjectField {
+                    name: Identifier::try_from("id").unwrap(),
+                    serialized_name: "id".to_string(),
+                    value_type: CompositeType {
+                        scalar: ScalarType::String,
+                        is_list: false,
+                        is_required: true,
+                    },
+                    description: None,
+                },
+                ObjectField {
+                    name: Identifier::try_from("metadata").unwrap(),
+                    serialized_name: "metadata".to_string(),
+                    value_type: CompositeType {
+                        scalar: ScalarType::Json,
+                        is_list: false,
+                        is_required: true,
+                    },
+                    description: Some(Comment::try_from("**추가 메타데이터**").unwrap()),
+                },
+                ObjectField {
+                    name: Identifier::try_from("tags").unwrap(),
+                    serialized_name: "tags".to_string(),
+                    value_type: CompositeType {
+                        scalar: ScalarType::String,
+                        is_list: true,
+                        is_required: false,
+                    },
+                    description: None,
+                },
+            ],
+            is_one_of: false,
+            union_parents: vec![],
+        };
+        assert_eq!(
+            object.to_string(),
+            r#"/**
+ * 커스텀 데이터
+ */
+@Parcelize
+data class CustomData(
+    val id: String,
+    /**
+     * **추가 메타데이터**
+     */
+    val metadata: @RawValue Map<String, Any?>,
+    val tags: List<String>?
+) : Parcelable {
+    fun toJson(): Map<String, Any?> = mapOf(
+        "id" to id,
+        "metadata" to metadata,
+        "tags" to tags?.let { tags }
+    )
 }
 "#
         );

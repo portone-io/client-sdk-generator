@@ -435,6 +435,14 @@ impl ResourceProcessor {
                     imports.push("android.os.Parcelable".to_string());
                     imports.push("kotlinx.parcelize.Parcelize".to_string());
                     
+                    // Add RawValue import if any field is JSON type
+                    let has_json_field = object.fields.iter().any(|field| {
+                        matches!(field.value_type.scalar, ScalarType::Json)
+                    });
+                    if has_json_field {
+                        imports.push("kotlinx.parcelize.RawValue".to_string());
+                    }
+                    
                     imports.sort();
                     imports.dedup();
 
@@ -598,6 +606,14 @@ impl ResourceProcessor {
                     // Add Parcelize imports
                     imports.push("android.os.Parcelable".to_string());
                     imports.push("kotlinx.parcelize.Parcelize".to_string());
+                    
+                    // Add RawValue import if any field is JSON type
+                    let has_json_field = intersection.fields.iter().any(|field| {
+                        matches!(field.value_type.scalar, ScalarType::Json)
+                    });
+                    if has_json_field {
+                        imports.push("kotlinx.parcelize.RawValue".to_string());
+                    }
                     
                     imports.sort();
                     imports.dedup();
