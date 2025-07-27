@@ -23,7 +23,8 @@ impl fmt::Display for Object {
 
         if self.fields.is_empty() && !self.is_one_of {
             // Empty object case
-            writeln!(f, "class {name} {{", name = self.name.as_ref())?;
+            writeln!(f, "@Parcelize")?;
+            writeln!(f, "class {name} : Parcelable {{", name = self.name.as_ref())?;
             {
                 let indent = Indent(1);
                 writeln!(f, "{indent}fun toJson(): Map<String, Any> = emptyMap()")?;
@@ -31,7 +32,8 @@ impl fmt::Display for Object {
             writeln!(f, "}}")
         } else if self.is_one_of {
             // OneOf (sealed interface) case
-            writeln!(f, "sealed interface {name} {{", name = self.name.as_ref())?;
+            writeln!(f, "@Parcelize")?;
+            writeln!(f, "sealed interface {name} : Parcelable {{", name = self.name.as_ref())?;
             {
                 let indent = Indent(1);
                 for field in self.fields.iter() {
@@ -49,6 +51,7 @@ impl fmt::Display for Object {
                     } else {
                         field.value_type.scalar.to_identifier().to_string()
                     };
+                    writeln!(f, "{indent}@Parcelize")?;
                     writeln!(
                         f,
                         "{indent}data class {field_name_pascal}(val value: {field_type}) : {name}",
@@ -77,6 +80,7 @@ impl fmt::Display for Object {
             }
             writeln!(f, "}}")
         } else {
+            writeln!(f, "@Parcelize")?;
             writeln!(f, "data class {name}(", name = self.name.as_ref())?;
             {
                 let indent = Indent(1);
@@ -92,7 +96,7 @@ impl fmt::Display for Object {
                     writeln!(f, "{indent}{field}{terminator}")?;
                 }
             }
-            writeln!(f, ") {{")?;
+            writeln!(f, ") : Parcelable {{")?;
             {
                 let indent = Indent(1);
                 writeln!(f, "{indent}fun toJson(): Map<String, Any?> = mapOf(")?;
@@ -147,11 +151,7 @@ impl fmt::Display for ToJson<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let name = self.name;
         match self.scalar {
-            ScalarType::Int
-            | ScalarType::Double
-            | ScalarType::Boolean
-            | ScalarType::Json
-            | ScalarType::String => {
+            ScalarType::Long | ScalarType::Boolean | ScalarType::Json | ScalarType::String => {
                 write!(f, "{name}")
             }
             ScalarType::TypeReference(_) => {
@@ -206,7 +206,8 @@ mod tests {
         };
         assert_eq!(
             object.to_string(),
-            r#"class IssueBillingKeyRequestUnionPaypal {
+            r#"@Parcelize
+class IssueBillingKeyRequestUnionPaypal : Parcelable {
     fun toJson(): Map<String, Any> = emptyMap()
 }
 "#
@@ -281,6 +282,7 @@ mod tests {
             r#"/**
  * 주소 정보
  */
+@Parcelize
 data class Address(
     val country: Country?,
     /**
@@ -299,7 +301,7 @@ data class Address(
      * **주, 도, 시**
      */
     val province: String?
-) {
+) : Parcelable {
     fun toJson(): Map<String, Any?> = mapOf(
         "country" to country?.let { country.toJson() },
         "addressLine1" to addressLine1,
@@ -322,7 +324,7 @@ data class Address(
                     name: Identifier::try_from("fixedMonth").unwrap(),
                     serialized_name: "fixedMonth".to_string(),
                     value_type: CompositeType {
-                        scalar: ScalarType::Int,
+                        scalar: ScalarType::Long,
                         is_list: false,
                         is_required: true,
                     },
@@ -335,7 +337,7 @@ data class Address(
                     name: Identifier::try_from("availableMonthList").unwrap(),
                     serialized_name: "availableMonthList".to_string(),
                     value_type: CompositeType {
-                        scalar: ScalarType::Int,
+                        scalar: ScalarType::Long,
                         is_list: true,
                         is_required: true,
                     },
@@ -353,15 +355,18 @@ data class Address(
             r#"/**
  * **할부 개월 수 설정**
  */
-sealed interface MonthOption {
+@Parcelize
+sealed interface MonthOption : Parcelable {
     /**
      * **구매자가 선택할 수 없도록 고정된 할부 개월수**
      */
-    data class FixedMonth(val value: Int) : MonthOption
+    @Parcelize
+    data class FixedMonth(val value: Long) : MonthOption
     /**
      * **구매자가 선택할 수 있는 할부 개월수 리스트**
      */
-    data class AvailableMonthList(val value: List<Int>) : MonthOption
+    @Parcelize
+    data class AvailableMonthList(val value: List<Long>) : MonthOption
 
     fun toJson(): Map<String, Any> = when (this) {
         is FixedMonth -> mapOf("fixedMonth" to value)

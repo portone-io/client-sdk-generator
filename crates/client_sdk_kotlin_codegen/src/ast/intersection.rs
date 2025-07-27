@@ -29,6 +29,7 @@ impl fmt::Display for Intersection {
         }
 
         // Data class declaration with flattened fields
+        writeln!(f, "@Parcelize")?;
         writeln!(f, "data class {name}(", name = self.name.as_ref())?;
         {
             let indent = Indent(1);
@@ -44,7 +45,7 @@ impl fmt::Display for Intersection {
                 writeln!(f, "{indent}{field}{terminator}")?;
             }
         }
-        writeln!(f, ") {{")?;
+        writeln!(f, ") : Parcelable {{")?;
 
         {
             let indent = Indent(1);
@@ -94,11 +95,7 @@ impl fmt::Display for ToJson<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let name = self.name;
         match self.scalar {
-            ScalarType::Int
-            | ScalarType::Double
-            | ScalarType::Boolean
-            | ScalarType::Json
-            | ScalarType::String => {
+            ScalarType::Long | ScalarType::Boolean | ScalarType::Json | ScalarType::String => {
                 write!(f, "{name}")
             }
             ScalarType::TypeReference(_) => {
@@ -145,7 +142,7 @@ mod tests {
                     name: Identifier::try_from("amount").unwrap(),
                     serialized_name: "amount".to_string(),
                     value_type: CompositeType {
-                        scalar: ScalarType::Int,
+                        scalar: ScalarType::Long,
                         is_list: false,
                         is_required: true,
                     },
@@ -197,11 +194,12 @@ mod tests {
             r#"/**
  * 결제 요청 정보
  */
+@Parcelize
 data class PaymentRequest(
     /**
      * 결제 금액
      */
-    val amount: Int,
+    val amount: Long,
     /**
      * 통화 코드
      */
@@ -214,7 +212,7 @@ data class PaymentRequest(
      * 카드 정보
      */
     val cardInfo: CardInfo?
-) {
+) : Parcelable {
     fun toJson(): Map<String, Any?> = mapOf(
         "amount" to amount,
         "currency" to currency,

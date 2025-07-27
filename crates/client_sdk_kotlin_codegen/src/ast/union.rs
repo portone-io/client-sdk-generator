@@ -38,7 +38,8 @@ impl fmt::Display for Union {
         }
 
         // Sealed class declaration
-        writeln!(f, "sealed class {name} {{", name = self.name.as_ref())?;
+        writeln!(f, "@Parcelize")?;
+        writeln!(f, "sealed class {name} : Parcelable {{", name = self.name.as_ref())?;
         {
             let indent = Indent(1);
 
@@ -51,6 +52,7 @@ impl fmt::Display for Union {
                     }
                     writeln!(f, "{indent} */")?;
                 }
+                writeln!(f, "{indent}@Parcelize")?;
                 writeln!(
                     f,
                     "{indent}data class {variant_name}(val value: {variant_type}) : {name}()",
@@ -118,8 +120,11 @@ mod tests {
         };
         assert_eq!(
             union.to_string(),
-            r#"sealed class LoadableUIType {
+            r#"@Parcelize
+sealed class LoadableUIType : Parcelable {
+    @Parcelize
     data class PaymentUiType(val value: PaymentUIType) : LoadableUIType()
+    @Parcelize
     data class IssueBillingKeyUiType(val value: IssueBillingKeyUIType) : LoadableUIType()
 
     fun toJson(): Any = when (this) {

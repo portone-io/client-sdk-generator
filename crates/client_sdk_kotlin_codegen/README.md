@@ -4,7 +4,7 @@
 
 | In Schema | In Kotlin                                                   |
 | --------- | ----------------------------------------------------------- |
-| integer   | Int                                                         |
+| integer   | Long                                                        |
 | number    | Double                                                      |
 | boolean   | Boolean                                                     |
 | array     | List<T>                                                     |
@@ -16,6 +16,7 @@
 /**
  * 주소 정보
  */
+@Parcelize
 data class Address(
     val country: Country?,
     /** **일반주소** */
@@ -76,11 +77,14 @@ Kotlin에서는 sealed class, interface를 사용하여 OneOf 타입을 구현�
 /**
  * **할부 개월 수 설정**
  */
+@Parcelize
 sealed interface MonthOption {
     /** **구매자가 선택할 수 없도록 고정된 할부 개월수** */
+    @Parcelize
     data class FixedMonth(val value: Int) : MonthOption
 
     /** **구매자가 선택할 수 있는 할부 개월수 리스트** */
+    @Parcelize
     data class AvailableMonthList(val value: List<Int>) : MonthOption
 
     fun toJson(): Map<String, Any> = when (this) {

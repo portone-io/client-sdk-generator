@@ -61,8 +61,7 @@ pub struct TypeReference {
 
 #[derive(Debug, Clone)]
 pub enum ScalarType {
-    Int,
-    Double,
+    Long,
     Boolean,
     Json,
     String,
@@ -72,8 +71,7 @@ pub enum ScalarType {
 impl ScalarType {
     pub fn to_identifier(&self) -> &str {
         match self {
-            ScalarType::Int => "Int",
-            ScalarType::Double => "Double",
+            ScalarType::Long => "Long",
             ScalarType::Boolean => "Boolean",
             ScalarType::Json => "Map<String, Any?>",
             ScalarType::String => "String",

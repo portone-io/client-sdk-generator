@@ -55,13 +55,17 @@ impl ResourceProcessor {
         type_reference: &TypeReference,
         import_base_path: &Path,
     ) -> String {
-        let package_path = type_reference
+        let mut path_segments = type_reference
             .path
             .split('/')
             .filter(|s| !s.is_empty())
-            .map(|s| s.to_case(Case::Camel))
-            .collect::<Vec<_>>()
-            .join(".");
+            .collect::<Vec<_>>();
+        if !path_segments.is_empty() {
+            path_segments.pop();
+        }
+        path_segments.push(type_reference.name.as_ref());
+
+        let package_path = path_segments.join(".");
 
         let base_package = import_base_path
             .to_string_lossy()
@@ -81,7 +85,7 @@ impl ResourceProcessor {
                 is_required,
             },
             ParameterType::Integer => CompositeType {
-                scalar: ScalarType::Int,
+                scalar: ScalarType::Long,
                 is_list: false,
                 is_required,
             },
@@ -103,7 +107,7 @@ impl ResourceProcessor {
                     ParameterType::String | ParameterType::StringLiteral { .. } => {
                         ScalarType::String
                     }
-                    ParameterType::Integer => ScalarType::Int,
+                    ParameterType::Integer => ScalarType::Long,
                     ParameterType::Boolean => ScalarType::Boolean,
                     ParameterType::ResourceRef(resource_ref) => ScalarType::TypeReference(
                         Self::resource_ref_to_type_reference(resource_ref),
@@ -313,12 +317,7 @@ impl ResourceProcessor {
                         ParameterType::ResourceRef(resource_ref) => {
                             let type_reference = Self::resource_ref_to_type_reference(resource_ref);
                             UnionVariant {
-                                name: type_reference
-                                    .name
-                                    .as_ref()
-                                    .to_case(Case::Camel)
-                                    .try_into()
-                                    .unwrap(),
+                                name: type_reference.name.as_ref().try_into().unwrap(),
                                 description: parameter
                                     .description
                                     .clone()
@@ -340,13 +339,7 @@ impl ResourceProcessor {
                         ParameterType::ResourceRef(resource_ref) => {
                             let type_reference = Self::resource_ref_to_type_reference(resource_ref);
                             IntersectionConstituent {
-                                name: type_reference
-                                    .name
-                                    .as_ref()
-                                    .to_string()
-                                    .to_case(Case::Camel)
-                                    .try_into()
-                                    .unwrap(),
+                                name: type_reference.name.as_ref().to_string().try_into().unwrap(),
                                 type_name: type_reference,
                             }
                         }
@@ -437,6 +430,11 @@ impl ResourceProcessor {
                             Self::type_reference_to_import_path(reference, import_base_path)
                         })
                         .collect::<Vec<_>>();
+                    
+                    // Add Parcelize imports
+                    imports.push("android.os.Parcelable".to_string());
+                    imports.push("kotlinx.parcelize.Parcelize".to_string());
+                    
                     imports.sort();
                     imports.dedup();
 
@@ -455,7 +453,6 @@ impl ResourceProcessor {
                                 .to_string_lossy()
                                 .split('/')
                                 .filter(|s| !s.is_empty())
-                                .map(|s| s.to_case(Case::Camel))
                                 .collect::<Vec<_>>()
                                 .join(".");
                             if sub.is_empty() {
@@ -474,7 +471,6 @@ impl ResourceProcessor {
                     writeln!(&mut content, "package {package_name}").unwrap();
                     writeln!(content).unwrap();
 
-                    // Imports
                     if !imports.is_empty() {
                         for import in imports {
                             writeln!(&mut content, "import {import}").unwrap();
@@ -501,7 +497,6 @@ impl ResourceProcessor {
                                 .to_string_lossy()
                                 .split('/')
                                 .filter(|s| !s.is_empty())
-                                .map(|s| s.to_case(Case::Snake))
                                 .collect::<Vec<_>>()
                                 .join(".");
                             if sub.is_empty() {
@@ -529,6 +524,11 @@ impl ResourceProcessor {
                             Self::type_reference_to_import_path(reference, import_base_path)
                         })
                         .collect::<Vec<_>>();
+                    
+                    // Add Parcelize imports
+                    imports.push("android.os.Parcelable".to_string());
+                    imports.push("kotlinx.parcelize.Parcelize".to_string());
+                    
                     imports.sort();
                     imports.dedup();
 
@@ -547,7 +547,6 @@ impl ResourceProcessor {
                                 .to_string_lossy()
                                 .split('/')
                                 .filter(|s| !s.is_empty())
-                                .map(|s| s.to_case(Case::Camel))
                                 .collect::<Vec<_>>()
                                 .join(".");
                             if sub.is_empty() {
@@ -566,7 +565,6 @@ impl ResourceProcessor {
                     writeln!(&mut content, "package {package_name}").unwrap();
                     writeln!(content).unwrap();
 
-                    // Imports
                     if !imports.is_empty() {
                         for import in imports {
                             writeln!(&mut content, "import {import}").unwrap();
@@ -596,6 +594,11 @@ impl ResourceProcessor {
                             Self::type_reference_to_import_path(reference, import_base_path)
                         })
                         .collect::<Vec<_>>();
+                    
+                    // Add Parcelize imports
+                    imports.push("android.os.Parcelable".to_string());
+                    imports.push("kotlinx.parcelize.Parcelize".to_string());
+                    
                     imports.sort();
                     imports.dedup();
 
@@ -614,7 +617,6 @@ impl ResourceProcessor {
                                 .to_string_lossy()
                                 .split('/')
                                 .filter(|s| !s.is_empty())
-                                .map(|s| s.to_case(Case::Camel))
                                 .collect::<Vec<_>>()
                                 .join(".");
                             if sub.is_empty() {
@@ -633,7 +635,6 @@ impl ResourceProcessor {
                     writeln!(&mut content, "package {package_name}").unwrap();
                     writeln!(content).unwrap();
 
-                    // Imports
                     if !imports.is_empty() {
                         for import in imports {
                             writeln!(&mut content, "import {import}").unwrap();
@@ -663,7 +664,7 @@ pub fn generate_resources_module(
     };
     if let Resource::SubResources(subresources) = resource {
         for (key, value) in subresources.iter() {
-            if matches!(key.as_str(), "entity" | "request") {
+            if matches!(key.as_str(), "entity" | "request" | "response") {
                 processor.process_resource(value, &mut vec![key.clone()]);
             }
         }
