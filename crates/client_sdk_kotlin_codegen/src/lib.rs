@@ -697,7 +697,15 @@ pub fn generate_resources_module(
                     .retain(|field| field.name.as_ref() != "redirectUrl");
                 for field in object.fields.iter_mut() {
                     if field.name.as_ref() == "appScheme" {
-                        field.value_type.is_required = true;
+                        field.value_type.is_required = false;
+                    }
+                }
+            }
+            if let Entity::Intersection(intersection) = entity {
+                intersection.fields.retain(|field| field.name.as_ref() != "redirectUrl");
+                for field in intersection.fields.iter_mut() {
+                    if field.name.as_ref() == "appScheme" {
+                        field.value_type.is_required = false;
                     }
                 }
             }
