@@ -27,21 +27,22 @@ data class Address(
     val city: String?,
     /** **주, 도, 시** */
     val province: String?
-) {
-    fun toJson(): Map<String, Any?> = mapOf(
-        "country" to country?.toJson(),
-        "addressLine1" to addressLine1,
-        "addressLine2" to addressLine2,
-        "city" to city,
-        "province" to province
-    )
+) : Parcelable {
+    fun toJson(): Map<String, Any> = buildMap {
+        country?.let { put("country", country.toJson()) }
+        put("addressLine1", addressLine1)
+        put("addressLine2", addressLine2)
+        city?.let { put("city", city) }
+        province?.let { put("province", province) }
+    }
 }
 ```
 
 ## Empty Object
 
 ```kotlin
-class IssueBillingKeyRequestUnionPaypal {
+@Parcelize
+class IssueBillingKeyRequestUnionPaypal : Parcelable {
     fun toJson(): Map<String, Any> = emptyMap()
 }
 ```

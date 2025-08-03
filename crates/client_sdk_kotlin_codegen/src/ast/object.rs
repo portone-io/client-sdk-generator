@@ -103,11 +103,10 @@ impl fmt::Display for Object {
             writeln!(f, ") : Parcelable {{")?;
             {
                 let indent = Indent(1);
-                writeln!(f, "{indent}fun toJson(): Map<String, Any?> = mapOf(")?;
+                writeln!(f, "{indent}fun toJson(): Map<String, Any> = buildMap {{")?;
                 {
                     let indent = Indent(2);
-                    for (i, field) in self.fields.iter().enumerate() {
-                        let terminator = if i + 1 == self.fields.len() { "" } else { "," };
+                    for field in self.fields.iter() {
                         let to_json = ToJson {
                             name: field.name.as_ref(),
                             is_list: field.value_type.is_list,
@@ -117,20 +116,20 @@ impl fmt::Display for Object {
                         if field.value_type.is_required {
                             writeln!(
                                 f,
-                                "{indent}\"{serialized_name}\" to {to_json}{terminator}",
+                                "{indent}put(\"{serialized_name}\", {to_json})",
                                 serialized_name = field.serialized_name
                             )?;
                         } else {
                             writeln!(
                                 f,
-                                "{indent}\"{serialized_name}\" to {field_name}?.let {{ {to_json} }}{terminator}",
+                                "{indent}{field_name}?.let {{ put(\"{serialized_name}\", {to_json}) }}",
                                 serialized_name = field.serialized_name,
                                 field_name = field.name.as_ref()
                             )?;
                         }
                     }
                 }
-                writeln!(f, "{indent})")?;
+                writeln!(f, "{indent}}}")?;
             }
             writeln!(f, "}}")
         }
@@ -319,13 +318,13 @@ data class Address(
      */
     val province: String?
 ) : Parcelable {
-    fun toJson(): Map<String, Any?> = mapOf(
-        "country" to country?.let { country.toJson() },
-        "addressLine1" to addressLine1,
-        "addressLine2" to addressLine2,
-        "city" to city?.let { city },
-        "province" to province?.let { province }
-    )
+    fun toJson(): Map<String, Any> = buildMap {
+        country?.let { put("country", country.toJson()) }
+        put("addressLine1", addressLine1)
+        put("addressLine2", addressLine2)
+        city?.let { put("city", city) }
+        province?.let { put("province", province) }
+    }
 }
 "#
         );
@@ -448,11 +447,11 @@ data class CustomData(
     val metadata: @RawValue Map<String, Any?>,
     val tags: List<String>?
 ) : Parcelable {
-    fun toJson(): Map<String, Any?> = mapOf(
-        "id" to id,
-        "metadata" to metadata,
-        "tags" to tags?.let { tags }
-    )
+    fun toJson(): Map<String, Any> = buildMap {
+        put("id", id)
+        put("metadata", metadata)
+        tags?.let { put("tags", tags) }
+    }
 }
 "#
         );

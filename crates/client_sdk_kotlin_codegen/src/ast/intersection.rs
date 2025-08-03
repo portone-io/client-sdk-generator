@@ -51,11 +51,10 @@ impl fmt::Display for Intersection {
             let indent = Indent(1);
 
             // toJson method with flattened fields
-            writeln!(f, "{indent}fun toJson(): Map<String, Any?> = mapOf(")?;
+            writeln!(f, "{indent}fun toJson(): Map<String, Any> = buildMap {{")?;
             {
                 let indent = Indent(2);
-                for (i, field) in self.fields.iter().enumerate() {
-                    let terminator = if i + 1 == self.fields.len() { "" } else { "," };
+                for field in self.fields.iter() {
                     let to_json = ToJson {
                         name: field.name.as_ref(),
                         is_list: field.value_type.is_list,
@@ -65,20 +64,20 @@ impl fmt::Display for Intersection {
                     if field.value_type.is_required {
                         writeln!(
                             f,
-                            "{indent}\"{serialized_name}\" to {to_json}{terminator}",
+                            "{indent}put(\"{serialized_name}\", {to_json})",
                             serialized_name = field.serialized_name
                         )?;
                     } else {
                         writeln!(
                             f,
-                            "{indent}\"{serialized_name}\" to {field_name}?.let {{ {to_json} }}{terminator}",
+                            "{indent}{field_name}?.let {{ put(\"{serialized_name}\", {to_json}) }}",
                             serialized_name = field.serialized_name,
                             field_name = field.name.as_ref()
                         )?;
                     }
                 }
             }
-            writeln!(f, "{indent})")?;
+            writeln!(f, "{indent}}}")?;
         }
 
         writeln!(f, "}}")
@@ -213,12 +212,12 @@ data class PaymentRequest(
      */
     val cardInfo: CardInfo?
 ) : Parcelable {
-    fun toJson(): Map<String, Any?> = mapOf(
-        "amount" to amount,
-        "currency" to currency,
-        "method" to method.toJson(),
-        "cardInfo" to cardInfo?.let { cardInfo.toJson() }
-    )
+    fun toJson(): Map<String, Any> = buildMap {
+        put("amount", amount)
+        put("currency", currency)
+        put("method", method.toJson())
+        cardInfo?.let { put("cardInfo", cardInfo.toJson()) }
+    }
 }
 "#
         );
