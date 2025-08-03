@@ -42,7 +42,11 @@ impl fmt::Display for Identifier {
 }
 
 fn normalize_identifier(s: &str) -> String {
-    let normalized = s.replace(['-', ' ', '.', '/'], "_");
+    let mut normalized = s.replace(['-', ' ', '.', '/'], "_");
+
+    if normalized.chars().next().is_some_and(|c| c.is_numeric()) {
+        normalized = format!("_{normalized}");
+    }
 
     // Handle Kotlin reserved keywords
     match normalized.as_str() {
@@ -87,6 +91,17 @@ mod tests {
         assert_eq!(
             Identifier::try_from("package").unwrap().as_ref(),
             "`package`"
+        );
+    }
+
+    #[test]
+    fn test_identifiers_starting_with_numbers() {
+        assert_eq!(Identifier::try_from("123").unwrap().as_ref(), "_123");
+        assert_eq!(Identifier::try_from("1st").unwrap().as_ref(), "_1st");
+        assert_eq!(Identifier::try_from("2factor").unwrap().as_ref(), "_2factor");
+        assert_eq!(
+            Identifier::try_from("3-way").unwrap().as_ref(),
+            "_3_way"
         );
     }
 }

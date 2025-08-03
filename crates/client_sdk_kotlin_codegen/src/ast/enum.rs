@@ -108,4 +108,53 @@ enum class Bank {
 
         assert_eq!(enum_entity.to_string(), expected);
     }
+
+    #[test]
+    fn enum_with_numeric_variant() {
+        let enum_entity = Enum {
+            name: Identifier::try_from("PaymentMethod").unwrap(),
+            description: Some(Comment::try_from("결제 수단").unwrap()),
+            variants: vec![
+                EnumVariant {
+                    name: Identifier::try_from("2checkout").unwrap(),
+                    value: "2checkout".into(),
+                    description: Some(Comment::try_from("2Checkout 결제").unwrap()),
+                },
+                EnumVariant {
+                    name: Identifier::try_from("3ds").unwrap(),
+                    value: "3ds".into(),
+                    description: Some(Comment::try_from("3D Secure 인증").unwrap()),
+                },
+                EnumVariant {
+                    name: Identifier::try_from("card").unwrap(),
+                    value: "card".into(),
+                    description: Some(Comment::try_from("카드 결제").unwrap()),
+                },
+            ],
+            union_parents: vec![],
+        };
+
+        let expected = r#"/**
+ * 결제 수단
+ */
+enum class PaymentMethod {
+    /**
+     * 2Checkout 결제
+     */
+    _2checkout,
+    /**
+     * 3D Secure 인증
+     */
+    _3ds,
+    /**
+     * 카드 결제
+     */
+    card;
+
+    fun toJson(): String = name
+}
+"#;
+
+        assert_eq!(enum_entity.to_string(), expected);
+    }
 }
