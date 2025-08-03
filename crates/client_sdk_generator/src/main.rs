@@ -84,7 +84,7 @@ fn main() {
                         client_sdk_kotlin_codegen::generate_resources_module(
                             &schema.resources,
                             &out_dir,
-                            "io/portone/sdk/type",
+                            "io/portone/sdk/android/type",
                         );
                     });
                     // Optional: Run ktlint formatter if available
