@@ -3,11 +3,11 @@
   "title": "Schema",
   "type": "object",
   "properties": {
-    "pgProviders": {
-      "description": "PG사 식별자 목록",
+    "flags": {
+      "description": "플래그 목록",
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/$defs/PgProvider"
+        "$ref": "#/$defs/Flag"
       }
     },
     "resources": {
@@ -23,12 +23,12 @@
     }
   },
   "required": [
-    "pgProviders",
+    "flags",
     "resources",
     "methods"
   ],
   "$defs": {
-    "PgProvider": {
+    "Flag": {
       "type": "object",
       "properties": {
         "description": {

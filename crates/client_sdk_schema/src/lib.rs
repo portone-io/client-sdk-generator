@@ -7,8 +7,8 @@ better_scoped_tls::scoped_tls!(pub static RESOURCE_INDEX: IndexMap<String, Param
 #[derive(Serialize, Deserialize, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Schema {
-    /// PG사 식별자 목록
-    pub pg_providers: IndexMap<String, PgProvider>,
+    /// 플래그 목록
+    pub flags: IndexMap<String, Flag>,
     /// 리소스 목록
     pub resources: Resource,
     /// 메소드 목록
@@ -50,7 +50,7 @@ pub enum Resource {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct PgProvider {
+pub struct Flag {
     /// PG사 설명
     pub description: String,
 }
@@ -313,34 +313,34 @@ mod tests {
 
     #[test]
     fn test_schema_serialization_to_yaml() {
-        let mut pg_providers: IndexMap<String, PgProvider> = IndexMap::new();
+        let mut pg_providers: IndexMap<String, Flag> = IndexMap::new();
         pg_providers.insert(
             "paypal".to_string(),
-            PgProvider {
+            Flag {
                 description: "PayPal payment provider".to_string(),
             },
         );
         pg_providers.insert(
             "stripe".to_string(),
-            PgProvider {
+            Flag {
                 description: "Stripe payment provider".to_string(),
             },
         );
         pg_providers.insert(
             "tosspayments".to_string(),
-            PgProvider {
+            Flag {
                 description: "Toss Payments provider".to_string(),
             },
         );
         pg_providers.insert(
             "danal".to_string(),
-            PgProvider {
+            Flag {
                 description: "Danal payment provider".to_string(),
             },
         );
         pg_providers.insert(
             "kcp".to_string(),
-            PgProvider {
+            Flag {
                 description: "KCP payment provider".to_string(),
             },
         );
@@ -470,7 +470,7 @@ mod tests {
         );
 
         let schema = Schema {
-            pg_providers,
+            flags: pg_providers,
             resources: Resource::SubResources(
                 parameters
                     .into_iter()
