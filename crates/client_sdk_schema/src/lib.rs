@@ -51,7 +51,7 @@ pub enum Resource {
 #[derive(Serialize, Deserialize, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Flag {
-    /// PG사 설명
+    /// 플래그 설명
     pub description: String,
 }
 
