@@ -485,7 +485,7 @@ mod tests {
 
         // Expected YAML
         let expected_yaml = r#"
-pgProviders:
+flags:
   paypal:
     description: PayPal payment provider
   stripe:
