@@ -313,32 +313,32 @@ mod tests {
 
     #[test]
     fn test_schema_serialization_to_yaml() {
-        let mut pg_providers: IndexMap<String, Flag> = IndexMap::new();
-        pg_providers.insert(
+        let mut flags: IndexMap<String, Flag> = IndexMap::new();
+        flags.insert(
             "paypal".to_string(),
             Flag {
                 description: "PayPal payment provider".to_string(),
             },
         );
-        pg_providers.insert(
+        flags.insert(
             "stripe".to_string(),
             Flag {
                 description: "Stripe payment provider".to_string(),
             },
         );
-        pg_providers.insert(
+        flags.insert(
             "tosspayments".to_string(),
             Flag {
                 description: "Toss Payments provider".to_string(),
             },
         );
-        pg_providers.insert(
+        flags.insert(
             "danal".to_string(),
             Flag {
                 description: "Danal payment provider".to_string(),
             },
         );
-        pg_providers.insert(
+        flags.insert(
             "kcp".to_string(),
             Flag {
                 description: "KCP payment provider".to_string(),
@@ -470,7 +470,7 @@ mod tests {
         );
 
         let schema = Schema {
-            flags: pg_providers,
+            flags,
             resources: Resource::SubResources(
                 parameters
                     .into_iter()
