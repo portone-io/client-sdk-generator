@@ -1,5 +1,11 @@
 # @portone/client-sdk-generator
 
+## 0.2.0
+
+### Minor Changes
+
+- [#28](https://github.com/portone-io/client-sdk-generator/pull/28) [`95736fe`](https://github.com/portone-io/client-sdk-generator/commit/95736fe602a61f6fb59d33d7967c923598f84233) Thanks [@CirnoV](https://github.com/CirnoV)! - PG별 조건부 렌더링을 범용 플래그 시스템으로 개선
+
 ## 0.1.4
 
 ### Patch Changes
