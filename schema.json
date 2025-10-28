@@ -3,11 +3,11 @@
   "title": "Schema",
   "type": "object",
   "properties": {
-    "pgProviders": {
-      "description": "PG사 식별자 목록",
+    "flags": {
+      "description": "플래그 목록",
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/$defs/PgProvider"
+        "$ref": "#/$defs/Flag"
       }
     },
     "resources": {
@@ -23,12 +23,12 @@
     }
   },
   "required": [
-    "pgProviders",
+    "flags",
     "resources",
     "methods"
   ],
   "$defs": {
-    "PgProvider": {
+    "Flag": {
       "type": "object",
       "properties": {
         "description": {
@@ -57,15 +57,15 @@
       "description": "파라미터 타입",
       "type": "object",
       "properties": {
-        "description": {
-          "description": "파라미터 설명",
+        "name": {
+          "description": "파라미터 이름",
           "type": [
             "string",
             "null"
           ]
         },
-        "name": {
-          "description": "파라미터 이름",
+        "description": {
+          "description": "파라미터 설명",
           "type": [
             "string",
             "null"
@@ -75,13 +75,13 @@
           "description": "Optional 여부",
           "type": "boolean"
         },
-        "pgSpecific": {
+        "flagOptions": {
           "type": [
             "object",
             "null"
           ],
           "additionalProperties": {
-            "$ref": "#/$defs/PgSpecific"
+            "$ref": "#/$defs/FlagOption"
           }
         },
         "deprecated": {
@@ -107,13 +107,13 @@
           "title": "stringLiteral",
           "type": "object",
           "properties": {
-            "type": {
-              "type": "string",
-              "const": "stringLiteral"
-            },
             "value": {
               "description": "StringLiteral의 값",
               "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "stringLiteral"
             }
           },
           "required": [
@@ -151,10 +151,6 @@
           "title": "array",
           "type": "object",
           "properties": {
-            "type": {
-              "type": "string",
-              "const": "array"
-            },
             "items": {
               "description": "Array의 item 타입",
               "$ref": "#/$defs/Parameter"
@@ -162,6 +158,10 @@
             "hide_if_empty": {
               "description": "Array가 비어있을 때 숨기기 여부",
               "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "const": "array"
             }
           },
           "required": [
@@ -173,10 +173,6 @@
           "title": "object",
           "type": "object",
           "properties": {
-            "type": {
-              "type": "string",
-              "const": "object"
-            },
             "properties": {
               "description": "Object의 프로퍼티 목록",
               "type": "object",
@@ -187,6 +183,10 @@
             "hideIfEmpty": {
               "description": "Object가 비어있을 때 숨기기 여부",
               "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "const": "object"
             }
           },
           "required": [
@@ -211,10 +211,6 @@
           "title": "enum",
           "type": "object",
           "properties": {
-            "type": {
-              "type": "string",
-              "const": "enum"
-            },
             "variants": {
               "description": "Enum의 variant 목록",
               "type": "object",
@@ -227,6 +223,10 @@
                 "string",
                 "null"
               ]
+            },
+            "type": {
+              "type": "string",
+              "const": "enum"
             }
           },
           "required": [
@@ -238,10 +238,6 @@
           "title": "oneOf",
           "type": "object",
           "properties": {
-            "type": {
-              "type": "string",
-              "const": "oneOf"
-            },
             "properties": {
               "description": "OneOf의 타입 목록",
               "type": "object",
@@ -252,6 +248,10 @@
             "hideIfEmpty": {
               "description": "OneOf가 비어있을 때 숨기기 여부",
               "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "const": "oneOf"
             }
           },
           "required": [
@@ -263,10 +263,6 @@
           "title": "union",
           "type": "object",
           "properties": {
-            "type": {
-              "type": "string",
-              "const": "union"
-            },
             "types": {
               "description": "Union의 타입 목록",
               "type": "array",
@@ -277,6 +273,10 @@
             "hideIfEmpty": {
               "description": "Union이 비어있을 때 숨기기 여부",
               "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "const": "union"
             }
           },
           "required": [
@@ -288,10 +288,6 @@
           "title": "intersection",
           "type": "object",
           "properties": {
-            "type": {
-              "type": "string",
-              "const": "intersection"
-            },
             "types": {
               "description": "Intersection의 타입 목록",
               "type": "array",
@@ -302,6 +298,10 @@
             "hideIfEmpty": {
               "description": "Intersection이 비어있을 때 숨기기 여부",
               "type": "boolean"
+            },
+            "type": {
+              "type": "string",
+              "const": "intersection"
             }
           },
           "required": [
@@ -327,9 +327,11 @@
           "title": "error",
           "type": "object",
           "properties": {
-            "type": {
-              "type": "string",
-              "const": "error"
+            "transactionType": {
+              "type": [
+                "string",
+                "null"
+              ]
             },
             "properties": {
               "description": "Error의 프로퍼티 목록",
@@ -338,11 +340,9 @@
                 "$ref": "#/$defs/Parameter"
               }
             },
-            "transactionType": {
-              "type": [
-                "string",
-                "null"
-              ]
+            "type": {
+              "type": "string",
+              "const": "error"
             }
           },
           "required": [
@@ -394,7 +394,7 @@
         "$ref"
       ]
     },
-    "PgSpecific": {
+    "FlagOption": {
       "type": "object",
       "properties": {
         "visible": {

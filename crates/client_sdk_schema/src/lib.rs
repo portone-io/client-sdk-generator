@@ -7,8 +7,8 @@ better_scoped_tls::scoped_tls!(pub static RESOURCE_INDEX: IndexMap<String, Param
 #[derive(Serialize, Deserialize, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Schema {
-    /// PG사 식별자 목록
-    pub pg_providers: IndexMap<String, PgProvider>,
+    /// 플래그 목록
+    pub flags: IndexMap<String, Flag>,
     /// 리소스 목록
     pub resources: Resource,
     /// 메소드 목록
@@ -50,8 +50,8 @@ pub enum Resource {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct PgProvider {
-    /// PG사 설명
+pub struct Flag {
+    /// 플래그 설명
     pub description: String,
 }
 
@@ -60,7 +60,7 @@ pub trait ParameterExt {
     fn description(&self) -> Option<String>;
     fn r#type(&self) -> &ParameterType;
     fn optional(&self) -> bool;
-    fn pg_specific(&self) -> Option<&IndexMap<String, PgSpecific>>;
+    fn flag_options(&self) -> Option<&IndexMap<String, FlagOption>>;
     fn deprecated(&self) -> bool;
 }
 
@@ -95,8 +95,8 @@ impl ParameterExt for Parameter {
         self.optional
     }
 
-    fn pg_specific(&self) -> Option<&IndexMap<String, PgSpecific>> {
-        self.pg_specific.as_ref()
+    fn flag_options(&self) -> Option<&IndexMap<String, FlagOption>> {
+        self.flag_options.as_ref()
     }
 
     fn deprecated(&self) -> bool {
@@ -135,7 +135,7 @@ pub struct Parameter {
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub optional: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pg_specific: Option<IndexMap<String, PgSpecific>>,
+    pub flag_options: Option<IndexMap<String, FlagOption>>,
     /// Deprecated 여부
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub deprecated: bool,
@@ -147,7 +147,7 @@ impl Parameter {
         description: Option<String>,
         r#type: ParameterType,
         optional: bool,
-        pg_specific: Option<IndexMap<String, PgSpecific>>,
+        flag_options: Option<IndexMap<String, FlagOption>>,
         deprecated: bool,
     ) -> Self {
         Self {
@@ -155,7 +155,7 @@ impl Parameter {
             description,
             r#type,
             optional,
-            pg_specific,
+            flag_options,
             deprecated,
         }
     }
@@ -163,7 +163,7 @@ impl Parameter {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct PgSpecific {
+pub struct FlagOption {
     /// Visible 여부
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     visible: bool,
@@ -313,34 +313,34 @@ mod tests {
 
     #[test]
     fn test_schema_serialization_to_yaml() {
-        let mut pg_providers: IndexMap<String, PgProvider> = IndexMap::new();
-        pg_providers.insert(
+        let mut flags: IndexMap<String, Flag> = IndexMap::new();
+        flags.insert(
             "paypal".to_string(),
-            PgProvider {
+            Flag {
                 description: "PayPal payment provider".to_string(),
             },
         );
-        pg_providers.insert(
+        flags.insert(
             "stripe".to_string(),
-            PgProvider {
+            Flag {
                 description: "Stripe payment provider".to_string(),
             },
         );
-        pg_providers.insert(
+        flags.insert(
             "tosspayments".to_string(),
-            PgProvider {
+            Flag {
                 description: "Toss Payments provider".to_string(),
             },
         );
-        pg_providers.insert(
+        flags.insert(
             "danal".to_string(),
-            PgProvider {
+            Flag {
                 description: "Danal payment provider".to_string(),
             },
         );
-        pg_providers.insert(
+        flags.insert(
             "kcp".to_string(),
-            PgProvider {
+            Flag {
                 description: "KCP payment provider".to_string(),
             },
         );
@@ -362,7 +362,7 @@ mod tests {
                                 description: Some("The person's name".to_string()),
                                 r#type: ParameterType::String,
                                 optional: false,
-                                pg_specific: None,
+                                flag_options: None,
                                 deprecated: false,
                             },
                         );
@@ -373,7 +373,7 @@ mod tests {
                                 description: Some("The person's age".to_string()),
                                 r#type: ParameterType::Integer,
                                 optional: true,
-                                pg_specific: None,
+                                flag_options: None,
                                 deprecated: false,
                             },
                         );
@@ -381,7 +381,7 @@ mod tests {
                     },
                 },
                 optional: false,
-                pg_specific: None,
+                flag_options: None,
                 deprecated: false,
             },
         );
@@ -419,7 +419,7 @@ mod tests {
                     value_prefix: None,
                 },
                 optional: false,
-                pg_specific: None,
+                flag_options: None,
                 deprecated: false,
             },
         );
@@ -434,13 +434,13 @@ mod tests {
                         description: None,
                         r#type: ParameterType::Integer,
                         optional: false,
-                        pg_specific: None,
+                        flag_options: None,
                         deprecated: false,
                     }),
                     hide_if_empty: false,
                 },
                 optional: false,
-                pg_specific: None,
+                flag_options: None,
                 deprecated: false,
             },
         );
@@ -451,7 +451,7 @@ mod tests {
                 description: Some("Boolean to indicate if human".to_string()),
                 r#type: ParameterType::Boolean,
                 optional: false,
-                pg_specific: None,
+                flag_options: None,
                 deprecated: false,
             },
         );
@@ -464,13 +464,13 @@ mod tests {
                     resource_ref: "#/resources/Person".to_string(),
                 }),
                 optional: false,
-                pg_specific: None,
+                flag_options: None,
                 deprecated: false,
             },
         );
 
         let schema = Schema {
-            pg_providers,
+            flags,
             resources: Resource::SubResources(
                 parameters
                     .into_iter()
@@ -485,7 +485,7 @@ mod tests {
 
         // Expected YAML
         let expected_yaml = r#"
-pgProviders:
+flags:
   paypal:
     description: PayPal payment provider
   stripe:
