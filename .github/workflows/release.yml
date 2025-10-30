@@ -10,6 +10,7 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
+  id-token: write
   actions: write
   contents: write
   pull-requests: write
@@ -229,6 +230,9 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -240,8 +244,6 @@ jobs:
           for package in packages/@portone/*; do
             npm publish $package --tag latest --access public --provenance
           done
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish release for @portone/client-sdk-generator
         run: |
