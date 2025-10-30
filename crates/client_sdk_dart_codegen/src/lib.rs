@@ -451,15 +451,15 @@ pub fn generate_resources_module(
     }
     // Mobile-only transformations
     for (path, entity) in processor.entities.iter_mut() {
-        if path.starts_with("request/") {
-            if let Entity::Object(object) = entity {
-                object
-                    .fields
-                    .retain(|field| field.name.as_ref() != "redirectUrl");
-                for field in object.fields.iter_mut() {
-                    if field.name.as_ref() == "appScheme" {
-                        field.value_type.is_required = true;
-                    }
+        if path.starts_with("request/")
+            && let Entity::Object(object) = entity
+        {
+            object
+                .fields
+                .retain(|field| field.name.as_ref() != "redirectUrl");
+            for field in object.fields.iter_mut() {
+                if field.name.as_ref() == "appScheme" {
+                    field.value_type.is_required = true;
                 }
             }
         }
