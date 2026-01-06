@@ -84,12 +84,15 @@ impl fmt::Display for Object {
             }
             writeln!(f, "}}")
         } else {
+            let mut sorted_fields: Vec<_> = self.fields.iter().collect();
+            sorted_fields.sort_by_key(|f| !f.value_type.is_required);
+
             writeln!(f, "@Parcelize")?;
             writeln!(f, "data class {name}(", name = self.name.as_ref())?;
             {
                 let indent = Indent(1);
-                for (i, field) in self.fields.iter().enumerate() {
-                    let terminator = if i + 1 == self.fields.len() { "" } else { "," };
+                for (i, field) in sorted_fields.iter().enumerate() {
+                    let terminator = if i + 1 == sorted_fields.len() { "" } else { "," };
                     if let Some(ref desc) = field.description {
                         writeln!(f, "{indent}/**")?;
                         for line in desc.lines() {
@@ -171,6 +174,11 @@ impl fmt::Display for ToJson<'_> {
 impl fmt::Display for ObjectField {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let nullable = if self.value_type.is_required { "" } else { "?" };
+        let default_value = if self.value_type.is_required {
+            ""
+        } else {
+            " = null"
+        };
         let field_type = if self.value_type.is_list {
             format!("List<{}>", self.value_type.scalar.to_identifier())
         } else {
@@ -182,14 +190,14 @@ impl fmt::Display for ObjectField {
             ScalarType::Json => {
                 write!(
                     f,
-                    "val {name}: @RawValue {field_type}{nullable}",
+                    "val {name}: @RawValue {field_type}{nullable}{default_value}",
                     name = self.name.as_ref()
                 )
             }
             _ => {
                 write!(
                     f,
-                    "val {name}: {field_type}{nullable}",
+                    "val {name}: {field_type}{nullable}{default_value}",
                     name = self.name.as_ref()
                 )
             }
@@ -300,7 +308,6 @@ class IssueBillingKeyRequestUnionPaypal : Parcelable {
  */
 @Parcelize
 data class Address(
-    val country: Country?,
     /**
      * **일반주소**
      */
@@ -309,14 +316,15 @@ data class Address(
      * **상세주소**
      */
     val addressLine2: String,
+    val country: Country? = null,
     /**
      * **도시**
      */
-    val city: String?,
+    val city: String? = null,
     /**
      * **주, 도, 시**
      */
-    val province: String?
+    val province: String? = null
 ) : Parcelable {
     fun toJson(): Map<String, Any> = buildMap {
         country?.let { put("country", country.toJson()) }
@@ -445,7 +453,7 @@ data class CustomData(
      * **추가 메타데이터**
      */
     val metadata: @RawValue Map<String, Any?>,
-    val tags: List<String>?
+    val tags: List<String>? = null
 ) : Parcelable {
     fun toJson(): Map<String, Any> = buildMap {
         put("id", id)
