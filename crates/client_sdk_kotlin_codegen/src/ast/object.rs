@@ -84,15 +84,12 @@ impl fmt::Display for Object {
             }
             writeln!(f, "}}")
         } else {
-            let mut sorted_fields: Vec<_> = self.fields.iter().collect();
-            sorted_fields.sort_by_key(|f| !f.value_type.is_required);
-
             writeln!(f, "@Parcelize")?;
             writeln!(f, "data class {name}(", name = self.name.as_ref())?;
             {
                 let indent = Indent(1);
-                for (i, field) in sorted_fields.iter().enumerate() {
-                    let terminator = if i + 1 == sorted_fields.len() { "" } else { "," };
+                for (i, field) in self.fields.iter().enumerate() {
+                    let terminator = if i + 1 == self.fields.len() { "" } else { "," };
                     if let Some(ref desc) = field.description {
                         writeln!(f, "{indent}/**")?;
                         for line in desc.lines() {
