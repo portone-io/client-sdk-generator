@@ -29,6 +29,7 @@ impl fmt::Display for Enum {
         writeln!(f, "enum class {name} {{", name = self.name.as_ref())?;
         {
             let indent = Indent(1);
+            let indent2 = Indent(2);
             let len = self.variants.len();
             for (i, variant) in self.variants.iter().enumerate() {
                 let terminator = if i + 1 == len { ";" } else { "," };
@@ -42,7 +43,26 @@ impl fmt::Display for Enum {
                 writeln!(f, "{indent}{variant}{terminator}")?;
             }
             writeln!(f)?;
-            writeln!(f, "{indent}fun toJson(): String = name")?;
+
+            let all_same = self
+                .variants
+                .iter()
+                .all(|v| v.name.as_ref() == v.value.as_str());
+
+            if all_same {
+                writeln!(f, "{indent}fun toJson(): String = name")?;
+            } else {
+                writeln!(f, "{indent}fun toJson(): String = when (this) {{")?;
+                for variant in &self.variants {
+                    writeln!(
+                        f,
+                        "{indent2}{name} -> \"{value}\"",
+                        name = variant.name.as_ref(),
+                        value = variant.value
+                    )?;
+                }
+                writeln!(f, "{indent}}}")?;
+            }
         }
         writeln!(f, "}}")
     }
@@ -151,7 +171,11 @@ enum class PaymentMethod {
      */
     card;
 
-    fun toJson(): String = name
+    fun toJson(): String = when (this) {
+        _2checkout -> "2checkout"
+        _3ds -> "3ds"
+        card -> "card"
+    }
 }
 "#;
 
