@@ -100,6 +100,11 @@ impl ResourceProcessor {
                 is_list: false,
                 is_required,
             },
+            ParameterType::Enum { .. } => CompositeType {
+                scalar: ScalarType::String,
+                is_list: false,
+                is_required,
+            },
             ParameterType::Array {
                 items,
                 hide_if_empty: _,
@@ -114,6 +119,7 @@ impl ResourceProcessor {
                         Self::resource_ref_to_type_reference(resource_ref),
                     ),
                     ParameterType::Json => ScalarType::Json,
+                    ParameterType::Enum { .. } => ScalarType::String,
                     _ => unreachable!(),
                 };
                 CompositeType {
