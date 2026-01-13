@@ -175,10 +175,38 @@ impl ResourceProcessor {
             name: field_name,
             serialized_name: name.to_string(),
             value_type,
-            description: parameter
-                .description
-                .clone()
-                .map(|d| Comment::try_from(d).unwrap()),
+            description: Self::build_field_description(parameter),
+        }
+    }
+
+    fn build_field_description(parameter: &Parameter) -> Option<Comment> {
+        let mut desc_parts = Vec::new();
+
+        if let Some(base_desc) = &parameter.description {
+            desc_parts.push(base_desc.clone());
+        }
+
+        if let ParameterType::Enum { variants, .. } = &parameter.r#type {
+            let variant_lines: Vec<String> = variants
+                .iter()
+                .map(|(value, variant)| {
+                    if let Some(variant_desc) = &variant.description {
+                        format!("- `{value}`: {variant_desc}")
+                    } else {
+                        format!("- `{value}`")
+                    }
+                })
+                .collect();
+
+            if !variant_lines.is_empty() {
+                desc_parts.push(variant_lines.join("\n"));
+            }
+        }
+
+        if desc_parts.is_empty() {
+            None
+        } else {
+            Some(Comment::try_from(desc_parts.join("\n\n")).unwrap())
         }
     }
 
