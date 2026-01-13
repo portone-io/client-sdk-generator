@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::ast::Indent;
 
-use super::{Comment, Identifier, TypeReference};
+use super::{Comment, Identifier, ObjectField, ScalarType, TypeReference};
 
 #[derive(Debug, Clone)]
 pub enum UnionParent {
@@ -13,10 +13,18 @@ pub enum UnionParent {
 }
 
 #[derive(Debug, Clone)]
+pub enum UnionDetail {
+    /// Object들의 union - flattened data class로 생성
+    FlattenedObject { fields: Vec<ObjectField> },
+    /// Enum들의 union - sealed class로 생성
+    SealedClass { variants: Vec<UnionVariant> },
+}
+
+#[derive(Debug, Clone)]
 pub struct Union {
     pub name: Identifier,
     pub description: Option<Comment>,
-    pub variants: Vec<UnionVariant>,
+    pub detail: UnionDetail,
 }
 
 #[derive(Debug, Clone)]
@@ -37,7 +45,69 @@ impl fmt::Display for Union {
             writeln!(f, " */")?;
         }
 
-        // Sealed class declaration
+        match &self.detail {
+            UnionDetail::FlattenedObject { fields } => self.fmt_flattened_object(f, fields),
+            UnionDetail::SealedClass { variants } => self.fmt_sealed_class(f, variants),
+        }
+    }
+}
+
+impl Union {
+    /// Object들의 union - flattened data class로 생성
+    fn fmt_flattened_object(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+        fields: &[ObjectField],
+    ) -> fmt::Result {
+        writeln!(f, "@Parcelize")?;
+        writeln!(f, "data class {name}(", name = self.name.as_ref())?;
+        {
+            let indent = Indent(1);
+            for (i, field) in fields.iter().enumerate() {
+                let terminator = if i + 1 == fields.len() { "" } else { "," };
+                if let Some(ref desc) = field.description {
+                    writeln!(f, "{indent}/**")?;
+                    for line in desc.lines() {
+                        writeln!(f, "{indent} * {line}")?;
+                    }
+                    writeln!(f, "{indent} */")?;
+                }
+                writeln!(f, "{indent}{field}{terminator}")?;
+            }
+        }
+        writeln!(f, ") : Parcelable {{")?;
+        {
+            let indent = Indent(1);
+            writeln!(f, "{indent}fun toJson(): Map<String, Any> = buildMap {{")?;
+            {
+                let indent = Indent(2);
+                for field in fields.iter() {
+                    let to_json = ToJson {
+                        name: field.name.as_ref(),
+                        is_list: field.value_type.is_list,
+                        scalar: &field.value_type.scalar,
+                    };
+
+                    // Union flattened object의 모든 필드는 nullable
+                    writeln!(
+                        f,
+                        "{indent}{field_name}?.let {{ put(\"{serialized_name}\", {to_json}) }}",
+                        serialized_name = field.serialized_name,
+                        field_name = field.name.as_ref()
+                    )?;
+                }
+            }
+            writeln!(f, "{indent}}}")?;
+        }
+        writeln!(f, "}}")
+    }
+
+    /// Enum들의 union - sealed class로 생성
+    fn fmt_sealed_class(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+        variants: &[UnionVariant],
+    ) -> fmt::Result {
         writeln!(f, "@Parcelize")?;
         writeln!(
             f,
@@ -48,7 +118,7 @@ impl fmt::Display for Union {
             let indent = Indent(1);
 
             // Variant declarations
-            for variant in self.variants.iter() {
+            for variant in variants.iter() {
                 if let Some(ref desc) = variant.description {
                     writeln!(f, "{indent}/**")?;
                     for line in desc.lines() {
@@ -72,7 +142,7 @@ impl fmt::Display for Union {
             writeln!(f, "{indent}fun toJson(): Any = when (this) {{")?;
             {
                 let indent = Indent(2);
-                for variant in self.variants.iter() {
+                for variant in variants.iter() {
                     writeln!(
                         f,
                         "{indent}is {variant_name} -> value.toJson()",
@@ -83,6 +153,30 @@ impl fmt::Display for Union {
             writeln!(f, "{indent}}}")?;
         }
         writeln!(f, "}}")
+    }
+}
+
+struct ToJson<'a> {
+    name: &'a str,
+    is_list: bool,
+    scalar: &'a ScalarType,
+}
+
+impl fmt::Display for ToJson<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let name = self.name;
+        match self.scalar {
+            ScalarType::Long | ScalarType::Boolean | ScalarType::Json | ScalarType::String => {
+                write!(f, "{name}")
+            }
+            ScalarType::TypeReference(_) => {
+                if self.is_list {
+                    write!(f, "{name}.map {{ it.toJson() }}")
+                } else {
+                    write!(f, "{name}.toJson()")
+                }
+            }
+        }
     }
 }
 
@@ -97,30 +191,33 @@ fn capitalize_first(s: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ast::CompositeType;
 
     #[test]
-    fn union_with_variant() {
+    fn union_sealed_class() {
         let union = Union {
             name: Identifier::try_from("LoadableUIType").unwrap(),
             description: None,
-            variants: vec![
-                UnionVariant {
-                    name: Identifier::try_from("paymentUiType").unwrap(),
-                    type_name: TypeReference {
-                        name: Identifier::try_from("PaymentUIType").unwrap(),
-                        path: "".into(),
+            detail: UnionDetail::SealedClass {
+                variants: vec![
+                    UnionVariant {
+                        name: Identifier::try_from("paymentUiType").unwrap(),
+                        type_name: TypeReference {
+                            name: Identifier::try_from("PaymentUIType").unwrap(),
+                            path: "".into(),
+                        },
+                        description: None,
                     },
-                    description: None,
-                },
-                UnionVariant {
-                    name: Identifier::try_from("issueBillingKeyUiType").unwrap(),
-                    type_name: TypeReference {
-                        name: Identifier::try_from("IssueBillingKeyUIType").unwrap(),
-                        path: "".into(),
+                    UnionVariant {
+                        name: Identifier::try_from("issueBillingKeyUiType").unwrap(),
+                        type_name: TypeReference {
+                            name: Identifier::try_from("IssueBillingKeyUIType").unwrap(),
+                            path: "".into(),
+                        },
+                        description: None,
                     },
-                    description: None,
-                },
-            ],
+                ],
+            },
         };
         assert_eq!(
             union.to_string(),
@@ -134,6 +231,61 @@ sealed class LoadableUIType : Parcelable {
     fun toJson(): Any = when (this) {
         is PaymentUiType -> value.toJson()
         is IssueBillingKeyUiType -> value.toJson()
+    }
+}
+"#
+        );
+    }
+
+    #[test]
+    fn union_flattened_object() {
+        let union = Union {
+            name: Identifier::try_from("OfferPeriodRange").unwrap(),
+            description: Some(Comment::try_from("**기간 범위**").unwrap()),
+            detail: UnionDetail::FlattenedObject {
+                fields: vec![
+                    ObjectField {
+                        name: Identifier::try_from("from").unwrap(),
+                        serialized_name: "from".to_string(),
+                        value_type: CompositeType {
+                            scalar: ScalarType::String,
+                            is_list: false,
+                            is_required: false,
+                        },
+                        description: Some(Comment::try_from("**시작 시점**").unwrap()),
+                    },
+                    ObjectField {
+                        name: Identifier::try_from("to").unwrap(),
+                        serialized_name: "to".to_string(),
+                        value_type: CompositeType {
+                            scalar: ScalarType::String,
+                            is_list: false,
+                            is_required: false,
+                        },
+                        description: Some(Comment::try_from("**종료 지점**").unwrap()),
+                    },
+                ],
+            },
+        };
+        assert_eq!(
+            union.to_string(),
+            r#"/**
+ * **기간 범위**
+ */
+@Parcelize
+data class OfferPeriodRange(
+    /**
+     * **시작 시점**
+     */
+    val from: String? = null,
+    /**
+     * **종료 지점**
+     */
+    val to: String? = null
+) : Parcelable {
+    fun toJson(): Map<String, Any> = buildMap {
+        from?.let { put("from", from) }
+        to?.let { put("to", to) }
     }
 }
 "#

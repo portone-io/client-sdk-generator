@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::Path};
 
 use ast::{
     Comment, CompositeType, Enum, EnumVariant, Identifier, Intersection, IntersectionConstituent,
-    Object, ObjectField, ScalarType, TypeReference, Union, UnionParent, UnionVariant,
+    Object, ObjectField, ScalarType, TypeReference, Union, UnionDetail, UnionParent, UnionVariant,
 };
 use client_sdk_schema::{Parameter, ParameterType, RESOURCE_INDEX, Resource, ResourceRef};
 use client_sdk_utils::write_generated_file;
@@ -48,6 +48,84 @@ impl ResourceProcessor {
                 }
             } else {
                 vec![]
+            }
+        })
+    }
+
+    /// Union의 variant들을 분석하여 UnionDetail을 생성
+    fn analyze_and_build_union_detail(types: &[Parameter], processor: &Self) -> UnionDetail {
+        RESOURCE_INDEX.with(|index| {
+            // variant 타입 분석
+            let mut all_objects = true;
+            let mut all_enums = true;
+
+            for param in types {
+                if let ParameterType::ResourceRef(resource_ref) = &param.r#type {
+                    if let Some(parameter) = index.get(resource_ref.resource_ref()) {
+                        match &parameter.r#type {
+                            ParameterType::Object { .. } | ParameterType::EmptyObject => {
+                                all_enums = false;
+                            }
+                            ParameterType::Enum { .. } => {
+                                all_objects = false;
+                            }
+                            _ => {
+                                all_objects = false;
+                                all_enums = false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if all_objects {
+                // Object들의 union - flattened data class
+                let mut all_fields: Vec<ObjectField> = Vec::new();
+                let mut field_names: std::collections::HashSet<String> =
+                    std::collections::HashSet::new();
+
+                for param in types {
+                    if let ParameterType::ResourceRef(resource_ref) = &param.r#type {
+                        let type_ref = Self::resource_ref_to_type_reference(resource_ref);
+                        let fields = processor.collect_fields_from_type(&type_ref);
+
+                        for mut field in fields {
+                            // Union의 모든 필드는 nullable
+                            field.value_type.is_required = false;
+
+                            // 중복 필드명 처리: 첫 번째 정의 사용
+                            if !field_names.contains(field.name.as_ref()) {
+                                field_names.insert(field.name.as_ref().to_string());
+                                all_fields.push(field);
+                            }
+                        }
+                    }
+                }
+
+                UnionDetail::FlattenedObject { fields: all_fields }
+            } else if all_enums {
+                // Enum들의 union - sealed class
+                let variants = types
+                    .iter()
+                    .map(|parameter| match &parameter.r#type {
+                        ParameterType::ResourceRef(resource_ref) => {
+                            let type_reference = Self::resource_ref_to_type_reference(resource_ref);
+                            UnionVariant {
+                                name: type_reference.name.as_ref().try_into().unwrap(),
+                                description: parameter
+                                    .description
+                                    .clone()
+                                    .map(|d| Comment::try_from(d).unwrap()),
+                                type_name: type_reference,
+                            }
+                        }
+                        _ => unreachable!(),
+                    })
+                    .collect();
+
+                UnionDetail::SealedClass { variants }
+            } else {
+                unreachable!("Mixed union types (object + enum) are not supported")
             }
         })
     }
@@ -247,14 +325,17 @@ impl ResourceProcessor {
                     path: path.clone(),
                     name: parent.name.clone(),
                 };
-                for variant in parent.variants.iter() {
-                    union_parents
-                        .entry(variant.type_name.path.clone())
-                        .or_insert(vec![])
-                        .push(UnionParent::Union {
-                            parent: parent_ref.clone(),
-                            variant_name: variant.name.clone(),
-                        });
+                // SealedClass에만 variants가 있음
+                if let UnionDetail::SealedClass { variants } = &parent.detail {
+                    for variant in variants.iter() {
+                        union_parents
+                            .entry(variant.type_name.path.clone())
+                            .or_insert(vec![])
+                            .push(UnionParent::Union {
+                                parent: parent_ref.clone(),
+                                variant_name: variant.name.clone(),
+                            });
+                    }
                 }
             }
         }
@@ -340,30 +421,19 @@ impl ResourceProcessor {
             ParameterType::Union {
                 types,
                 hide_if_empty: _,
-            } => Some(Entity::Union(Union {
-                name: name.clone(),
-                description: parameter
-                    .description
-                    .clone()
-                    .map(|d| Comment::try_from(d).unwrap()),
-                variants: types
-                    .iter()
-                    .map(|parameter| match &parameter.r#type {
-                        ParameterType::ResourceRef(resource_ref) => {
-                            let type_reference = Self::resource_ref_to_type_reference(resource_ref);
-                            UnionVariant {
-                                name: type_reference.name.as_ref().try_into().unwrap(),
-                                description: parameter
-                                    .description
-                                    .clone()
-                                    .map(|d| Comment::try_from(d).unwrap()),
-                                type_name: type_reference,
-                            }
-                        }
-                        _ => unreachable!(),
-                    })
-                    .collect(),
-            })),
+            } => {
+                // Analyze union variant types
+                let detail = Self::analyze_and_build_union_detail(types, &self);
+
+                Some(Entity::Union(Union {
+                    name: name.clone(),
+                    description: parameter
+                        .description
+                        .clone()
+                        .map(|d| Comment::try_from(d).unwrap()),
+                    detail,
+                }))
+            }
             ParameterType::Intersection {
                 types,
                 hide_if_empty: _,
@@ -562,16 +632,52 @@ impl ResourceProcessor {
                     content
                 }
                 Entity::Union(union) => {
-                    let variants_refs = union.variants.iter().map(|variant| &variant.type_name);
-                    let mut imports = variants_refs
-                        .map(|reference| {
-                            Self::type_reference_to_import_path(reference, import_base_path)
-                        })
-                        .collect::<Vec<_>>();
+                    let mut imports: Vec<String> = match &union.detail {
+                        UnionDetail::FlattenedObject { fields } => {
+                            // FlattenedObject: fields의 TypeReference import
+                            fields
+                                .iter()
+                                .filter_map(|field| {
+                                    if let ScalarType::TypeReference(reference) =
+                                        &field.value_type.scalar
+                                    {
+                                        Some(Self::type_reference_to_import_path(
+                                            reference,
+                                            import_base_path,
+                                        ))
+                                    } else {
+                                        None
+                                    }
+                                })
+                                .collect()
+                        }
+                        UnionDetail::SealedClass { variants } => {
+                            // SealedClass: variants의 type_name import
+                            variants
+                                .iter()
+                                .map(|variant| {
+                                    Self::type_reference_to_import_path(
+                                        &variant.type_name,
+                                        import_base_path,
+                                    )
+                                })
+                                .collect()
+                        }
+                    };
 
                     // Add Parcelize imports
                     imports.push("android.os.Parcelable".to_string());
                     imports.push("kotlinx.parcelize.Parcelize".to_string());
+
+                    // Add RawValue import if any field is JSON type (for FlattenedObject)
+                    if let UnionDetail::FlattenedObject { fields } = &union.detail {
+                        let has_json_field = fields
+                            .iter()
+                            .any(|field| matches!(field.value_type.scalar, ScalarType::Json));
+                        if has_json_field {
+                            imports.push("kotlinx.parcelize.RawValue".to_string());
+                        }
+                    }
 
                     imports.sort();
                     imports.dedup();
