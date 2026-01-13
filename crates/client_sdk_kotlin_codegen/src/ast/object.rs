@@ -305,6 +305,7 @@ class IssueBillingKeyRequestUnionPaypal : Parcelable {
  */
 @Parcelize
 data class Address(
+    val country: Country? = null,
     /**
      * **일반주소**
      */
@@ -313,7 +314,6 @@ data class Address(
      * **상세주소**
      */
     val addressLine2: String,
-    val country: Country? = null,
     /**
      * **도시**
      */
