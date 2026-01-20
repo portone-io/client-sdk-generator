@@ -1,5 +1,7 @@
 # @portone/client-sdk-generator-darwin-arm64
 
+## 0.3.0
+
 ## 0.2.0
 
 ## 0.1.4

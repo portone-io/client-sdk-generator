@@ -1,5 +1,11 @@
 # @portone/client-sdk-generator
 
+## 0.3.0
+
+### Minor Changes
+
+- [#31](https://github.com/portone-io/client-sdk-generator/pull/31) [`aa81760`](https://github.com/portone-io/client-sdk-generator/commit/aa81760027fa99cd9a00368b175c9fbbc216ffc4) Thanks [@CirnoV](https://github.com/CirnoV)! - Kotlin (Android) 코드젠 구현
+
 ## 0.2.0
 
 ### Minor Changes
