@@ -1,5 +1,7 @@
 # @portone/client-sdk-generator-linux-arm64-musl
 
+## 0.3.0
+
 ## 0.2.0
 
 ## 0.1.4
