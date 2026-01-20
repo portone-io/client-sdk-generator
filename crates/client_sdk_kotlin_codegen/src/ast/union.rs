@@ -37,6 +37,15 @@ impl fmt::Display for Union {
             writeln!(f, " */")?;
         }
 
+        for variant in self.variants.iter() {
+            writeln!(
+                f,
+                "private typealias _{type_name} = {type_name}",
+                type_name = variant.type_name.name.as_ref()
+            )?;
+        }
+        writeln!(f)?;
+
         // Sealed class declaration
         writeln!(f, "@Parcelize")?;
         writeln!(
@@ -59,9 +68,9 @@ impl fmt::Display for Union {
                 writeln!(f, "{indent}@Parcelize")?;
                 writeln!(
                     f,
-                    "{indent}data class {variant_name}(val value: {variant_type}) : {name}()",
+                    "{indent}data class {variant_name}(val value: _{type_name}) : {name}()",
                     variant_name = capitalize_first(variant.name.as_ref()),
-                    variant_type = variant.type_name.name.as_ref(),
+                    type_name = variant.type_name.name.as_ref(),
                     name = self.name.as_ref(),
                 )?;
             }
@@ -124,12 +133,15 @@ mod tests {
         };
         assert_eq!(
             union.to_string(),
-            r#"@Parcelize
+            r#"private typealias _PaymentUIType = PaymentUIType
+private typealias _IssueBillingKeyUIType = IssueBillingKeyUIType
+
+@Parcelize
 sealed class LoadableUIType : Parcelable {
     @Parcelize
-    data class PaymentUiType(val value: PaymentUIType) : LoadableUIType()
+    data class PaymentUiType(val value: _PaymentUIType) : LoadableUIType()
     @Parcelize
-    data class IssueBillingKeyUiType(val value: IssueBillingKeyUIType) : LoadableUIType()
+    data class IssueBillingKeyUiType(val value: _IssueBillingKeyUIType) : LoadableUIType()
 
     fun toJson(): Any = when (this) {
         is PaymentUiType -> value.toJson()
