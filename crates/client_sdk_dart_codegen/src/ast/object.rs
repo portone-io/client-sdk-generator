@@ -11,6 +11,7 @@ pub struct Object {
     pub fields: Vec<ObjectField>,
     pub union_parents: Vec<UnionParent>,
     pub is_one_of: bool,
+    pub skip_from_json: bool,
 }
 
 impl fmt::Display for Object {
@@ -24,34 +25,36 @@ impl fmt::Display for Object {
             {
                 let indent = Indent(1);
                 writeln!(f, "{indent}Map<String, dynamic> toJson();")?;
-                // fromJson static method for sealed class — dispatch by key
-                writeln!(
-                    f,
-                    "{indent}static {name} fromJson(Map<String, dynamic> json) {{",
-                    name = self.name.as_ref()
-                )?;
-                {
-                    let indent = Indent(2);
-                    for field in self.fields.iter() {
-                        let subclass_name = format!(
-                            "{}{}",
-                            self.name.as_ref(),
-                            capitalize_first(field.name.as_ref())
-                        );
-                        writeln!(
-                            f,
-                            "{indent}if (json.containsKey('{serialized_name}')) return {subclass_name}.fromJson(json);",
-                            serialized_name = field.serialized_name,
-                        )?;
-                    }
+                if !self.skip_from_json {
+                    // fromJson static method for sealed class — dispatch by key
                     writeln!(
                         f,
-                        "{indent}throw ArgumentError('Unknown {name} variant');",
+                        "{indent}static {name} fromJson(Map<String, dynamic> json) {{",
                         name = self.name.as_ref()
                     )?;
+                    {
+                        let indent = Indent(2);
+                        for field in self.fields.iter() {
+                            let subclass_name = format!(
+                                "{}{}",
+                                self.name.as_ref(),
+                                capitalize_first(field.name.as_ref())
+                            );
+                            writeln!(
+                                f,
+                                "{indent}if (json.containsKey('{serialized_name}')) return {subclass_name}.fromJson(json);",
+                                serialized_name = field.serialized_name,
+                            )?;
+                        }
+                        writeln!(
+                            f,
+                            "{indent}throw ArgumentError('Unknown {name} variant');",
+                            name = self.name.as_ref()
+                        )?;
+                    }
+                    let indent = Indent(1);
+                    writeln!(f, "{indent}}}")?;
                 }
-                let indent = Indent(1);
-                writeln!(f, "{indent}}}")?;
             }
             writeln!(f, "}}")?;
 
@@ -79,20 +82,22 @@ impl fmt::Display for Object {
                         "{indent}{subclass_name}(this.{field_name});",
                         field_name = field.name.as_ref()
                     )?;
-                    // fromJson static method for subclass
-                    let from_json = FromJson {
-                        serialized_name: &field.serialized_name,
-                        is_list: field.value_type.is_list,
-                        scalar: &field.value_type.scalar,
-                        is_required: field.value_type.is_required,
-                    };
-                    writeln!(
-                        f,
-                        "{indent}static {subclass_name} fromJson(Map<String, dynamic> json) =>"
-                    )?;
-                    {
-                        let indent = Indent(3);
-                        writeln!(f, "{indent}{subclass_name}({from_json});")?;
+                    if !self.skip_from_json {
+                        // fromJson static method for subclass
+                        let from_json = FromJson {
+                            serialized_name: &field.serialized_name,
+                            is_list: field.value_type.is_list,
+                            scalar: &field.value_type.scalar,
+                            is_required: field.value_type.is_required,
+                        };
+                        writeln!(
+                            f,
+                            "{indent}static {subclass_name} fromJson(Map<String, dynamic> json) =>"
+                        )?;
+                        {
+                            let indent = Indent(3);
+                            writeln!(f, "{indent}{subclass_name}({from_json});")?;
+                        }
                     }
                     writeln!(f, "{indent}@override")?;
                     let to_json = ToJson {
@@ -117,11 +122,13 @@ impl fmt::Display for Object {
                 let indent = Indent(1);
                 if self.fields.is_empty() {
                     writeln!(f, "{indent}Map<String, dynamic> toJson() => {{}};")?;
-                    writeln!(
-                        f,
-                        "{indent}static {name} fromJson(Map<String, dynamic> json) => {name}();",
-                        name = self.name.as_ref()
-                    )?;
+                    if !self.skip_from_json {
+                        writeln!(
+                            f,
+                            "{indent}static {name} fromJson(Map<String, dynamic> json) => {name}();",
+                            name = self.name.as_ref()
+                        )?;
+                    }
                 } else {
                     for field in self.fields.iter() {
                         for comment in field.description.iter().flat_map(Comment::lines) {
@@ -179,29 +186,31 @@ impl fmt::Display for Object {
                         }
                     }
                     writeln!(f, "{indent}}};")?;
-                    writeln!(f)?;
-                    writeln!(
-                        f,
-                        "{indent}static {name} fromJson(Map<String, dynamic> json) => {name}(",
-                        name = self.name.as_ref()
-                    )?;
-                    {
-                        let indent = Indent(2);
-                        for field in self.fields.iter() {
-                            let from_json = FromJson {
-                                serialized_name: &field.serialized_name,
-                                is_list: field.value_type.is_list,
-                                scalar: &field.value_type.scalar,
-                                is_required: field.value_type.is_required,
-                            };
-                            writeln!(
-                                f,
-                                "{indent}{field_name}: {from_json},",
-                                field_name = field.name.as_ref(),
-                            )?;
+                    if !self.skip_from_json {
+                        writeln!(f)?;
+                        writeln!(
+                            f,
+                            "{indent}static {name} fromJson(Map<String, dynamic> json) => {name}(",
+                            name = self.name.as_ref()
+                        )?;
+                        {
+                            let indent = Indent(2);
+                            for field in self.fields.iter() {
+                                let from_json = FromJson {
+                                    serialized_name: &field.serialized_name,
+                                    is_list: field.value_type.is_list,
+                                    scalar: &field.value_type.scalar,
+                                    is_required: field.value_type.is_required,
+                                };
+                                writeln!(
+                                    f,
+                                    "{indent}{field_name}: {from_json},",
+                                    field_name = field.name.as_ref(),
+                                )?;
+                            }
                         }
+                        writeln!(f, "{indent});")?;
                     }
-                    writeln!(f, "{indent});")?;
                 }
                 if !self.union_parents.is_empty() {
                     writeln!(f)?;
@@ -233,6 +242,7 @@ pub struct ObjectField {
     pub serialized_name: String,
     pub value_type: CompositeType,
     pub description: Option<Comment>,
+    pub import_alias: Option<String>,
 }
 
 struct ToJson<'a> {
@@ -330,10 +340,14 @@ impl fmt::Display for FromJson<'_> {
 impl fmt::Display for ObjectField {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let nullable = if self.value_type.is_required { "" } else { "?" };
+        let type_prefix = match &self.import_alias {
+            Some(alias) => format!("{alias}."),
+            None => String::new(),
+        };
         if self.value_type.is_list {
-            write!(f, "List<{type}>{nullable} {name}", type = self.value_type.scalar.to_identifier(), name = self.name.as_ref())
+            write!(f, "List<{type_prefix}{type}>{nullable} {name}", type = self.value_type.scalar.to_identifier(), name = self.name.as_ref())
         } else {
-            write!(f, "{type}{nullable} {name}", type = self.value_type.scalar.to_identifier(), name = self.name.as_ref())
+            write!(f, "{type_prefix}{type}{nullable} {name}", type = self.value_type.scalar.to_identifier(), name = self.name.as_ref())
         }
     }
 }
@@ -358,6 +372,7 @@ mod tests {
                 },
                 variant_name: Identifier::try_from("test").unwrap(),
             }],
+            skip_from_json: false,
         };
         assert_eq!(
             object.to_string(),
@@ -390,6 +405,7 @@ class Test {
                         is_required: false,
                     },
                     description: None,
+                    import_alias: None,
                 },
                 ObjectField {
                     name: Identifier::try_from("addressLine1").unwrap(),
@@ -400,6 +416,7 @@ class Test {
                         is_required: true,
                     },
                     description: Some(Comment::try_from("**일반주소**").unwrap()),
+                    import_alias: None,
                 },
                 ObjectField {
                     name: Identifier::try_from("addressLine2").unwrap(),
@@ -410,6 +427,7 @@ class Test {
                         is_required: true,
                     },
                     description: Some(Comment::try_from("**상세주소**").unwrap()),
+                    import_alias: None,
                 },
                 ObjectField {
                     name: Identifier::try_from("city").unwrap(),
@@ -420,6 +438,7 @@ class Test {
                         is_required: false,
                     },
                     description: Some(Comment::try_from("**도시**").unwrap()),
+                    import_alias: None,
                 },
                 ObjectField {
                     name: Identifier::try_from("province").unwrap(),
@@ -430,10 +449,12 @@ class Test {
                         is_required: false,
                     },
                     description: Some(Comment::try_from("**주, 도, 시**").unwrap()),
+                    import_alias: None,
                 },
             ],
             is_one_of: false,
             union_parents: vec![],
+            skip_from_json: false,
         };
         assert_eq!(
             object.to_string(),
@@ -495,6 +516,7 @@ class Address {
                         is_required: false,
                     },
                     description: None,
+                    import_alias: Some("_offer_period_range".to_string()),
                 },
                 ObjectField {
                     name: Identifier::try_from("unit").unwrap(),
@@ -508,27 +530,22 @@ class Address {
                         is_required: true,
                     },
                     description: None,
+                    import_alias: None,
                 },
             ],
             is_one_of: true,
             union_parents: vec![],
+            skip_from_json: true,
         };
         assert_eq!(
             object.to_string(),
             r"sealed class OfferPeriod {
     Map<String, dynamic> toJson();
-    static OfferPeriod fromJson(Map<String, dynamic> json) {
-        if (json.containsKey('range')) return OfferPeriodRange.fromJson(json);
-        if (json.containsKey('unit')) return OfferPeriodUnit.fromJson(json);
-        throw ArgumentError('Unknown OfferPeriod variant');
-    }
 }
 
 class OfferPeriodRange extends OfferPeriod {
-    final OfferPeriodRange? range;
+    final _offer_period_range.OfferPeriodRange? range;
     OfferPeriodRange(this.range);
-    static OfferPeriodRange fromJson(Map<String, dynamic> json) =>
-            OfferPeriodRange(json['range'] != null ? OfferPeriodRange.fromJson(json['range']) : null);
     @override
     Map<String, dynamic> toJson() => {'range': range?.toJson()};
 }
@@ -536,8 +553,6 @@ class OfferPeriodRange extends OfferPeriod {
 class OfferPeriodUnit extends OfferPeriod {
     final OfferPeriodUnit unit;
     OfferPeriodUnit(this.unit);
-    static OfferPeriodUnit fromJson(Map<String, dynamic> json) =>
-            OfferPeriodUnit(OfferPeriodUnit.fromJson(json['unit']));
     @override
     Map<String, dynamic> toJson() => {'unit': unit.toJson()};
 }
@@ -563,6 +578,7 @@ class OfferPeriodUnit extends OfferPeriod {
                         Comment::try_from("**구매자가 선택할 수 없도록 고정된 할부 개월수**")
                             .unwrap(),
                     ),
+                    import_alias: None,
                 },
                 ObjectField {
                     name: Identifier::try_from("availableMonthList").unwrap(),
@@ -576,10 +592,12 @@ class OfferPeriodUnit extends OfferPeriod {
                         Comment::try_from("**구매자가 선택할 수 있는 할부 개월수 리스트**")
                             .unwrap(),
                     ),
+                    import_alias: None,
                 },
             ],
             is_one_of: true,
             union_parents: vec![],
+            skip_from_json: false,
         };
         assert_eq!(
             object.to_string(),

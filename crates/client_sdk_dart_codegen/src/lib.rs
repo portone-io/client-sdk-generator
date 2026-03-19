@@ -1,8 +1,9 @@
 use std::{collections::HashMap, path::Path};
 
 use ast::{
-    Comment, CompositeType, Enum, EnumVariant, Identifier, Intersection, IntersectionConstituent,
-    Object, ObjectField, ScalarType, TypeReference, Union, UnionParent, UnionVariant,
+    capitalize_first, Comment, CompositeType, Enum, EnumVariant, Identifier, Intersection,
+    IntersectionConstituent, Object, ObjectField, ScalarType, TypeReference, Union, UnionParent,
+    UnionVariant,
 };
 use client_sdk_schema::{Parameter, ParameterType, RESOURCE_INDEX, Resource, ResourceRef};
 use client_sdk_utils::write_generated_file;
@@ -140,6 +141,7 @@ impl ResourceProcessor {
                                         .description
                                         .clone()
                                         .map(|d| Comment::try_from(d).unwrap()),
+                                    import_alias: None,
                                 };
                             }
                             ParameterType::ResourceRef(r) => {
@@ -161,6 +163,7 @@ impl ResourceProcessor {
             serialized_name: name.to_string(),
             value_type,
             description: Self::build_field_description(parameter),
+            import_alias: None,
         }
     }
 
@@ -275,6 +278,7 @@ impl ResourceProcessor {
                 fields: Self::build_field_list(properties.iter()),
                 is_one_of: false,
                 union_parents: vec![],
+                skip_from_json: false,
             })),
             ParameterType::EmptyObject => Some(Entity::Object(Object {
                 name: name.clone(),
@@ -285,6 +289,7 @@ impl ResourceProcessor {
                 fields: vec![],
                 is_one_of: false,
                 union_parents: vec![],
+                skip_from_json: false,
             })),
             ParameterType::Enum { variants, .. } => Some(Entity::Enum(Enum {
                 name: name.clone(),
@@ -321,6 +326,7 @@ impl ResourceProcessor {
                 fields: Self::build_field_list(properties.iter()),
                 is_one_of: true,
                 union_parents: vec![],
+                skip_from_json: false,
             })),
             ParameterType::Union {
                 types,
@@ -404,6 +410,7 @@ impl ResourceProcessor {
                     constituents,
                     fields: all_fields,
                     union_parents: vec![],
+                    skip_from_json: false,
                 }))
             }
             _ => None,
@@ -444,31 +451,55 @@ impl ResourceProcessor {
             }
 
             let content = match entity {
-                Entity::Object(object) => {
-                    let fields_refs = object.fields.iter().flat_map(|field| {
-                        if let ScalarType::TypeReference(reference) = &field.value_type.scalar {
-                            Some(reference)
-                        } else {
-                            None
+                Entity::Object(mut object) => {
+                    // response/ 가 아니면 fromJson 생략
+                    object.skip_from_json = !path.starts_with("response/");
+
+                    // OneOf 이름 충돌 감지
+                    if object.is_one_of {
+                        let parent_name = object.name.as_ref().to_string();
+                        for field in &mut object.fields {
+                            let subclass_name = format!(
+                                "{}{}",
+                                parent_name,
+                                capitalize_first(field.name.as_ref())
+                            );
+                            if let ScalarType::TypeReference(type_ref) = &field.value_type.scalar
+                                && type_ref.name.as_ref() == subclass_name {
+                                    field.import_alias = Some(format!(
+                                        "_{}",
+                                        type_ref.name.as_ref().to_case(Case::Snake)
+                                    ));
+                                }
                         }
-                    });
-                    let union_parents_refs = object
-                        .union_parents
-                        .iter()
-                        .map(|UnionParent::Union { parent, .. }| parent);
-                    let mut imports = fields_refs
-                        .chain(union_parents_refs)
-                        .map(|reference| {
-                            Self::type_reference_to_import_path(reference, import_base_path)
-                        })
-                        .collect::<Vec<_>>();
-                    imports.sort();
-                    imports.dedup();
+                    }
+
+                    // Build imports with alias support
+                    let mut import_entries: Vec<(String, Option<String>)> = Vec::new();
+                    for field in object.fields.iter() {
+                        if let ScalarType::TypeReference(reference) = &field.value_type.scalar {
+                            let import_path =
+                                Self::type_reference_to_import_path(reference, import_base_path);
+                            import_entries.push((import_path, field.import_alias.clone()));
+                        }
+                    }
+                    for parent in object.union_parents.iter() {
+                        let UnionParent::Union { parent, .. } = parent;
+                        let import_path =
+                            Self::type_reference_to_import_path(parent, import_base_path);
+                        import_entries.push((import_path, None));
+                    }
+                    import_entries.sort_by(|a, b| a.0.cmp(&b.0));
+                    import_entries.dedup_by(|a, b| a.0 == b.0);
 
                     use std::fmt::Write;
                     let mut content = String::new();
-                    for import in imports {
-                        writeln!(&mut content, "import '{import}';").unwrap();
+                    for (import_path, alias) in &import_entries {
+                        if let Some(alias) = alias {
+                            writeln!(&mut content, "import '{import_path}' as {alias};").unwrap();
+                        } else {
+                            writeln!(&mut content, "import '{import_path}';").unwrap();
+                        }
                     }
                     writeln!(content).unwrap();
                     write!(content, "{object}").unwrap();
@@ -518,7 +549,8 @@ impl ResourceProcessor {
                     content
                 }
 
-                Entity::Intersection(intersection) => {
+                Entity::Intersection(mut intersection) => {
+                    intersection.skip_from_json = !path.starts_with("response/");
                     let fields_refs = intersection.fields.iter().flat_map(|field| {
                         if let ScalarType::TypeReference(reference) = &field.value_type.scalar {
                             Some(reference)

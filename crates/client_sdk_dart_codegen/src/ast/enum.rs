@@ -41,7 +41,6 @@ impl fmt::Display for Enum {
                 name = self.name.as_ref()
             )?;
             writeln!(f, "{indent}String toJson() => _value;")?;
-            writeln!(f, "{indent}static {name} fromJson(String value) => values.firstWhere((e) => e._value == value);", name = self.name.as_ref())?;
 
             // Union parent conversion methods
             for parent in self.union_parents.iter() {
@@ -116,7 +115,6 @@ enum Test1 {
     final String _value;
     const Test1(String value) : _value = value;
     String toJson() => _value;
-    static Test1 fromJson(String value) => values.firstWhere((e) => e._value == value);
 }
 "
         );
@@ -148,7 +146,6 @@ enum Test1 {
     final String _value;
     const PaymentUIType(String value) : _value = value;
     String toJson() => _value;
-    static PaymentUIType fromJson(String value) => values.firstWhere((e) => e._value == value);
     LoadableUIType toLoadableUIType() => LoadableUITypePaymentUiType(this);
 }
 "

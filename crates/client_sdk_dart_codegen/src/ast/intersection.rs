@@ -11,6 +11,7 @@ pub struct Intersection {
     pub constituents: Vec<IntersectionConstituent>,
     pub fields: Vec<ObjectField>,
     pub union_parents: Vec<UnionParent>,
+    pub skip_from_json: bool,
 }
 
 pub struct IntersectionConstituent {
@@ -28,11 +29,13 @@ impl fmt::Display for Intersection {
             let indent = Indent(1);
             if self.fields.is_empty() {
                 writeln!(f, "{indent}Map<String, dynamic> toJson() => {{}};")?;
-                writeln!(
-                    f,
-                    "{indent}static {name} fromJson(Map<String, dynamic> json) => {name}();",
-                    name = self.name.as_ref()
-                )?;
+                if !self.skip_from_json {
+                    writeln!(
+                        f,
+                        "{indent}static {name} fromJson(Map<String, dynamic> json) => {name}();",
+                        name = self.name.as_ref()
+                    )?;
+                }
             } else {
                 for field in self.fields.iter() {
                     for comment in field.description.iter().flat_map(Comment::lines) {
@@ -90,29 +93,31 @@ impl fmt::Display for Intersection {
                     }
                 }
                 writeln!(f, "{indent}}};")?;
-                writeln!(f)?;
-                writeln!(
-                    f,
-                    "{indent}static {name} fromJson(Map<String, dynamic> json) => {name}(",
-                    name = self.name.as_ref()
-                )?;
-                {
-                    let indent = Indent(2);
-                    for field in self.fields.iter() {
-                        let from_json = FromJson {
-                            serialized_name: &field.serialized_name,
-                            is_list: field.value_type.is_list,
-                            scalar: &field.value_type.scalar,
-                            is_required: field.value_type.is_required,
-                        };
-                        writeln!(
-                            f,
-                            "{indent}{field_name}: {from_json},",
-                            field_name = field.name.as_ref(),
-                        )?;
+                if !self.skip_from_json {
+                    writeln!(f)?;
+                    writeln!(
+                        f,
+                        "{indent}static {name} fromJson(Map<String, dynamic> json) => {name}(",
+                        name = self.name.as_ref()
+                    )?;
+                    {
+                        let indent = Indent(2);
+                        for field in self.fields.iter() {
+                            let from_json = FromJson {
+                                serialized_name: &field.serialized_name,
+                                is_list: field.value_type.is_list,
+                                scalar: &field.value_type.scalar,
+                                is_required: field.value_type.is_required,
+                            };
+                            writeln!(
+                                f,
+                                "{indent}{field_name}: {from_json},",
+                                field_name = field.name.as_ref(),
+                            )?;
+                        }
                     }
+                    writeln!(f, "{indent});")?;
                 }
-                writeln!(f, "{indent});")?;
             }
             if !self.union_parents.is_empty() {
                 writeln!(f)?;
@@ -265,6 +270,7 @@ mod tests {
                         is_required: true,
                     },
                     description: Some(Comment::try_from("결제 금액").unwrap()),
+                    import_alias: None,
                 },
                 ObjectField {
                     name: Identifier::try_from("currency").unwrap(),
@@ -275,6 +281,7 @@ mod tests {
                         is_required: true,
                     },
                     description: Some(Comment::try_from("통화 코드").unwrap()),
+                    import_alias: None,
                 },
                 ObjectField {
                     name: Identifier::try_from("method").unwrap(),
@@ -288,6 +295,7 @@ mod tests {
                         is_required: true,
                     },
                     description: Some(Comment::try_from("결제 수단").unwrap()),
+                    import_alias: None,
                 },
                 ObjectField {
                     name: Identifier::try_from("cardInfo").unwrap(),
@@ -301,9 +309,11 @@ mod tests {
                         is_required: false,
                     },
                     description: Some(Comment::try_from("카드 정보").unwrap()),
+                    import_alias: None,
                 },
             ],
             union_parents: vec![],
+            skip_from_json: false,
         };
         assert_eq!(
             intersection.to_string(),
