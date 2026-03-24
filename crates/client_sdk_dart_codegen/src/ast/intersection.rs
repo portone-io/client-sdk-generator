@@ -1,8 +1,8 @@
 use core::fmt;
 
 use super::{
-    capitalize_first, Comment, Identifier, Indent, ObjectField, ScalarType, TypeReference,
-    UnionParent,
+    Comment, Identifier, Indent, ObjectField, ScalarType, TypeReference, UnionParent,
+    capitalize_first,
 };
 
 pub struct Intersection {
@@ -189,9 +189,15 @@ impl fmt::Display for FromJson<'_> {
                 ScalarType::TypeReference(type_ref) => {
                     let type_name = type_ref.name.as_ref();
                     if self.is_required {
-                        write!(f, "(json['{key}'] as List).map((e) => {type_name}.fromJson(e)).toList()")
+                        write!(
+                            f,
+                            "(json['{key}'] as List).map((e) => {type_name}.fromJson(e)).toList()"
+                        )
                     } else {
-                        write!(f, "(json['{key}'] as List?)?.map((e) => {type_name}.fromJson(e)).toList()")
+                        write!(
+                            f,
+                            "(json['{key}'] as List?)?.map((e) => {type_name}.fromJson(e)).toList()"
+                        )
                     }
                 }
                 scalar => {
@@ -220,7 +226,10 @@ impl fmt::Display for FromJson<'_> {
                     if self.is_required {
                         write!(f, "{type_name}.fromJson(json['{key}'])")
                     } else {
-                        write!(f, "json['{key}'] != null ? {type_name}.fromJson(json['{key}']) : null")
+                        write!(
+                            f,
+                            "json['{key}'] != null ? {type_name}.fromJson(json['{key}']) : null"
+                        )
                     }
                 }
                 scalar => {

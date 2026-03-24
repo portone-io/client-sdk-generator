@@ -1,6 +1,6 @@
 use std::fmt;
 
-use super::{capitalize_first, Comment, Identifier, Indent, UnionParent};
+use super::{Comment, Identifier, Indent, UnionParent, capitalize_first};
 
 #[derive(Debug, Clone)]
 pub struct Enum {

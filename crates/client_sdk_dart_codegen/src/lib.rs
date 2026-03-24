@@ -1,9 +1,9 @@
 use std::{collections::HashMap, path::Path};
 
 use ast::{
-    capitalize_first, Comment, CompositeType, Enum, EnumVariant, Identifier, Intersection,
-    IntersectionConstituent, Object, ObjectField, ScalarType, TypeReference, Union, UnionParent,
-    UnionVariant,
+    Comment, CompositeType, Enum, EnumVariant, Identifier, Intersection, IntersectionConstituent,
+    Object, ObjectField, ScalarType, TypeReference, Union, UnionParent, UnionVariant,
+    capitalize_first,
 };
 use client_sdk_schema::{Parameter, ParameterType, RESOURCE_INDEX, Resource, ResourceRef};
 use client_sdk_utils::write_generated_file;
@@ -459,18 +459,16 @@ impl ResourceProcessor {
                     if object.is_one_of {
                         let parent_name = object.name.as_ref().to_string();
                         for field in &mut object.fields {
-                            let subclass_name = format!(
-                                "{}{}",
-                                parent_name,
-                                capitalize_first(field.name.as_ref())
-                            );
+                            let subclass_name =
+                                format!("{}{}", parent_name, capitalize_first(field.name.as_ref()));
                             if let ScalarType::TypeReference(type_ref) = &field.value_type.scalar
-                                && type_ref.name.as_ref() == subclass_name {
-                                    field.import_alias = Some(format!(
-                                        "_{}",
-                                        type_ref.name.as_ref().to_case(Case::Snake)
-                                    ));
-                                }
+                                && type_ref.name.as_ref() == subclass_name
+                            {
+                                field.import_alias = Some(format!(
+                                    "_{}",
+                                    type_ref.name.as_ref().to_case(Case::Snake)
+                                ));
+                            }
                         }
                     }
 

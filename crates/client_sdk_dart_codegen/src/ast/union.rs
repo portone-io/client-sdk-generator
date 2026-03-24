@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::ast::Indent;
 
-use super::{capitalize_first, Comment, Identifier, TypeReference};
+use super::{Comment, Identifier, TypeReference, capitalize_first};
 
 #[derive(Debug, Clone)]
 pub enum UnionParent {

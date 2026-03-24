@@ -37,15 +37,15 @@ fn normalize_identifier(s: &str) -> String {
 
     // Handle Dart reserved keywords
     match normalized.as_str() {
-        "abstract" | "as" | "assert" | "async" | "await" | "break" | "case" | "catch"
-        | "class" | "const" | "continue" | "covariant" | "default" | "deferred" | "do"
-        | "dynamic" | "else" | "enum" | "export" | "extends" | "extension" | "external"
-        | "factory" | "false" | "final" | "finally" | "for" | "Function" | "get" | "hide"
-        | "if" | "implements" | "import" | "in" | "interface" | "is" | "late" | "library"
-        | "mixin" | "new" | "null" | "of" | "on" | "operator" | "part" | "required"
-        | "rethrow" | "return" | "sealed" | "set" | "show" | "static" | "super" | "switch"
-        | "sync" | "this" | "throw" | "true" | "try" | "typedef" | "var" | "void" | "when"
-        | "while" | "with" | "yield" => format!("${normalized}"),
+        "abstract" | "as" | "assert" | "async" | "await" | "break" | "case" | "catch" | "class"
+        | "const" | "continue" | "covariant" | "default" | "deferred" | "do" | "dynamic"
+        | "else" | "enum" | "export" | "extends" | "extension" | "external" | "factory"
+        | "false" | "final" | "finally" | "for" | "Function" | "get" | "hide" | "if"
+        | "implements" | "import" | "in" | "interface" | "is" | "late" | "library" | "mixin"
+        | "new" | "null" | "of" | "on" | "operator" | "part" | "required" | "rethrow"
+        | "return" | "sealed" | "set" | "show" | "static" | "super" | "switch" | "sync"
+        | "this" | "throw" | "true" | "try" | "typedef" | "var" | "void" | "when" | "while"
+        | "with" | "yield" => format!("${normalized}"),
         _ => normalized,
     }
 }
