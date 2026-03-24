@@ -66,7 +66,7 @@ fn main() {
                         client_sdk_dart_codegen::generate_resources_module(
                             &schema.resources,
                             &out_dir,
-                            "package:portone_flutter_sdk",
+                            "package:portone_flutter/v2/model",
                         );
                     });
                     let mut child = std::process::Command::new("dart")

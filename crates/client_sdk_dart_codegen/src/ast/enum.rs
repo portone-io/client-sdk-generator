@@ -1,6 +1,6 @@
 use std::fmt;
 
-use super::{Comment, Identifier, Indent, UnionParent};
+use super::{Comment, Identifier, Indent, UnionParent, capitalize_first};
 
 #[derive(Debug, Clone)]
 pub struct Enum {
@@ -41,6 +41,23 @@ impl fmt::Display for Enum {
                 name = self.name.as_ref()
             )?;
             writeln!(f, "{indent}String toJson() => _value;")?;
+
+            // Union parent conversion methods
+            for parent in self.union_parents.iter() {
+                match parent {
+                    UnionParent::Union {
+                        parent,
+                        variant_name,
+                    } => {
+                        writeln!(
+                            f,
+                            "{indent}{parent_name} to{parent_name}() => {parent_name}{variant_pascal}(this);",
+                            parent_name = parent.name.as_ref(),
+                            variant_pascal = capitalize_first(variant_name.as_ref()),
+                        )?;
+                    }
+                }
+            }
         }
         writeln!(f, "}}")
     }
@@ -60,6 +77,8 @@ impl fmt::Display for EnumVariant {
 
 #[cfg(test)]
 mod tests {
+    use crate::ast::TypeReference;
+
     use super::*;
 
     #[test]
@@ -96,6 +115,38 @@ enum Test1 {
     final String _value;
     const Test1(String value) : _value = value;
     String toJson() => _value;
+}
+"
+        );
+    }
+
+    #[test]
+    fn enum_with_union_parent() {
+        let enum_entity = Enum {
+            name: Identifier::try_from("PaymentUIType").unwrap(),
+            description: None,
+            variants: vec![EnumVariant {
+                name: Identifier::try_from("PAYPAL_SPB").unwrap(),
+                value: "PAYPAL_SPB".into(),
+                description: None,
+            }],
+            union_parents: vec![UnionParent::Union {
+                parent: TypeReference {
+                    name: Identifier::try_from("LoadableUIType").unwrap(),
+                    path: "".into(),
+                },
+                variant_name: Identifier::try_from("paymentUiType").unwrap(),
+            }],
+        };
+        assert_eq!(
+            enum_entity.to_string(),
+            r"enum PaymentUIType {
+    PAYPAL_SPB('PAYPAL_SPB');
+
+    final String _value;
+    const PaymentUIType(String value) : _value = value;
+    String toJson() => _value;
+    LoadableUIType toLoadableUIType() => LoadableUITypePaymentUiType(this);
 }
 "
         );
