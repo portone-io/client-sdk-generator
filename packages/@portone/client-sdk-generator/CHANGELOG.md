@@ -1,13 +1,5 @@
 # @portone/client-sdk-generator
 
-## 0.4.0
-
-### Minor Changes
-
-- [`3c7f89d`](https://github.com/portone-io/client-sdk-generator/commit/3c7f89dbdc009957b514d0f0259976d3c6e262df) Thanks [@CirnoV](https://github.com/CirnoV)! - Dart 코드젠 재작성
-
-- [#35](https://github.com/portone-io/client-sdk-generator/pull/35) [`f48f216`](https://github.com/portone-io/client-sdk-generator/commit/f48f2163a7c8e21313c89d44deb1efc8d69e1df2) Thanks [@CirnoV](https://github.com/CirnoV)! - Swift 코드젠 작성
-
 ## 0.3.0
 
 ### Minor Changes
