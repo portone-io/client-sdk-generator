@@ -34,6 +34,8 @@ enum Generator {
     Dart,
     #[clap(name = "kotlin")]
     Kotlin,
+    #[clap(name = "swift")]
+    Swift,
 }
 
 fn load_schema(path: &PathBuf) -> Schema {
@@ -95,6 +97,30 @@ fn main() {
                     {
                         let mut child = std::process::Command::new("ktlint")
                             .arg("-F")
+                            .arg(&out_dir)
+                            .spawn()
+                            .unwrap();
+                        child.wait().unwrap();
+                    }
+                }
+                Generator::Swift => {
+                    println!("Generating Swift code");
+                    let schema: Schema = load_schema(&args.schema);
+                    let resource_index = schema.build_resource_index();
+                    RESOURCE_INDEX.set(&resource_index, || {
+                        client_sdk_swift_codegen::generate_resources_module(
+                            &schema.resources,
+                            &out_dir,
+                            "PortOneSDK",
+                        );
+                    });
+                    // Optional: Run swiftformat if available
+                    if std::process::Command::new("swiftformat")
+                        .arg("--version")
+                        .output()
+                        .is_ok()
+                    {
+                        let mut child = std::process::Command::new("swiftformat")
                             .arg(&out_dir)
                             .spawn()
                             .unwrap();
