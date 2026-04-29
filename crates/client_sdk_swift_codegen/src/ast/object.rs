@@ -500,10 +500,10 @@ public enum MonthOption: Codable {
 public struct CustomData: Codable {
     public let id: String
     /// **추가 메타데이터**
-    public let metadata: [String: Any]
+    public let metadata: JSONValue
     public let tags: [String]?
 
-    public init(id: String, metadata: [String: Any], tags: [String]? = nil) {
+    public init(id: String, metadata: JSONValue, tags: [String]? = nil) {
         self.id = id
         self.metadata = metadata
         self.tags = tags
