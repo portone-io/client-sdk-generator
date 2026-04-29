@@ -13,19 +13,30 @@ env:
   INPUT_VERSION: ${{ inputs.version }}
   CARGO_TERM_COLOR: always
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.version }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   version:
     name: Generate version
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     outputs:
       version: ${{ env.version }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js 22.x
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
+          package-manager-cache: false
 
       - name: Set beta version
         run: |
@@ -57,6 +68,8 @@ jobs:
 
     name: Package ${{ matrix.code-target }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
 
     env:
       version: ${{ needs.version.outputs.version }}
@@ -66,9 +79,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
       - name: Install Rust toolchain
-        run: rustup target add ${{ matrix.target }}
+        run: rustup target add "$TARGET"
+        env:
+          TARGET: ${{ matrix.target }}
 
       - name: Install musl toolchain
         if: matrix.code-target == 'linux-x64-musl' || matrix.code-target == 'linux-arm64-musl'
@@ -88,8 +105,9 @@ jobs:
 
       # Build the Client SDK Generator binary
       - name: Build binaries
-        run: cargo build -p client_sdk_generator --release --target ${{ matrix.target }}
+        run: cargo build -p client_sdk_generator --release --target "$TARGET"
         env:
+          TARGET: ${{ matrix.target }}
           # Strip all debug symbols from the resulting binaries
           RUSTFLAGS: "-C strip=symbols -C codegen-units=1"
 
@@ -98,12 +116,18 @@ jobs:
         if: matrix.os == 'windows-2025'
         run: |
           mkdir dist
-          cp target/${{ matrix.target }}/release/portone-client-sdk-generator.exe ./dist/portone-client-sdk-generator-${{ matrix.code-target }}.exe
+          cp "target/$TARGET/release/portone-client-sdk-generator.exe" "./dist/portone-client-sdk-generator-$CODE_TARGET.exe"
+        env:
+          TARGET: ${{ matrix.target }}
+          CODE_TARGET: ${{ matrix.code-target }}
       - name: Copy Client SDK Generator binary
         if: matrix.os != 'windows-2025'
         run: |
           mkdir dist
-          cp target/${{ matrix.target }}/release/portone-client-sdk-generator ./dist/portone-client-sdk-generator-${{ matrix.code-target }}
+          cp "target/$TARGET/release/portone-client-sdk-generator" "./dist/portone-client-sdk-generator-$CODE_TARGET"
+        env:
+          TARGET: ${{ matrix.target }}
+          CODE_TARGET: ${{ matrix.code-target }}
 
       # Upload the Client SDK Generator binary as a build artifact
       - name: Upload Client SDK Generator artifact
@@ -128,6 +152,8 @@ jobs:
 
     name: Package ${{ matrix.code-target }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     container:
       image: rust:1.89.0-bullseye@sha256:8f72d971a31b278cebdb2eb64a44c3900ff27c716a4ef6f4db05946d10c9ae4e
 
@@ -139,6 +165,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
       - name: Set jemalloc page size for linux-arm64
         if: matrix.code-target == 'linux-arm64'
@@ -147,8 +175,9 @@ jobs:
 
       # Build the Client SDK Generator binary
       - name: Build binaries
-        run: cargo build -p client_sdk_generator --release --target ${{ matrix.target }}
+        run: cargo build -p client_sdk_generator --release --target "$TARGET"
         env:
+          TARGET: ${{ matrix.target }}
           # Strip all debug symbols from the resulting binaries
           RUSTFLAGS: "-C strip=symbols -C codegen-units=1"
 
@@ -156,7 +185,10 @@ jobs:
       - name: Copy Client SDK Generator binary
         run: |
           mkdir dist
-          cp target/${{ matrix.target }}/release/portone-client-sdk-generator ./dist/portone-client-sdk-generator-${{ matrix.code-target }}
+          cp "target/$TARGET/release/portone-client-sdk-generator" "./dist/portone-client-sdk-generator-$CODE_TARGET"
+        env:
+          TARGET: ${{ matrix.target }}
+          CODE_TARGET: ${{ matrix.code-target }}
 
       # Upload the Client SDK Generator binary as a build artifact
       - name: Upload Client SDK Generator artifact
@@ -166,18 +198,18 @@ jobs:
           path: ./dist/portone-client-sdk-generator-*
           if-no-files-found: error
 
-  publish:
-    name: Publish
+  package-npm:
+    name: Package npm
     runs-on: ubuntu-24.04
     needs:
       - build
       - build-gnu
-    environment: npm-publish
     permissions:
-      contents: write
-      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
       - name: Download Client SDK Generator artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
@@ -189,6 +221,7 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
 
       - name: Install pnpm
         uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
@@ -199,24 +232,71 @@ jobs:
       - name: Generate npm packages
         run: node packages/@portone/client-sdk-generator/scripts/generate-packages.js
 
-      - name: Publish npm packages as beta
+      - name: Pack npm packages
         run: |
+          mkdir npm-packages
           for package in packages/@portone/*; do
-            npm publish $package --tag beta --access public --provenance
+            npm pack "$package" --pack-destination npm-packages
           done
+
+      - name: Upload npm package tarballs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: npm-packages
+          path: npm-packages/*.tgz
+          if-no-files-found: error
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-24.04
+    needs:
+      - build
+      - build-gnu
+      - package-npm
+    environment: npm-publish
+    permissions:
+      contents: write # Required to create the GitHub release and tag.
+      id-token: write # Required for npm provenance during publish.
+    steps:
+      - name: Download Client SDK Generator artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          pattern: client-sdk-generator-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Download npm package tarballs
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: npm-packages
+          path: npm-packages
+
+      - name: Configure npm registry
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > "$HOME/.npmrc"
+          echo "registry=https://registry.npmjs.org" >> "$HOME/.npmrc"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Publish npm packages as beta
+        run: |
+          for package in npm-packages/*.tgz; do
+            npm publish "$package" --tag beta --access public --provenance
+          done
+
       - name: Create GitHub release and tag
-        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda
+        run: |
+          shopt -s nullglob
+          assets=(release-assets/portone-client-sdk-generator-*)
+          if [ "${#assets[@]}" -eq 0 ]; then
+            echo "No release assets found" >&2
+            exit 1
+          fi
+          gh release create "$TAG_NAME" "${assets[@]}" \
+            --title "Client SDK Generator v$VERSION" \
+            --prerelease \
+            --generate-notes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          name: Client SDK Generator v${{ needs.build.outputs.version }}
-          tag_name: "@portone/client-sdk-generator@${{ needs.build.outputs.version }}"
-          draft: false
-          prerelease: true
-          files: |
-            portone-client-sdk-generator-*
-          fail_on_unmatched_files: true
-          generate_release_notes: true
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: "@portone/client-sdk-generator@${{ needs.build.outputs.version }}"
+          VERSION: ${{ needs.build.outputs.version }}
