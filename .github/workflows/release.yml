@@ -41,7 +41,7 @@ jobs:
 
       - name: Create Release Pull Request
         id: changesets-action
-        uses: changesets/action@e0145edc7d9d8679003495b11f87bd8ef63c0cba
+        uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf
         with:
           version: pnpm run version
           commit: "ci: release"
@@ -115,7 +115,7 @@ jobs:
           sudo apt-get install -y musl-tools
 
       - name: Install cargo-audit
-        uses: taiki-e/install-action@542cebaaed782771e619bd5609d97659d109c492
+        uses: taiki-e/install-action@1329c298aa20c3257846c9b2e0e55967df3e3c37
         if: matrix.code-target == 'linux-x64-musl'
         with:
           tool: cargo-audit
