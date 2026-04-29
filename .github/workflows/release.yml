@@ -32,8 +32,7 @@ jobs:
       - name: Setup Node.js 22.x
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
-          node-version: 22
-          package-manager-cache: false
+          node-version: 24
 
       - name: Install pnpm
         uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
@@ -253,9 +252,8 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
-          package-manager-cache: false
 
       - name: Install pnpm
         uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
@@ -326,6 +324,14 @@ jobs:
         with:
           name: release-notes
           path: .
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 24
+
+      - name: Update npm
+        run: npm install -g npm@latest
 
       - name: Publish npm packages as latest
         run: |
