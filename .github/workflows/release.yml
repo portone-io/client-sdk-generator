@@ -165,7 +165,7 @@ jobs:
 
       # Upload the Client SDK Generator binary as a build artifact
       - name: Upload Client SDK Generator artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: client-sdk-generator-${{ matrix.target }}
           path: ./dist/portone-client-sdk-generator-*
@@ -222,7 +222,7 @@ jobs:
 
       # Upload the Client SDK Generator binary as a build artifact
       - name: Upload Client SDK Generator artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: client-sdk-generator-${{ matrix.target }}
           path: ./dist/portone-client-sdk-generator-*
@@ -275,7 +275,7 @@ jobs:
           done
 
       - name: Upload npm package tarballs
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: npm-packages
           path: npm-packages/*.tgz
@@ -287,7 +287,7 @@ jobs:
           VERSION: ${{ needs.build-binaries.outputs.version }}
 
       - name: Upload release notes
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: release-notes
           path: RELEASE_NOTES
