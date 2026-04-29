@@ -22,13 +22,19 @@ env:
   RUST_LOG: info
   RUST_BACKTRACE: 1
 
+permissions: {}
+
 jobs:
   format-js:
     name: Check JS Files
     runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
       - name: Free Disk Space
         uses: ./.github/actions/free-disk-space
       - name: Cache pnpm modules
