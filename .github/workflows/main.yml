@@ -26,6 +26,10 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
       - name: Support longpaths
         run: git config core.longpaths true
       - name: Checkout repository
