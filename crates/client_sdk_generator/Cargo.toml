@@ -12,6 +12,7 @@ better_scoped_tls = { workspace = true }
 client_sdk_dart_codegen = { workspace = true }
 client_sdk_kotlin_codegen = { workspace = true }
 client_sdk_schema = { workspace = true }
+client_sdk_swift_codegen = { workspace = true }
 client_sdk_ts_codegen = { workspace = true }
 clap = { version = "4.5.16", features = ["derive"] }
 serde_yaml_ng = { workspace = true }

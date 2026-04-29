@@ -487,6 +487,7 @@ dependencies = [
  "client_sdk_dart_codegen",
  "client_sdk_kotlin_codegen",
  "client_sdk_schema",
+ "client_sdk_swift_codegen",
  "client_sdk_ts_codegen",
  "serde_yaml_ng",
 ]
@@ -511,6 +512,15 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml_ng",
+]
+
+[[package]]
+name = "client_sdk_swift_codegen"
+version = "0.1.0"
+dependencies = [
+ "client_sdk_schema",
+ "client_sdk_utils",
+ "convert_case",
 ]
 
 [[package]]
