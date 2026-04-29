@@ -33,7 +33,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - name: Free Disk Space
@@ -56,7 +56,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout PR Branch
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - name: Free Disk Space
@@ -83,7 +83,7 @@ jobs:
           - os: ubuntu-24.04-arm
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - name: Free Disk Space
