@@ -71,7 +71,7 @@ jobs:
 
       - name: Check Client SDK Generator version changes
         id: client-sdk-generator-version-changed
-        uses: EndBug/version-check@36ff30f37c7deabe56a30caa043d127be658c425
+        uses: EndBug/version-check@095362f3cd50f690c8fa0e6afeea81834bd8d320
         with:
           diff-search: true
           file-name: packages/@portone/client-sdk-generator/package.json
