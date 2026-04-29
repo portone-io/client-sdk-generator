@@ -20,10 +20,10 @@ jobs:
     outputs:
       version: ${{ env.version }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Setup Node.js 22.x
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22
 
@@ -65,7 +65,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Install Rust toolchain
         run: rustup target add ${{ matrix.target }}
@@ -77,7 +77,7 @@ jobs:
           sudo apt-get install -y musl-tools
 
       - name: Install cargo-audit
-        uses: taiki-e/install-action@9ba3ac3fd006a70c6e186a683577abc1ccf0ff3a # v2.54.0
+        uses: taiki-e/install-action@9ba3ac3fd006a70c6e186a683577abc1ccf0ff3a
         if: matrix.code-target == 'linux-x64-musl'
         with:
           tool: cargo-audit
@@ -107,7 +107,7 @@ jobs:
 
       # Upload the Client SDK Generator binary as a build artifact
       - name: Upload Client SDK Generator artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: client-sdk-generator-${{ matrix.target }}
           path: ./dist/portone-client-sdk-generator-*
@@ -138,7 +138,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Set jemalloc page size for linux-arm64
         if: matrix.code-target == 'linux-arm64'
@@ -160,7 +160,7 @@ jobs:
 
       # Upload the Client SDK Generator binary as a build artifact
       - name: Upload Client SDK Generator artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: client-sdk-generator-${{ matrix.target }}
           path: ./dist/portone-client-sdk-generator-*
@@ -177,21 +177,21 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Download Client SDK Generator artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.6.2
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           pattern: client-sdk-generator-*
           merge-multiple: true
       - name: Install Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
 
       - name: Install pnpm
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
 
       - name: Set beta version
         run: node packages/@portone/client-sdk-generator/scripts/update-beta-version.js
@@ -208,7 +208,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub release and tag
-        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
+        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

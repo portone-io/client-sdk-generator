@@ -8,7 +8,7 @@ runs:
   steps:
     - name: Free Disk Space (Ubuntu)
       if: runner.os == 'Linux'
-      uses: xc2/free-disk-space@fbe203b3788f2bebe2c835a15925da303eaa5efe # v1.0.0
+      uses: xc2/free-disk-space@fbe203b3788f2bebe2c835a15925da303eaa5efe
       with:
         # We need to reclaim some space, but uninstalling everyting takes
         # too long. So we'll just remove some of the larger packages.
