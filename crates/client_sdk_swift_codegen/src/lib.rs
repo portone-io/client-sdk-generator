@@ -557,7 +557,8 @@ impl ResourceProcessor {
                 }
             };
 
-            let mut file_path = file_base_path.join(path.rsplit_once('/').map(|(dir, _)| dir).unwrap_or(""));
+            let mut file_path =
+                file_base_path.join(path.rsplit_once('/').map(|(dir, _)| dir).unwrap_or(""));
             std::fs::create_dir_all(&file_path).unwrap();
             file_path = file_path.join(&final_name);
             file_path.set_extension("swift");

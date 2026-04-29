@@ -27,7 +27,11 @@ impl fmt::Display for Intersection {
         }
 
         // Struct declaration with flattened fields
-        writeln!(f, "public struct {name}: Codable {{", name = self.name.as_ref())?;
+        writeln!(
+            f,
+            "public struct {name}: Codable {{",
+            name = self.name.as_ref()
+        )?;
         {
             let indent = Indent(1);
 
@@ -69,7 +73,11 @@ impl fmt::Display for Intersection {
             write!(f, "{indent}public init(")?;
             for (i, field) in self.fields.iter().enumerate() {
                 let separator = if i > 0 { ", " } else { "" };
-                let nullable = if field.value_type.is_required { "" } else { "?" };
+                let nullable = if field.value_type.is_required {
+                    ""
+                } else {
+                    "?"
+                };
                 let default_value = if field.value_type.is_required {
                     ""
                 } else {

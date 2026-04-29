@@ -21,7 +21,11 @@ impl fmt::Display for Object {
 
         if self.fields.is_empty() && !self.is_one_of {
             // Empty object case
-            writeln!(f, "public struct {name}: Codable {{", name = self.name.as_ref())?;
+            writeln!(
+                f,
+                "public struct {name}: Codable {{",
+                name = self.name.as_ref()
+            )?;
             {
                 let indent = Indent(1);
                 writeln!(f, "{indent}public init() {{}}")?;
@@ -29,7 +33,11 @@ impl fmt::Display for Object {
             writeln!(f, "}}")
         } else if self.is_one_of {
             // OneOf (enum with associated values) case
-            writeln!(f, "public enum {name}: Codable {{", name = self.name.as_ref())?;
+            writeln!(
+                f,
+                "public enum {name}: Codable {{",
+                name = self.name.as_ref()
+            )?;
             {
                 let indent = Indent(1);
                 for field in self.fields.iter() {
@@ -72,7 +80,10 @@ impl fmt::Display for Object {
                 writeln!(f, "{indent}public init(from decoder: Decoder) throws {{")?;
                 {
                     let indent = Indent(2);
-                    writeln!(f, "{indent}let container = try decoder.container(keyedBy: CodingKeys.self)")?;
+                    writeln!(
+                        f,
+                        "{indent}let container = try decoder.container(keyedBy: CodingKeys.self)"
+                    )?;
                     for (i, field) in self.fields.iter().enumerate() {
                         let field_type = if field.value_type.is_list {
                             format!("[{}]", field.value_type.scalar.to_swift_type())
@@ -94,13 +105,20 @@ impl fmt::Display for Object {
                         }
                         {
                             let indent = Indent(3);
-                            writeln!(f, "{indent}self = .{field_name}(value)", field_name = field.name.as_ref())?;
+                            writeln!(
+                                f,
+                                "{indent}self = .{field_name}(value)",
+                                field_name = field.name.as_ref()
+                            )?;
                         }
                     }
                     writeln!(f, "{indent}}} else {{")?;
                     {
                         let indent = Indent(3);
-                        writeln!(f, "{indent}throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: \"No valid case found\"))")?;
+                        writeln!(
+                            f,
+                            "{indent}throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: \"No valid case found\"))"
+                        )?;
                     }
                     writeln!(f, "{indent}}}")?;
                 }
@@ -108,10 +126,16 @@ impl fmt::Display for Object {
                 writeln!(f)?;
 
                 // Custom Encodable encode
-                writeln!(f, "{indent}public func encode(to encoder: Encoder) throws {{")?;
+                writeln!(
+                    f,
+                    "{indent}public func encode(to encoder: Encoder) throws {{"
+                )?;
                 {
                     let indent = Indent(2);
-                    writeln!(f, "{indent}var container = encoder.container(keyedBy: CodingKeys.self)")?;
+                    writeln!(
+                        f,
+                        "{indent}var container = encoder.container(keyedBy: CodingKeys.self)"
+                    )?;
                     writeln!(f, "{indent}switch self {{")?;
                     for field in self.fields.iter() {
                         let indent = Indent(2);
@@ -136,7 +160,11 @@ impl fmt::Display for Object {
             writeln!(f, "}}")
         } else {
             // Regular struct case
-            writeln!(f, "public struct {name}: Codable {{", name = self.name.as_ref())?;
+            writeln!(
+                f,
+                "public struct {name}: Codable {{",
+                name = self.name.as_ref()
+            )?;
             {
                 let indent = Indent(1);
                 // Properties
@@ -177,7 +205,11 @@ impl fmt::Display for Object {
                 write!(f, "{indent}public init(")?;
                 for (i, field) in self.fields.iter().enumerate() {
                     let separator = if i > 0 { ", " } else { "" };
-                    let nullable = if field.value_type.is_required { "" } else { "?" };
+                    let nullable = if field.value_type.is_required {
+                        ""
+                    } else {
+                        "?"
+                    };
                     let default_value = if field.value_type.is_required {
                         ""
                     } else {

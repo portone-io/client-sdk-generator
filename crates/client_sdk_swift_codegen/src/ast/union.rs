@@ -36,7 +36,11 @@ impl fmt::Display for Union {
         }
 
         // Enum declaration with associated values
-        writeln!(f, "public enum {name}: Codable {{", name = self.name.as_ref())?;
+        writeln!(
+            f,
+            "public enum {name}: Codable {{",
+            name = self.name.as_ref()
+        )?;
         {
             let indent = Indent(1);
 
@@ -65,9 +69,15 @@ impl fmt::Display for Union {
                     let variant_name = decapitalize_first(variant.name.as_ref());
                     let type_name = variant.type_name.name.as_ref();
                     if i == 0 {
-                        writeln!(f, "{indent}if let value = try? {type_name}(from: decoder) {{")?;
+                        writeln!(
+                            f,
+                            "{indent}if let value = try? {type_name}(from: decoder) {{"
+                        )?;
                     } else {
-                        writeln!(f, "{indent}}} else if let value = try? {type_name}(from: decoder) {{")?;
+                        writeln!(
+                            f,
+                            "{indent}}} else if let value = try? {type_name}(from: decoder) {{"
+                        )?;
                     }
                     {
                         let indent = Indent(3);
@@ -77,7 +87,10 @@ impl fmt::Display for Union {
                 writeln!(f, "{indent}}} else {{")?;
                 {
                     let indent = Indent(3);
-                    writeln!(f, "{indent}throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: \"No matching type found\"))")?;
+                    writeln!(
+                        f,
+                        "{indent}throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: \"No matching type found\"))"
+                    )?;
                 }
                 writeln!(f, "{indent}}}")?;
             }
@@ -85,7 +98,10 @@ impl fmt::Display for Union {
             writeln!(f)?;
 
             // Custom Encodable encode
-            writeln!(f, "{indent}public func encode(to encoder: Encoder) throws {{")?;
+            writeln!(
+                f,
+                "{indent}public func encode(to encoder: Encoder) throws {{"
+            )?;
             {
                 let indent = Indent(2);
                 writeln!(f, "{indent}switch self {{")?;
