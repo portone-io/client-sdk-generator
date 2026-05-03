@@ -109,6 +109,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout repository
@@ -332,7 +335,7 @@ jobs:
 
       - name: Publish npm packages as latest
         run: |
-          for package in npm-packages/*.tgz; do
+          for package in ./npm-packages/*.tgz; do
             npm publish "$package" --tag latest --access public --provenance
           done
 
