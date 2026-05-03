@@ -309,6 +309,11 @@ jobs:
       contents: write # Required to create the GitHub release and tag.
       id-token: write # Required for npm provenance during publish.
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
       - name: Download Client SDK Generator artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
