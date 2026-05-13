@@ -35,7 +35,7 @@ jobs:
           node-version: 24
 
       - name: Install pnpm
-        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
+        uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -131,7 +131,7 @@ jobs:
           sudo apt-get install -y musl-tools
 
       - name: Install cargo-audit
-        uses: taiki-e/install-action@1329c298aa20c3257846c9b2e0e55967df3e3c37
+        uses: taiki-e/install-action@cca35edeb1d01366c2843b68fc3ca441446d73d3
         if: matrix.code-target == 'linux-x64-musl'
         with:
           tool: cargo-audit
@@ -259,7 +259,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Install pnpm
-        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
+        uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d
 
       - name: Update npm
         run: npm install -g npm@latest

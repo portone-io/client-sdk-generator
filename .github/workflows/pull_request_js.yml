@@ -44,7 +44,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-
-      - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
+      - uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d
       - name: Run CI check
         run: |
           pnpm i
