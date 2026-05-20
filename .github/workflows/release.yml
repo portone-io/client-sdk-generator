@@ -35,14 +35,14 @@ jobs:
           node-version: 24
 
       - name: Install pnpm
-        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Create Release Pull Request
         id: changesets-action
-        uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf
+        uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b
         with:
           version: pnpm run version
           commit: "ci: release"
@@ -131,7 +131,7 @@ jobs:
           sudo apt-get install -y musl-tools
 
       - name: Install cargo-audit
-        uses: taiki-e/install-action@1329c298aa20c3257846c9b2e0e55967df3e3c37
+        uses: taiki-e/install-action@3235f8901fd37ffed0052b276cec25a362fb82e9
         if: matrix.code-target == 'linux-x64-musl'
         with:
           tool: cargo-audit
@@ -259,7 +259,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Install pnpm
-        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
 
       - name: Update npm
         run: npm install -g npm@latest
