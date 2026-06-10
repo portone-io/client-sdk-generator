@@ -32,7 +32,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           persist-credentials: false
       - name: Free Disk Space
@@ -44,7 +44,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-
-      - uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
       - name: Run CI check
         run: |
           pnpm i
