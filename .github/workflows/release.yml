@@ -25,24 +25,24 @@ jobs:
       pull-requests: write # Required to open or update the release pull request.
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Setup Node.js 22.x
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24
 
       - name: Install pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Create Release Pull Request
         id: changesets-action
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
           version: pnpm run version
           commit: "ci: release"
@@ -65,13 +65,13 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Check Client SDK Generator version changes
         id: client-sdk-generator-version-changed
-        uses: EndBug/version-check@095362f3cd50f690c8fa0e6afeea81834bd8d320
+        uses: EndBug/version-check@095362f3cd50f690c8fa0e6afeea81834bd8d320 # v3.0.0
         with:
           diff-search: true
           file-name: packages/@portone/client-sdk-generator/package.json
@@ -115,7 +115,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -131,7 +131,7 @@ jobs:
           sudo apt-get install -y musl-tools
 
       - name: Install cargo-audit
-        uses: taiki-e/install-action@b8cecb83565409bcc297b2df6e77f030b2a468d5
+        uses: taiki-e/install-action@b8cecb83565409bcc297b2df6e77f030b2a468d5 # v2.82.0
         if: matrix.code-target == 'linux-x64-musl'
         with:
           tool: cargo-audit
@@ -168,7 +168,7 @@ jobs:
 
       # Upload the Client SDK Generator binary as a build artifact
       - name: Upload Client SDK Generator artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: client-sdk-generator-${{ matrix.target }}
           path: ./dist/portone-client-sdk-generator-*
@@ -197,7 +197,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -225,7 +225,7 @@ jobs:
 
       # Upload the Client SDK Generator binary as a build artifact
       - name: Upload Client SDK Generator artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: client-sdk-generator-${{ matrix.target }}
           path: ./dist/portone-client-sdk-generator-*
@@ -243,26 +243,23 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Download Client SDK Generator artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: client-sdk-generator-*
           merge-multiple: true
       - name: Install Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
       - name: Install pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
-
-      - name: Update npm
-        run: npm install -g npm@latest
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -278,7 +275,7 @@ jobs:
           done
 
       - name: Upload npm package tarballs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: npm-packages
           path: npm-packages/*.tgz
@@ -290,7 +287,7 @@ jobs:
           VERSION: ${{ needs.build-binaries.outputs.version }}
 
       - name: Upload release notes
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release-notes
           path: RELEASE_NOTES
@@ -307,42 +304,83 @@ jobs:
     environment: npm-publish
     permissions:
       contents: write # Required to create the GitHub release and tag.
-      id-token: write # Required for npm provenance during publish.
+      id-token: write # Required for npm trusted staging and provenance.
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Download Client SDK Generator artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: client-sdk-generator-*
           path: release-assets
           merge-multiple: true
 
       - name: Download npm package tarballs
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: npm-packages
           path: npm-packages
 
       - name: Download release notes
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: release-notes
           path: .
 
       - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24
 
-      - name: Publish npm packages as latest
+      - name: Stage npm packages for maintainer approval
+        env:
+          VERSION: ${{ needs.build-binaries.outputs.version }}
         run: |
-          for package in ./npm-packages/*.tgz; do
-            npm publish "$package" --tag latest --access public --provenance
+          set -euo pipefail
+          shopt -s nullglob
+
+          # Validate the full artifact set before submitting any package.
+          platform_names=$(jq -er '.optionalDependencies | keys[]' packages/@portone/client-sdk-generator/package.json)
+          mapfile -t platform_names <<< "$platform_names"
+          packages=(npm-packages/*.tgz)
+          wrapper="npm-packages/portone-client-sdk-generator-${VERSION}.tgz"
+          expected_count=$(( ${#platform_names[@]} + 1 ))
+          if [[ ! -f "$wrapper" || "${#packages[@]}" -ne "$expected_count" ]]; then
+            echo "Unexpected npm artifacts for $VERSION; no packages were staged." >&2
+            exit 1
+          fi
+
+          platform_packages=()
+          for name in "${platform_names[@]}"; do
+            package="npm-packages/${name#@}-${VERSION}.tgz"
+            package="${package/portone\//portone-}"
+            if [[ ! -f "$package" ]]; then
+              echo "Missing expected npm artifact: $package; no packages were staged." >&2
+              exit 1
+            fi
+            platform_packages+=("$package")
           done
+
+          # The wrapper depends on all platform packages at this exact version.
+          for package in "${platform_packages[@]}" "$wrapper"; do
+            if ! npm exec --yes --package=npm@11.21.2 -- npm stage publish "$package" --registry https://registry.npmjs.org --tag latest --access public --provenance; then
+              {
+                printf '### npm staging failed for v%s\n\n' "$VERSION"
+                printf 'Submission stopped at `%s`. Earlier submissions may still be staged.\n\n' "$package"
+                echo 'Before retrying, check the exact version in npm Staged Packages. A maintainer can reject the prior staging entries for this version before rerunning the job, or verify the entries and submit only the missing tarballs. Do not approve the wrapper until all platform packages are available.'
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+          done
+
+          {
+            printf '### npm packages staged for approval: v%s\n\n' "$VERSION"
+            echo 'The npm packages are not live. Review them in [Staged Packages](https://www.npmjs.com/package/@portone/client-sdk-generator) or with `npm stage list` and `npm stage view <stage-id>`.'
+            echo 'Approve all platform packages first, then `@portone/client-sdk-generator`, using `npm stage approve <stage-id>` (2FA required).'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create GitHub @portone/client-sdk-generator release and tag
         run: |
