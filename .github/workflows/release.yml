@@ -307,7 +307,7 @@ jobs:
     environment: npm-publish
     permissions:
       contents: write # Required to create the GitHub release and tag.
-      id-token: write # Required for npm provenance during publish.
+      id-token: write # Required for npm trusted staging and provenance.
     steps:
       - name: Checkout Repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -338,11 +338,55 @@ jobs:
         with:
           node-version: 24
 
-      - name: Publish npm packages as latest
+      - name: Install npm with staged publishing support
+        run: npm install --global npm@11.21.2
+
+      - name: Stage npm packages for maintainer approval
+        env:
+          VERSION: ${{ needs.build-binaries.outputs.version }}
         run: |
-          for package in ./npm-packages/*.tgz; do
-            npm publish "$package" --tag latest --access public --provenance
+          set -euo pipefail
+          shopt -s nullglob
+
+          # Validate the full artifact set before submitting any package.
+          platform_names=$(jq -er '.optionalDependencies | keys[]' packages/@portone/client-sdk-generator/package.json)
+          mapfile -t platform_names <<< "$platform_names"
+          packages=(npm-packages/*.tgz)
+          wrapper="npm-packages/portone-client-sdk-generator-${VERSION}.tgz"
+          expected_count=$(( ${#platform_names[@]} + 1 ))
+          if [[ ! -f "$wrapper" || "${#packages[@]}" -ne "$expected_count" ]]; then
+            echo "Unexpected npm artifacts for $VERSION; no packages were staged." >&2
+            exit 1
+          fi
+
+          platform_packages=()
+          for name in "${platform_names[@]}"; do
+            package="npm-packages/${name#@}-${VERSION}.tgz"
+            package="${package/portone\//portone-}"
+            if [[ ! -f "$package" ]]; then
+              echo "Missing expected npm artifact: $package; no packages were staged." >&2
+              exit 1
+            fi
+            platform_packages+=("$package")
           done
+
+          # The wrapper depends on all platform packages at this exact version.
+          for package in "${platform_packages[@]}" "$wrapper"; do
+            if ! npm stage publish "$package" --registry https://registry.npmjs.org --tag latest --access public --provenance; then
+              {
+                printf '### npm staging failed for v%s\n\n' "$VERSION"
+                printf 'Submission stopped at `%s`. Earlier submissions may still be staged.\n\n' "$package"
+                echo 'Before retrying, check the exact version in npm Staged Packages. A maintainer can reject the prior staging entries for this version before rerunning the job, or verify the entries and submit only the missing tarballs. Do not approve the wrapper until all platform packages are available.'
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+          done
+
+          {
+            printf '### npm packages staged for approval: v%s\n\n' "$VERSION"
+            echo 'The npm packages are not live. Review them in [Staged Packages](https://www.npmjs.com/package/@portone/client-sdk-generator) or with `npm stage list` and `npm stage view <stage-id>`.'
+            echo 'Approve all platform packages first, then `@portone/client-sdk-generator`, using `npm stage approve <stage-id>` (2FA required).'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create GitHub @portone/client-sdk-generator release and tag
         run: |
