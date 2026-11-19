@@ -5,7 +5,7 @@
   "license": "AGPL-3.0-or-later",
   "author": "portone-dx <support@portone.io>",
   "repository": "https://github.com/portone-io/client-sdk-generator",
-  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a",
+  "packageManager": "pnpm@12.21.0+sha512.66fd8278ee28935ce951792d34367ff3af5c432a2756445823029533835b8da529bbe0be5130afd56ed0713fb8789e47bad82d93bd5ae2fe54b15562d6276ef0",
   "scripts": {
     "version": "changeset version && pnpm i --lockfile-only",
     "ci": "biome ci"
