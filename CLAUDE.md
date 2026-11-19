@@ -51,7 +51,7 @@ cargo lint
 cargo clippy --workspace --all-targets -- --deny warnings
 
 # JavaScript/TypeScript formatting and linting (using Biome)
-pnpm ci
+pnpm run ci
 # or
 biome ci
 ```
