@@ -1,5 +1,11 @@
 # @portone/client-sdk-generator
 
+## 0.4.1
+
+### Patch Changes
+
+- [#55](https://github.com/portone-io/client-sdk-generator/pull/55) [`a5219e0`](https://github.com/portone-io/client-sdk-generator/commit/a5219e0d4a87ed6b1d1ed83ed5fed45ea92413e3) Thanks [@CirnoV](https://github.com/CirnoV)! - \[Dart, Kotlin, Swift\] request 필드에 인라인으로 정의된, 이름 있는 객체 참조 union의 모델을 생성하도록 수정
+
 ## 0.4.0
 
 ### Minor Changes
