@@ -2,4 +2,4 @@
 "@portone/client-sdk-generator": patch
 ---
 
-Generate Dart, Kotlin, and Swift models for named inline request unions of object references, including the subscription registration bypass. Keep the selected object's JSON unchanged without adding a discriminator.
+\[Dart, Kotlin, Swift\] request 필드에 인라인으로 정의된, 이름 있는 객체 참조 union의 모델을 생성하도록 수정
