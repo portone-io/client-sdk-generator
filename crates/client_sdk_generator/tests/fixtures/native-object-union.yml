@@ -1,0 +1,60 @@
+flags: {}
+methods: {}
+resources:
+  entity:
+    ChoiceA:
+      type: object
+      properties:
+        shared_pg:
+          type: resourceRef
+          $ref: "#/resources/entity/FirstOptions"
+          optional: true
+        both:
+          type: resourceRef
+          $ref: "#/resources/entity/SharedOptions"
+          optional: true
+    ChoiceB:
+      type: object
+      properties:
+        shared_pg:
+          type: resourceRef
+          $ref: "#/resources/entity/SecondOptions"
+          optional: true
+        both:
+          type: resourceRef
+          $ref: "#/resources/entity/SharedOptions"
+          optional: true
+    FirstOptions:
+      type: object
+      properties:
+        logo_url: { type: string, optional: true }
+    SecondOptions:
+      type: object
+      properties:
+        opt_in: { type: boolean, optional: true }
+        count: { type: integer, optional: true }
+        modes:
+          type: array
+          optional: true
+          items: { type: string }
+    SharedOptions:
+      type: object
+      properties:
+        item_code: { type: string, optional: true }
+    ExistingUnion:
+      type: union
+      types:
+        - { type: resourceRef, $ref: "#/resources/entity/ChoiceA" }
+        - { type: resourceRef, $ref: "#/resources/entity/ChoiceB" }
+  request:
+    SyntheticRequest:
+      type: object
+      properties:
+        bypass:
+          name: RequestBypass
+          type: union
+          optional: true
+          description: Select the bypass for this request.
+          types:
+            - { type: resourceRef, $ref: "#/resources/entity/ChoiceA" }
+            - { type: resourceRef, $ref: "#/resources/entity/ChoiceB" }

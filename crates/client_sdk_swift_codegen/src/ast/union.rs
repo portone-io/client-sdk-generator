@@ -17,6 +17,7 @@ pub struct Union {
     pub name: Identifier,
     pub description: Option<Comment>,
     pub variants: Vec<UnionVariant>,
+    pub match_json_shape: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -65,18 +66,26 @@ impl fmt::Display for Union {
             writeln!(f, "{indent}public init(from decoder: Decoder) throws {{")?;
             {
                 let indent = Indent(2);
+                if self.match_json_shape {
+                    writeln!(f, "{indent}let shape = try JSONShape(from: decoder)")?;
+                }
                 for (i, variant) in self.variants.iter().enumerate() {
                     let variant_name = decapitalize_first(variant.name.as_ref());
                     let type_name = variant.type_name.name.as_ref();
+                    let shape_check = if self.match_json_shape {
+                        ", (try? JSONShape.of(value)) == shape"
+                    } else {
+                        ""
+                    };
                     if i == 0 {
                         writeln!(
                             f,
-                            "{indent}if let value = try? {type_name}(from: decoder) {{"
+                            "{indent}if let value = try? {type_name}(from: decoder){shape_check} {{"
                         )?;
                     } else {
                         writeln!(
                             f,
-                            "{indent}}} else if let value = try? {type_name}(from: decoder) {{"
+                            "{indent}}} else if let value = try? {type_name}(from: decoder){shape_check} {{"
                         )?;
                     }
                     {
@@ -117,9 +126,53 @@ impl fmt::Display for Union {
             }
             writeln!(f, "{indent}}}")?;
         }
+        if self.match_json_shape {
+            write!(f, "{JSON_SHAPE}")?;
+        }
         writeln!(f, "}}")
     }
 }
+
+// Swift's synthesized Decodable accepts unknown keys. Compare nested key/array
+// shapes as well as successfully decoding the candidate to avoid losing fields.
+const JSON_SHAPE: &str = r#"
+    private enum JSONShape: Decodable, Equatable {
+        case object([String: JSONShape])
+        case array([JSONShape])
+        case scalar
+        case null
+
+        private struct Key: CodingKey {
+            let stringValue: String
+            let intValue: Int? = nil
+
+            init(stringValue: String) { self.stringValue = stringValue }
+            init?(intValue: Int) { return nil }
+        }
+
+        init(from decoder: Decoder) throws {
+            if let container = try? decoder.container(keyedBy: Key.self) {
+                var fields: [String: JSONShape] = [:]
+                for key in container.allKeys {
+                    fields[key.stringValue] = try container.decode(JSONShape.self, forKey: key)
+                }
+                self = .object(fields)
+            } else if var container = try? decoder.unkeyedContainer() {
+                var elements: [JSONShape] = []
+                while !container.isAtEnd {
+                    elements.append(try container.decode(JSONShape.self))
+                }
+                self = .array(elements)
+            } else {
+                self = try decoder.singleValueContainer().decodeNil() ? .null : .scalar
+            }
+        }
+
+        static func of<Value: Encodable>(_ value: Value) throws -> JSONShape {
+            try JSONDecoder().decode(JSONShape.self, from: JSONEncoder().encode(value))
+        }
+    }
+"#;
 
 fn decapitalize_first(s: &str) -> String {
     let mut chars = s.chars();
@@ -138,6 +191,7 @@ mod tests {
         let union = Union {
             name: Identifier::try_from("LoadableUIType").unwrap(),
             description: None,
+            match_json_shape: false,
             variants: vec![
                 UnionVariant {
                     name: Identifier::try_from("PaymentUIType").unwrap(),
