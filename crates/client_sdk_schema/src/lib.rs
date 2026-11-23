@@ -18,11 +18,6 @@ pub struct Schema {
 }
 
 impl Schema {
-    /// Expose named top-level request fields that are unions of object references as resources.
-    ///
-    /// A reference replaces the request field, retaining its wire key and optionality.
-    /// TypeScript still consumes the original schema. The Swift backend uses the returned
-    /// paths to distinguish these structurally decoded unions from existing named unions.
     pub fn lift_native_request_object_unions(&mut self) -> HashSet<String> {
         let index = self.build_resource_index();
         let Resource::SubResources(sections) = &mut self.resources else {

@@ -133,8 +133,6 @@ impl fmt::Display for Union {
     }
 }
 
-// Swift's synthesized Decodable accepts unknown keys. Compare nested key/array
-// shapes as well as successfully decoding the candidate to avoid losing fields.
 const JSON_SHAPE: &str = r#"
     private enum JSONShape: Decodable, Equatable {
         case object([String: JSONShape])
@@ -154,7 +152,10 @@ const JSON_SHAPE: &str = r#"
             if let container = try? decoder.container(keyedBy: Key.self) {
                 var fields: [String: JSONShape] = [:]
                 for key in container.allKeys {
-                    fields[key.stringValue] = try container.decode(JSONShape.self, forKey: key)
+                    let field = try container.decode(JSONShape.self, forKey: key)
+                    if field != .null {
+                        fields[key.stringValue] = field
+                    }
                 }
                 self = .object(fields)
             } else if var container = try? decoder.unkeyedContainer() {
