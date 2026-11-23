@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use indexmap::IndexMap;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -16,6 +18,63 @@ pub struct Schema {
 }
 
 impl Schema {
+    pub fn lift_native_request_object_unions(&mut self) -> HashSet<String> {
+        let index = self.build_resource_index();
+        let Resource::SubResources(sections) = &mut self.resources else {
+            return HashSet::new();
+        };
+        let Some(Resource::SubResources(requests)) = sections.get_mut("request") else {
+            return HashSet::new();
+        };
+        let mut lifted = Vec::new();
+        for request in requests.values_mut() {
+            let Resource::Parameter(Parameter {
+                r#type: ParameterType::Object { properties, .. },
+                ..
+            }) = request
+            else {
+                continue;
+            };
+            for property in properties.values_mut() {
+                let (
+                    Some(name),
+                    ParameterType::Union {
+                        types,
+                        hide_if_empty: false,
+                    },
+                ) = (&property.name, &property.r#type)
+                else {
+                    continue;
+                };
+                if types.is_empty()
+                    || !types.iter().all(|variant| {
+                        matches!(&variant.r#type, ParameterType::ResourceRef(reference)
+                            if index.get(reference.resource_ref()).is_some_and(|target|
+                                matches!(target.r#type, ParameterType::Object { .. } | ParameterType::EmptyObject)))
+                    })
+                {
+                    continue;
+                }
+                let path = format!("request/{name}");
+                let mut resource = property.clone();
+                resource.optional = false;
+                lifted.push((name.clone(), path.clone(), resource));
+                property.r#type = ParameterType::ResourceRef(ResourceRef::new(&path));
+            }
+        }
+        lifted
+            .into_iter()
+            .map(|(name, path, resource)| {
+                assert!(
+                    !requests.contains_key(&name),
+                    "native inline union resource conflicts with {path}"
+                );
+                requests.insert(name, Resource::Parameter(resource));
+                path
+            })
+            .collect()
+    }
+
     pub fn build_resource_index(&self) -> IndexMap<String, Parameter> {
         let mut index = IndexMap::new();
         Schema::collect_resources("", &self.resources, &mut index);

@@ -62,7 +62,8 @@ fn main() {
                 }
                 Generator::Dart => {
                     println!("Generating Dart code");
-                    let schema: Schema = load_schema(&args.schema);
+                    let mut schema = load_schema(&args.schema);
+                    schema.lift_native_request_object_unions();
                     let resource_index = schema.build_resource_index();
                     RESOURCE_INDEX.set(&resource_index, || {
                         client_sdk_dart_codegen::generate_resources_module(
@@ -80,7 +81,8 @@ fn main() {
                 }
                 Generator::Kotlin => {
                     println!("Generating Kotlin code");
-                    let schema: Schema = load_schema(&args.schema);
+                    let mut schema = load_schema(&args.schema);
+                    schema.lift_native_request_object_unions();
                     let resource_index = schema.build_resource_index();
                     RESOURCE_INDEX.set(&resource_index, || {
                         client_sdk_kotlin_codegen::generate_resources_module(
@@ -105,13 +107,15 @@ fn main() {
                 }
                 Generator::Swift => {
                     println!("Generating Swift code");
-                    let schema: Schema = load_schema(&args.schema);
+                    let mut schema = load_schema(&args.schema);
+                    let lifted_unions = schema.lift_native_request_object_unions();
                     let resource_index = schema.build_resource_index();
                     RESOURCE_INDEX.set(&resource_index, || {
                         client_sdk_swift_codegen::generate_resources_module(
                             &schema.resources,
                             &out_dir,
                             "PortOneSDK",
+                            &lifted_unions,
                         );
                     });
                     // Optional: Run swiftformat if available

@@ -1,4 +1,7 @@
-use std::{collections::HashMap, path::Path};
+use std::{
+    collections::{HashMap, HashSet},
+    path::Path,
+};
 
 use ast::{
     Comment, CompositeType, Enum, EnumVariant, Identifier, Intersection, IntersectionConstituent,
@@ -366,6 +369,7 @@ impl ResourceProcessor {
                         _ => unreachable!(),
                     })
                     .collect(),
+                match_json_shape: false,
             })),
             ParameterType::Intersection {
                 types,
@@ -571,6 +575,7 @@ pub fn generate_resources_module(
     resource: &Resource,
     file_base_path: impl AsRef<Path>,
     module_name: &str,
+    lifted_unions: &HashSet<String>,
 ) {
     let mut processor = ResourceProcessor {
         entities: HashMap::new(),
@@ -580,6 +585,11 @@ pub fn generate_resources_module(
             if matches!(key.as_str(), "entity" | "request" | "response") {
                 processor.process_resource(value, &mut vec![key.clone()]);
             }
+        }
+    }
+    for path in lifted_unions {
+        if let Some(Entity::Union(union)) = processor.entities.get_mut(path) {
+            union.match_json_shape = true;
         }
     }
     // Mobile-only transformations (iOS specific)
