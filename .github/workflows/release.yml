@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -57,8 +58,8 @@ jobs:
     permissions:
       contents: read
     outputs:
-      client-sdk-generator-version: ${{ steps.client-sdk-generator-version-changed.outputs.version }}
-      client-sdk-generator-version-changed: ${{ steps.client-sdk-generator-version-changed.outputs.changed }}
+      client-sdk-generator-version: ${{ steps.client-sdk-generator-version.outputs.version }}
+      client-sdk-generator-released: ${{ steps.client-sdk-generator-version.outputs.released }}
 
     steps:
       - name: Checkout Repo
@@ -66,20 +67,26 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check Client SDK Generator version changes
-        id: client-sdk-generator-version-changed
-        uses: EndBug/version-check@095362f3cd50f690c8fa0e6afeea81834bd8d320 # v3.0.0
-        with:
-          diff-search: true
-          file-name: packages/@portone/client-sdk-generator/package.json
+      - name: Check whether the Client SDK Generator version is released
+        id: client-sdk-generator-version
+        run: |
+          set -euo pipefail
+          version=$(jq -er '.version' packages/@portone/client-sdk-generator/package.json)
+          status=0
+          git ls-remote --exit-code --tags origin "refs/tags/@portone/client-sdk-generator@${version}" > /dev/null || status=$?
+          case "$status" in
+            0) released=true ;;
+            2) released=false ;;
+            *) exit "$status" ;;
+          esac
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "released=${released}" >> "$GITHUB_OUTPUT"
 
   # Building jobs
 
   build-binaries:
     needs: version
-    if: needs.version.outputs.client-sdk-generator-version-changed == 'true'
-    outputs:
-      version: ${{ needs.version.outputs.client-sdk-generator-version }}
+    if: needs.version.outputs.client-sdk-generator-released == 'false'
     strategy:
       matrix:
         include:
@@ -95,10 +102,10 @@ jobs:
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
             code-target: linux-arm64-musl
-          - os: macos-14
+          - os: macos-26
             target: x86_64-apple-darwin
             code-target: darwin-x64
-          - os: macos-14
+          - os: macos-26
             target: aarch64-apple-darwin
             code-target: darwin-arm64
 
@@ -174,7 +181,7 @@ jobs:
   # Build GNU/Linux binaries in Docker, using Debian 11 (bullseye), to support older versions of glibc.
   build-binaries-gnu:
     needs: version
-    if: needs.version.outputs.client-sdk-generator-version-changed == 'true'
+    if: needs.version.outputs.client-sdk-generator-released == 'false'
     strategy:
       matrix:
         include:
@@ -230,17 +237,20 @@ jobs:
 
   # Publishing jobs
 
-  package-client-sdk-generator:
-    name: Package Client SDK Generator
+  publish-client-sdk-generator:
+    name: Publish Client SDK Generator
     runs-on: ubuntu-24.04
     needs:
+      - version
       - build-binaries
       - build-binaries-gnu
-    if: needs.build-binaries.outputs.version
+    environment: npm-publish
     permissions:
       contents: read
+      id-token: write # Required for npm trusted staging and provenance.
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Checkout Repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -249,59 +259,61 @@ jobs:
         with:
           pattern: client-sdk-generator-*
           merge-multiple: true
-      - name: Install Node.js
+
+      - name: Setup Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
 
       - name: Install pnpm
         uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
       - name: Generate npm packages
         run: node packages/@portone/client-sdk-generator/scripts/generate-packages.js
 
-      - name: Pack npm packages
-        run: |
-          mkdir npm-packages
-          for package in packages/@portone/*; do
-            npm pack "$package" --pack-destination npm-packages
-          done
-
-      - name: Upload npm package tarballs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: npm-packages
-          path: npm-packages/*.tgz
-          if-no-files-found: error
-
-      - name: Generate release notes
-        run: bash scripts/print-changelog.sh "$VERSION" > RELEASE_NOTES
+      - name: Stage npm packages for maintainer approval
+        id: stage
         env:
-          VERSION: ${{ needs.build-binaries.outputs.version }}
+          VERSION: ${{ needs.version.outputs.client-sdk-generator-version }}
+        run: |
+          set -euo pipefail
+          pnpm stage publish --recursive --no-git-checks --ignore-scripts --registry https://registry.npmjs.org --tag latest --access public --provenance --report-summary
+          staged=$(jq -r '.publishedPackages[] | "- `\(.id)`"' pnpm-publish-summary.json)
+          {
+            if [[ -z "$staged" ]]; then
+              printf '### npm packages are already published: v%s\n' "$VERSION"
+            else
+              printf '### npm packages staged for approval: v%s\n\n' "$VERSION"
+              printf '%s\n\n' "$staged"
+              echo 'The npm packages are not live. Review them in [Staged Packages](https://www.npmjs.com/package/@portone/client-sdk-generator) or with `npm stage list` and `npm stage view <stage-id>`.'
+              echo 'Approve all platform packages first, then `@portone/client-sdk-generator`, using `npm stage approve <stage-id>` (2FA required).'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload release notes
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: release-notes
-          path: RELEASE_NOTES
-          if-no-files-found: error
+      - name: Report npm staging failure
+        if: failure() && steps.stage.outcome == 'failure'
+        env:
+          VERSION: ${{ needs.version.outputs.client-sdk-generator-version }}
+        run: |
+          {
+            printf '### npm staging failed for v%s\n\n' "$VERSION"
+            if [[ -f pnpm-publish-summary.json ]]; then
+              echo 'Staged before the failure:'
+              echo
+              jq -r '.publishedPackages[] | "- `\(.id)`"' pnpm-publish-summary.json
+              echo
+            fi
+            echo 'Packages already live on npm are skipped on retry, but staged packages are not. Before retrying, a maintainer should reject the staging entries for this version in npm Staged Packages. Do not approve the wrapper until all platform packages are available.'
+          } >> "$GITHUB_STEP_SUMMARY"
 
-  publish-client-sdk-generator:
-    name: Publish Client SDK Generator
+  release-client-sdk-generator:
+    name: Release Client SDK Generator
     runs-on: ubuntu-24.04
     needs:
-      - build-binaries
-      - build-binaries-gnu
-      - package-client-sdk-generator
-    if: needs.build-binaries.outputs.version
-    environment: npm-publish
+      - version
+      - publish-client-sdk-generator
     permissions:
       contents: write # Required to create the GitHub release and tag.
-      id-token: write # Required for npm trusted staging and provenance.
     steps:
       - name: Checkout Repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -315,72 +327,18 @@ jobs:
           path: release-assets
           merge-multiple: true
 
-      - name: Download npm package tarballs
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: npm-packages
-          path: npm-packages
-
-      - name: Download release notes
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: release-notes
-          path: .
-
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version: 24
-
-      - name: Stage npm packages for maintainer approval
+      - name: Generate release notes
+        run: bash scripts/print-changelog.sh "$VERSION" > RELEASE_NOTES
         env:
-          VERSION: ${{ needs.build-binaries.outputs.version }}
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-
-          # Validate the full artifact set before submitting any package.
-          platform_names=$(jq -er '.optionalDependencies | keys[]' packages/@portone/client-sdk-generator/package.json)
-          mapfile -t platform_names <<< "$platform_names"
-          packages=(npm-packages/*.tgz)
-          wrapper="npm-packages/portone-client-sdk-generator-${VERSION}.tgz"
-          expected_count=$(( ${#platform_names[@]} + 1 ))
-          if [[ ! -f "$wrapper" || "${#packages[@]}" -ne "$expected_count" ]]; then
-            echo "Unexpected npm artifacts for $VERSION; no packages were staged." >&2
-            exit 1
-          fi
-
-          platform_packages=()
-          for name in "${platform_names[@]}"; do
-            package="npm-packages/${name#@}-${VERSION}.tgz"
-            package="${package/portone\//portone-}"
-            if [[ ! -f "$package" ]]; then
-              echo "Missing expected npm artifact: $package; no packages were staged." >&2
-              exit 1
-            fi
-            platform_packages+=("$package")
-          done
-
-          # The wrapper depends on all platform packages at this exact version.
-          for package in "${platform_packages[@]}" "$wrapper"; do
-            if ! npm exec --yes --package=npm@11.21.2 -- npm stage publish "$package" --registry https://registry.npmjs.org --tag latest --access public --provenance; then
-              {
-                printf '### npm staging failed for v%s\n\n' "$VERSION"
-                printf 'Submission stopped at `%s`. Earlier submissions may still be staged.\n\n' "$package"
-                echo 'Before retrying, check the exact version in npm Staged Packages. A maintainer can reject the prior staging entries for this version before rerunning the job, or verify the entries and submit only the missing tarballs. Do not approve the wrapper until all platform packages are available.'
-              } >> "$GITHUB_STEP_SUMMARY"
-              exit 1
-            fi
-          done
-
-          {
-            printf '### npm packages staged for approval: v%s\n\n' "$VERSION"
-            echo 'The npm packages are not live. Review them in [Staged Packages](https://www.npmjs.com/package/@portone/client-sdk-generator) or with `npm stage list` and `npm stage view <stage-id>`.'
-            echo 'Approve all platform packages first, then `@portone/client-sdk-generator`, using `npm stage approve <stage-id>` (2FA required).'
-          } >> "$GITHUB_STEP_SUMMARY"
+          VERSION: ${{ needs.version.outputs.client-sdk-generator-version }}
 
       - name: Create GitHub @portone/client-sdk-generator release and tag
         run: |
+          set -euo pipefail
+          if gh release view "$TAG_NAME" > /dev/null 2>&1; then
+            echo "Release $TAG_NAME already exists."
+            exit 0
+          fi
           shopt -s nullglob
           assets=(release-assets/portone-client-sdk-generator-*)
           if [ "${#assets[@]}" -eq 0 ]; then
@@ -388,10 +346,11 @@ jobs:
             exit 1
           fi
           gh release create "$TAG_NAME" "${assets[@]}" \
+            --target "$GITHUB_SHA" \
             --title "PortOne Client SDK Generator v$VERSION" \
             --notes-file RELEASE_NOTES \
             --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG_NAME: "@portone/client-sdk-generator@${{ needs.build-binaries.outputs.version }}"
-          VERSION: ${{ needs.build-binaries.outputs.version }}
+          TAG_NAME: "@portone/client-sdk-generator@${{ needs.version.outputs.client-sdk-generator-version }}"
+          VERSION: ${{ needs.version.outputs.client-sdk-generator-version }}

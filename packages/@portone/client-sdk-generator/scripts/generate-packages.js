@@ -110,8 +110,11 @@ function updateVersionInJsPackage(packageName) {
 
 function updateVersionInDependencies(dependencies, version) {
   if (dependencies) {
-    for (const dependency of Object.keys(dependencies)) {
-      if (dependency.startsWith("@portone/")) {
+    for (const [dependency, spec] of Object.entries(dependencies)) {
+      if (
+        dependency.startsWith("@portone/") &&
+        !spec.startsWith("workspace:")
+      ) {
         dependencies[dependency] = version;
       }
     }
