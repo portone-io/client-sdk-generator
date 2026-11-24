@@ -1,5 +1,11 @@
 # @portone/client-sdk-generator
 
+## 0.4.2
+
+### Patch Changes
+
+- [#58](https://github.com/portone-io/client-sdk-generator/pull/58) [`64d1f5f`](https://github.com/portone-io/client-sdk-generator/commit/64d1f5fecd7c4cf3029856a146d94a83975811cc) Thanks [@CirnoV](https://github.com/CirnoV)! - npm(npx)으로 설치했을 때 Linux, macOS에서 CLI 실행이 실패하던 문제 수정
+
 ## 0.4.1
 
 ### Patch Changes
