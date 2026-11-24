@@ -2,4 +2,4 @@ rules:
   concurrency-limits:
     ignore:
       # Release publishing intentionally serializes without cancellation to avoid partial npm publishes.
-      - release.yml:10
+      - release.yml:11
